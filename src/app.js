@@ -74,26 +74,51 @@ function bindDashboardActions() {
     });
   }
 
+  const methodSelect = document.querySelector("#log-method");
+
+  if (methodSelect) {
+    methodSelect.addEventListener("change", async event => {
+      const methodId = event.target.value;
+
+      const { renderMethodFields } = await import(
+        "./components/methodFields.js"
+      );
+
+      const dynamicContainer = document.querySelector(
+        "#dynamic-method-fields"
+      );
+
+      dynamicContainer.innerHTML = renderMethodFields(methodId);
+    });
+  }
+
   const addButton = document.querySelector("#add-exercise-log");
 
   if (addButton) {
     addButton.addEventListener("click", () => {
       const exerciseId = document.querySelector("#log-exercise").value;
+
       const methodId = document.querySelector("#log-method").value;
-      const load = document.querySelector("#log-load").value;
-      const reps = document.querySelector("#log-reps").value;
+
       const rpe = document.querySelector("#log-rpe").value;
+
       const pain = document.querySelector("#log-pain").value;
+
       const notes = document.querySelector("#log-notes").value;
+
+      const dynamicData = {};
+
+      document.querySelectorAll("[id^='dynamic-']").forEach(field => {
+        dynamicData[field.id.replace("dynamic-", "")] = field.value;
+      });
 
       addExerciseLog({
         exerciseId,
         methodId,
-        load,
-        reps,
         rpe,
         pain,
-        notes
+        notes,
+        data: dynamicData
       });
 
       renderApp();
