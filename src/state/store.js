@@ -22,11 +22,12 @@ export function clearSelectedSession() {
   store.selectedSessionId = null;
 }
 
-export function startSession(template) {
+export function startSession(sessionData = {}) {
   store.activeSession = {
     id: crypto.randomUUID(),
-    templateId: template.id,
-    name: template.name,
+    templateId: sessionData.templateId || null,
+    name: sessionData.name || "Untitled Session",
+    goal: sessionData.goal || "",
     startedAt: new Date().toISOString(),
     exercises: []
   };
