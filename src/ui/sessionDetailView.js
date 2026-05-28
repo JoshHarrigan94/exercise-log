@@ -77,7 +77,7 @@ export function renderSessionDetail() {
                 <strong>${getExerciseName(log.exerciseId)}</strong>
 
                 <small>
-                  ${formatMethodData(log.data)} ·
+                  ${formatMethodData(log.data, log.methodId)} ·
                   RPE ${log.rpe || "-"} ·
                   Pain ${log.pain || "0"}
                 </small>
