@@ -168,6 +168,37 @@ function bindHistoryActions() {
   });
 }
 
+function populateLoggerFromLog(log) {
+  const exerciseInput = document.querySelector("#log-exercise");
+  const methodInput = document.querySelector("#log-method");
+  const rpeInput = document.querySelector("#log-rpe");
+  const painInput = document.querySelector("#log-pain");
+  const notesInput = document.querySelector("#log-notes");
+
+  if (!exerciseInput || !methodInput) return;
+
+  exerciseInput.value = log.exerciseId;
+  methodInput.value = log.methodId;
+
+  methodInput.dispatchEvent(new Event("change", { bubbles: true }));
+
+  setTimeout(() => {
+    Object.entries(log.data || {}).forEach(([key, value]) => {
+      const field = document.querySelector(`#dynamic-${key}`);
+      if (field) field.value = value;
+    });
+
+    if (rpeInput) rpeInput.value = log.rpe || "";
+    if (painInput) painInput.value = log.pain || "";
+    if (notesInput) notesInput.value = log.notes || "";
+
+    const editingInput = document.querySelector("#editing-log-id");
+    if (editingInput) editingInput.value = log.id;
+
+    updateMethodPreview();
+  }, 0);
+}
+
 function bindLiveSessionActions() {
   const completeButton = document.querySelector(".complete-session-button");
 
@@ -193,6 +224,26 @@ function bindLiveSessionActions() {
     });
   }
 
+document.querySelectorAll("[data-edit-log-id]").forEach(button => {
+  button.addEventListener("click", () => {
+    const log = store.activeSession?.exercises.find(
+      item => item.id === button.dataset.editLogId
+    );
+
+    if (!log) return;
+
+    populateLoggerFromLog(log);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+document.querySelectorAll("[data-duplicate-log-id]").forEach(button => {
+  button.addEventListener("click", () => {
+    duplicateExerciseLog(button.dataset.duplicateLogId);
+    renderApp();
+  });
+});
+  
   document.querySelectorAll("[data-remove-log-id]").forEach(button => {
     button.addEventListener("click", () => {
       removeExerciseLog(button.dataset.removeLogId);
@@ -248,16 +299,24 @@ function bindLiveSessionActions() {
         dynamicData[field.id.replace("dynamic-", "")] = field.value;
       });
 
-      addExerciseLog({
-        exerciseId,
-        methodId,
-        rpe,
-        pain,
-        notes,
-        data: dynamicData
-      });
+      const editingLogId = document.querySelector("#editing-log-id")?.value;
 
-      renderApp();
+const logPayload = {
+  exerciseId,
+  methodId,
+  rpe,
+  pain,
+  notes,
+  data: dynamicData
+};
+
+if (editingLogId) {
+  updateExerciseLog(editingLogId, logPayload);
+} else {
+  addExerciseLog(logPayload);
+}
+
+renderApp();
     });
   }
 }
