@@ -1,3 +1,7 @@
+import {
+  updateMethodMemoryPanel,
+  bindMethodMemoryActions
+} from "./components/methodMemoryPanel.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { renderDashboard } from "./ui/dashboardView.js";
@@ -117,7 +121,7 @@ function bindDashboardActions() {
 
   const methodSelect = document.querySelector("#log-method");
 
-  if (methodSelect) {
+if (methodSelect) {
   methodSelect.addEventListener("change", async event => {
     const { renderMethodFields } = await import("./components/methodFields.js");
 
@@ -127,6 +131,17 @@ function bindDashboardActions() {
     bindQuickChips();
     bindPreviewInputs();
     updateMethodPreview();
+    updateMethodMemoryPanel();
+    bindMethodMemoryActions();
+  });
+}
+
+const exerciseSelect = document.querySelector("#log-exercise");
+
+if (exerciseSelect) {
+  exerciseSelect.addEventListener("change", () => {
+    updateMethodMemoryPanel();
+    bindMethodMemoryActions();
   });
 }
 
@@ -200,6 +215,8 @@ export function renderApp() {
   bindQuickChips();
   bindPreviewInputs();
   updateMethodPreview();
+  updateMethodMemoryPanel();
+  bindMethodMemoryActions();
 }
 
 window.renderApp = renderApp;
