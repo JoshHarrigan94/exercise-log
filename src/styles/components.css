@@ -602,3 +602,24 @@ textarea {
   top: 12px;
   right: 12px;
 }
+
+.log-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-action-button {
+  border: var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mini-action-button:active {
+  transform: scale(0.96);
+}
