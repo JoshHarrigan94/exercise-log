@@ -54,6 +54,16 @@ export function renderLiveSession() {
 
         <h1>${activeSession.name}</h1>
 
+${
+  activeSession.goal
+    ? `
+      <p class="session-goal">
+        ${activeSession.goal}
+      </p>
+    `
+    : ""
+}
+
         <div class="session-meta-grid">
           <div>
             <span>Logged</span>
