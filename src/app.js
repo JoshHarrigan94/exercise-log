@@ -5,7 +5,15 @@ import { renderProgress } from "./ui/progressView.js";
 import { renderHistory } from "./ui/historyView.js";
 import { renderNav } from "./components/nav.js";
 
-import { store, setView } from "./state/store.js";
+import {
+  store,
+  setView,
+  startSession,
+  saveSession,
+  addExerciseLog
+} from "./state/store.js";
+
+import { sessionTemplates } from "./data/sessionTemplates.js";
 
 const app = document.querySelector("#app");
 
@@ -42,6 +50,57 @@ function bindNavigation() {
   });
 }
 
+function bindSessionStart() {
+  document.querySelectorAll("[data-template-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      const template = sessionTemplates.find(
+        item => item.id === button.dataset.templateId
+      );
+
+      startSession(template);
+      setView("dashboard");
+      renderApp();
+    });
+  });
+}
+
+function bindDashboardActions() {
+  const completeButton = document.querySelector(".complete-session-button");
+
+  if (completeButton) {
+    completeButton.addEventListener("click", () => {
+      saveSession();
+      renderApp();
+    });
+  }
+
+  const addButton = document.querySelector("#add-exercise-log");
+
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      const exerciseId = document.querySelector("#log-exercise").value;
+      const methodId = document.querySelector("#log-method").value;
+      const load = document.querySelector("#log-load").value;
+      const reps = document.querySelector("#log-reps").value;
+      const rpe = document.querySelector("#log-rpe").value;
+      const pain = document.querySelector("#log-pain").value;
+      const notes = document.querySelector("#log-notes").value;
+
+      addExerciseLog({
+        exerciseId,
+        methodId,
+        load,
+        reps,
+        rpe,
+        pain,
+        notes
+      });
+
+      renderApp();
+    });
+  }
+}
+
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
@@ -63,6 +122,8 @@ export function renderApp() {
   `;
 
   bindNavigation();
+  bindSessionStart();
+  bindDashboardActions();
 }
 
 window.renderApp = renderApp;
