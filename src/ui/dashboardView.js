@@ -11,6 +11,12 @@ function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
 }
 
+function formatMethodData(data = {}) {
+  return Object.values(data)
+    .filter(Boolean)
+    .join(" · ");
+}
+
 export function renderDashboard() {
   const activeSession = store.activeSession;
 
@@ -52,7 +58,9 @@ export function renderDashboard() {
                     <span>${getMethodName(log.methodId)}</span>
                     <strong>${getExerciseName(log.exerciseId)}</strong>
                     <small>
-                      ${log.load || "No load"} · ${log.reps || "No reps"} · RPE ${log.rpe || "-"} · Pain ${log.pain || "0"}
+                      ${formatMethodData(log.data)} ·
+                      RPE ${log.rpe || "-"} ·
+                      Pain ${log.pain || "0"}
                     </small>
                     ${log.notes ? `<p>${log.notes}</p>` : ""}
                   </article>
