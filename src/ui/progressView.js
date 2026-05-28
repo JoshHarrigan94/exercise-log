@@ -1,5 +1,5 @@
 import { store } from "../state/store.js";
-import { exercises } from "../data/exercises.js";
+import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 
 import {
@@ -13,7 +13,7 @@ import {
 } from "../logic/analytics.js";
 
 function getExerciseName(id) {
-  return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
+  return getExerciseById(id)?.name || "Exercise";
 }
 
 function getMethodName(id) {
