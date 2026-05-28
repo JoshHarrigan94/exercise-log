@@ -4,6 +4,7 @@ import { exercises } from "../data/exercises.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { getProgressionRecommendation } from "../logic/progressionEngine.js";
 import { renderRecommendationBadge } from "../components/recommendationBadge.js";
+import { formatMethodData } from "../utils/format.js";
 
 function getExerciseName(id) {
   return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
@@ -11,12 +12,6 @@ function getExerciseName(id) {
 
 function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
-}
-
-function formatMethodData(data = {}) {
-  return Object.values(data)
-    .filter(Boolean)
-    .join(" · ");
 }
 
 export function renderDashboard() {
@@ -30,9 +25,9 @@ export function renderDashboard() {
             <article class="hero-card">
               <p class="eyebrow">Active session</p>
               <h1>${activeSession.name}</h1>
+
               <p class="hero-text">
-                Log each exercise with its actual method: top set, ladder, cluster,
-                rest-pause, isometric, or interval.
+                Log each exercise with its actual method and progression context.
               </p>
 
               <div class="target-box">
@@ -40,9 +35,15 @@ export function renderDashboard() {
                 <strong>${activeSession.exercises.length}</strong>
               </div>
 
-              <button class="complete-session-button">
-                Complete Session
-              </button>
+              <div class="action-row">
+                <button class="complete-session-button">
+                  Complete
+                </button>
+
+                <button class="cancel-session-button danger-button">
+                  Discard
+                </button>
+              </div>
             </article>
 
             ${renderSetLogger()}
@@ -60,14 +61,28 @@ export function renderDashboard() {
 
                   return `
                     <article class="history-card">
-                      <span>${getMethodName(log.methodId)}</span>
+                      <div class="card-topline">
+                        <span>${getMethodName(log.methodId)}</span>
+
+                        <button 
+                          class="mini-delete-button"
+                          data-remove-log-id="${log.id}"
+                          aria-label="Remove log"
+                        >
+                          ×
+                        </button>
+                      </div>
+
                       <strong>${getExerciseName(log.exerciseId)}</strong>
+
                       <small>
-                        ${formatMethodData(log.data) || "No method data"} ·
+                        ${formatMethodData(log.data)} ·
                         RPE ${log.rpe || "-"} ·
                         Pain ${log.pain || "0"}
                       </small>
+
                       ${log.notes ? `<p>${log.notes}</p>` : ""}
+
                       ${renderRecommendationBadge(recommendation)}
                     </article>
                   `;
