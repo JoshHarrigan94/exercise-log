@@ -147,3 +147,31 @@ export function deleteCustomTemplate(templateId) {
 
   saveData(store.data);
 }
+
+export function createTemplateFromSession(sessionId) {
+  const session =
+    store.activeSession?.id === sessionId
+      ? store.activeSession
+      : store.data.sessions.find(item => item.id === sessionId);
+
+  if (!session) return;
+
+  const template = {
+    id: `custom-template-${crypto.randomUUID()}`,
+    name: `${session.name} Template`,
+    goal: session.goal || "",
+    priority: session.exercises[0]?.exerciseId || "Custom",
+    estimatedMinutes: "",
+    createdFromSessionId: session.id,
+    createdAt: new Date().toISOString(),
+    exercises: session.exercises.map(log => ({
+      exerciseId: log.exerciseId,
+      methodId: log.methodId,
+      target: log.data || {},
+      notes: log.notes || ""
+    }))
+  };
+
+  store.data.customTemplates.push(template);
+  saveData(store.data);
+}
