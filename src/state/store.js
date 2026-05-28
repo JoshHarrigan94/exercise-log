@@ -95,3 +95,32 @@ export function removeExerciseLog(logId) {
     log => log.id !== logId
   );
 }
+
+export function updateExerciseLog(logId, updatedLog) {
+  if (!store.activeSession) return;
+
+  store.activeSession.exercises = store.activeSession.exercises.map(log =>
+    log.id === logId
+      ? {
+          ...log,
+          ...updatedLog,
+          updatedAt: new Date().toISOString()
+        }
+      : log
+  );
+}
+
+export function duplicateExerciseLog(logId) {
+  if (!store.activeSession) return;
+
+  const log = store.activeSession.exercises.find(item => item.id === logId);
+
+  if (!log) return;
+
+  store.activeSession.exercises.push({
+    ...log,
+    id: crypto.randomUUID(),
+    loggedAt: new Date().toISOString(),
+    duplicatedFrom: logId
+  });
+}
