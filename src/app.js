@@ -1,3 +1,4 @@
+import { bindQuickChips } from "./components/quickChips.js";
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLibrary } from "./ui/exerciseLibraryView.js";
@@ -179,6 +180,7 @@ export function renderApp() {
   bindHistoryActions();
   bindDashboardActions();
   bindSessionDetailActions(renderApp);
+  bindQuickChips();
 }
 
 window.renderApp = renderApp;
