@@ -32,12 +32,25 @@ export function startSession(template) {
   };
 }
 
+export function cancelActiveSession() {
+  store.activeSession = null;
+}
+
 export function saveSession() {
   if (!store.activeSession) return;
 
   store.data.sessions.unshift(store.activeSession);
   saveData(store.data);
   store.activeSession = null;
+}
+
+export function deleteSession(sessionId) {
+  store.data.sessions = store.data.sessions.filter(
+    session => session.id !== sessionId
+  );
+
+  saveData(store.data);
+  clearSelectedSession();
 }
 
 export function addExerciseLog(exerciseLog) {
@@ -48,4 +61,12 @@ export function addExerciseLog(exerciseLog) {
     loggedAt: new Date().toISOString(),
     ...exerciseLog
   });
+}
+
+export function removeExerciseLog(logId) {
+  if (!store.activeSession) return;
+
+  store.activeSession.exercises = store.activeSession.exercises.filter(
+    log => log.id !== logId
+  );
 }
