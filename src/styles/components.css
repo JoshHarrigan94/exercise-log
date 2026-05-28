@@ -537,3 +537,34 @@ textarea {
   padding: 10px 12px;
   font-size: 0.82rem;
 }
+
+.compact-hero {
+  gap: 12px;
+}
+
+.session-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.session-meta-grid div {
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.session-meta-grid span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.session-meta-grid strong {
+  color: var(--text);
+  font-size: 1rem;
+}
