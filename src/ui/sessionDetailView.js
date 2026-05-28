@@ -2,7 +2,8 @@ import {
   store,
   setView,
   clearSelectedSession,
-  deleteSession
+  deleteSession,
+  createTemplateFromSession
 } from "../state/store.js";
 
 import { getExerciseById } from "../logic/exerciseLibrary.js";
