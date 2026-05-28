@@ -1,3 +1,7 @@
+import {
+  addCustomExercise,
+  deleteCustomExercise
+} from "./state/store.js";
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
@@ -86,6 +90,45 @@ function bindSessionStart() {
       });
 
       setView("live");
+     
+      function bindLibraryActions() {
+  const addButton = document.querySelector("#add-custom-exercise");
+
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      const name = document.querySelector("#custom-exercise-name")?.value?.trim();
+      const category = document.querySelector("#custom-exercise-category")?.value?.trim();
+      const pattern = document.querySelector("#custom-exercise-pattern")?.value?.trim();
+      const defaultMethod = document.querySelector("#custom-exercise-method")?.value;
+
+      if (!name) {
+        alert("Add an exercise name first.");
+        return;
+      }
+
+      addCustomExercise({
+        name,
+        category,
+        pattern,
+        defaultMethod
+      });
+
+      renderApp();
+    });
+  }
+
+  document.querySelectorAll("[data-delete-custom-exercise]").forEach(button => {
+    button.addEventListener("click", () => {
+      const confirmed = confirm("Delete this custom exercise?");
+
+      if (!confirmed) return;
+
+      deleteCustomExercise(button.dataset.deleteCustomExercise);
+      renderApp();
+    });
+  });
+}
+      
       renderApp();
     });
   });
@@ -172,6 +215,7 @@ function bindLiveSessionActions() {
       updateMethodPreview();
       updateMethodMemoryPanel();
       bindMethodMemoryActions();
+      bindLibraryActions();
     });
   }
 
