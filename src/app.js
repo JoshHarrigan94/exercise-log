@@ -16,6 +16,8 @@ import {
   startSession,
   saveSession,
   addExerciseLog,
+  removeExerciseLog,
+  cancelActiveSession,
   selectSession
 } from "./state/store.js";
 
@@ -91,21 +93,34 @@ function bindDashboardActions() {
     });
   }
 
+  const cancelButton = document.querySelector(".cancel-session-button");
+
+  if (cancelButton) {
+    cancelButton.addEventListener("click", () => {
+      const confirmed = confirm("Discard this active session?");
+
+      if (!confirmed) return;
+
+      cancelActiveSession();
+      renderApp();
+    });
+  }
+
+  document.querySelectorAll("[data-remove-log-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      removeExerciseLog(button.dataset.removeLogId);
+      renderApp();
+    });
+  });
+
   const methodSelect = document.querySelector("#log-method");
 
   if (methodSelect) {
     methodSelect.addEventListener("change", async event => {
-      const methodId = event.target.value;
+      const { renderMethodFields } = await import("./components/methodFields.js");
 
-      const { renderMethodFields } = await import(
-        "./components/methodFields.js"
-      );
-
-      const dynamicContainer = document.querySelector(
-        "#dynamic-method-fields"
-      );
-
-      dynamicContainer.innerHTML = renderMethodFields(methodId);
+      document.querySelector("#dynamic-method-fields").innerHTML =
+        renderMethodFields(event.target.value);
     });
   }
 
