@@ -124,3 +124,26 @@ export function duplicateExerciseLog(logId) {
     duplicatedFrom: logId
   });
 }
+
+export function addCustomTemplate(template) {
+  const newTemplate = {
+    id: `custom-template-${crypto.randomUUID()}`,
+    name: template.name,
+    goal: template.goal || "",
+    priority: template.priority || "Custom",
+    estimatedMinutes: template.estimatedMinutes || "",
+    exercises: template.exercises || [],
+    createdAt: new Date().toISOString()
+  };
+
+  store.data.customTemplates.push(newTemplate);
+  saveData(store.data);
+}
+
+export function deleteCustomTemplate(templateId) {
+  store.data.customTemplates = store.data.customTemplates.filter(
+    template => template.id !== templateId
+  );
+
+  saveData(store.data);
+}
