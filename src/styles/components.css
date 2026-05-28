@@ -568,3 +568,27 @@ textarea {
   color: var(--text);
   font-size: 1rem;
 }
+
+.ad-hoc-card {
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card-header h2 {
+  margin-top: 4px;
+}
+
+.card-copy {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.session-goal {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
