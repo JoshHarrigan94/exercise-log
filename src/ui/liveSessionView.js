@@ -105,13 +105,31 @@ ${
                 <div class="card-topline">
                   <span>${getMethodName(log.methodId)}</span>
 
-                  <button 
-                    class="mini-delete-button"
-                    data-remove-log-id="${log.id}"
-                    aria-label="Remove log"
-                  >
-                    ×
-                  </button>
+                  <div class="log-actions">
+  <button 
+    class="mini-action-button"
+    data-edit-log-id="${log.id}"
+    aria-label="Edit log"
+  >
+    Edit
+  </button>
+
+  <button 
+    class="mini-action-button"
+    data-duplicate-log-id="${log.id}"
+    aria-label="Duplicate log"
+  >
+    Copy
+  </button>
+
+  <button 
+    class="mini-delete-button"
+    data-remove-log-id="${log.id}"
+    aria-label="Remove log"
+  >
+    ×
+  </button>
+</div>
                 </div>
 
                 <strong>${getExerciseName(log.exerciseId)}</strong>
