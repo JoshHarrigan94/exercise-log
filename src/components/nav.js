@@ -1,10 +1,9 @@
-
 const navItems = [
-  { id: "dashboard", label: "Today", icon: "🏠" },
-  { id: "session", label: "Train", icon: "🔥" },
-  { id: "library", label: "Library", icon: "📚" },
-  { id: "progress", label: "Progress", icon: "📈" },
-  { id: "history", label: "History", icon: "🕘" }
+  { id: "dashboard", label: "Today", icon: "⌂" },
+  { id: "session", label: "Train", icon: "＋" },
+  { id: "live", label: "Live", icon: "●" },
+  { id: "progress", label: "Progress", icon: "↗" },
+  { id: "history", label: "History", icon: "◷" }
 ];
 
 export function renderNav(activeView) {
