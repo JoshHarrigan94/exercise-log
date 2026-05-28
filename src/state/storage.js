@@ -1,7 +1,8 @@
-const STORAGE_KEY = "progression-lab-data";
+const STORAGE_KEY = "progression-lab-data-v1";
 
 const defaultData = {
   sessions: [],
+  customExercises: [],
   settings: {
     unit: "kg"
   }
@@ -12,14 +13,20 @@ export function loadData() {
 
   if (!raw) {
     saveData(defaultData);
-    return defaultData;
+    return structuredClone(defaultData);
   }
 
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+
+    return {
+      ...defaultData,
+      ...parsed,
+      customExercises: parsed.customExercises || []
+    };
   } catch (error) {
-    console.error("Storage parse failed", error);
-    return defaultData;
+    console.error("Failed to load storage", error);
+    return structuredClone(defaultData);
   }
 }
 
