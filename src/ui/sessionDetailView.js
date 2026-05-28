@@ -70,6 +70,9 @@ export function renderSessionDetail() {
         <button class="danger-button" id="delete-session">
           Delete Session
         </button>
+        <button class="secondary-button" id="save-session-as-template">
+  Save as Template
+</button>
       </article>
 
       <div class="stack">
