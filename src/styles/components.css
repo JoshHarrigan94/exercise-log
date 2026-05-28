@@ -592,3 +592,13 @@ textarea {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+.exercise-row-wrap {
+  position: relative;
+}
+
+.custom-exercise-delete {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
