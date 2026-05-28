@@ -282,3 +282,62 @@ textarea {
   flex-direction: column;
   gap: 12px;
 }
+
+.recommendation-badge {
+  margin-top: 12px;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: var(--border);
+}
+
+.recommendation-badge span {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.recommendation-badge strong {
+  font-size: 0.95rem;
+}
+
+.recommendation-badge p {
+  font-size: 0.85rem;
+}
+
+.recommendation-progress {
+  background: rgba(139, 226, 139, 0.12);
+  border-color: rgba(139, 226, 139, 0.28);
+}
+
+.recommendation-progress span,
+.recommendation-progress strong {
+  color: var(--green);
+}
+
+.recommendation-hold {
+  background: rgba(255, 209, 102, 0.12);
+  border-color: rgba(255, 209, 102, 0.28);
+}
+
+.recommendation-hold span,
+.recommendation-hold strong {
+  color: var(--yellow);
+}
+
+.recommendation-reduce {
+  background: rgba(255, 107, 107, 0.12);
+  border-color: rgba(255, 107, 107, 0.28);
+}
+
+.recommendation-reduce span,
+.recommendation-reduce strong {
+  color: var(--red);
+}
+
+.recommendation-neutral {
+  background: rgba(255, 255, 255, 0.06);
+}
