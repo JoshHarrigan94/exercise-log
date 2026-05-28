@@ -54,6 +54,30 @@ export function deleteSession(sessionId) {
   clearSelectedSession();
 }
 
+export function addCustomExercise(exercise) {
+  const newExercise = {
+    id: `custom-${crypto.randomUUID()}`,
+    name: exercise.name,
+    category: exercise.category || "Custom",
+    pattern: exercise.pattern || "Custom",
+    equipment: exercise.equipment || [],
+    loadType: exercise.loadType || "custom",
+    defaultMethod: exercise.defaultMethod || "standard-sets",
+    cues: exercise.cues || []
+  };
+
+  store.data.customExercises.push(newExercise);
+  saveData(store.data);
+}
+
+export function deleteCustomExercise(exerciseId) {
+  store.data.customExercises = store.data.customExercises.filter(
+    exercise => exercise.id !== exerciseId
+  );
+
+  saveData(store.data);
+}
+
 export function addExerciseLog(exerciseLog) {
   if (!store.activeSession) return;
 
