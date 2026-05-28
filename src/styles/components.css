@@ -623,3 +623,13 @@ textarea {
 .mini-action-button:active {
   transform: scale(0.96);
 }
+
+.template-row-wrap {
+  position: relative;
+}
+
+.template-delete {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
