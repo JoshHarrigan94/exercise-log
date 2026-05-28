@@ -1,5 +1,15 @@
 import { getAllTemplates } from "../logic/templateLibrary.js";
 
+function formatTemplatePriority(template) {
+  if (!template.priority) return "Custom";
+
+  if (template.priority.startsWith?.("custom-") || template.priority.includes("-")) {
+    return "Saved Session";
+  }
+
+  return template.priority;
+}
+
 export function renderSession() {
   const templates = getAllTemplates();
 
@@ -94,7 +104,7 @@ export function renderSession() {
               data-template-id="${template.id}"
             >
               <span>${template.name}</span>
-              <strong>${template.priority || "Custom"}</strong>
+              <strong>${formatTemplatePriority(template)}</strong>
               <small>${template.goal || "No goal set"}</small>
             </button>
 
