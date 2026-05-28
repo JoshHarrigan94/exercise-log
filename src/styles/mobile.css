@@ -1,1 +1,25 @@
+@media (max-width: 380px) {
+  .app-shell {
+    padding-inline: 12px;
+  }
 
+  .top-bar h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-card h1 {
+    font-size: 1.8rem;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-nav {
+    width: calc(100% - 16px);
+  }
+
+  .nav-item small {
+    display: none;
+  }
+}
