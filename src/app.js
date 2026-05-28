@@ -30,6 +30,8 @@ import {
   removeExerciseLog,
   cancelActiveSession,
   selectSession
+  updateExerciseLog,
+  duplicateExerciseLog
 } from "./state/store.js";
 
 import { sessionTemplates } from "./data/sessionTemplates.js";
