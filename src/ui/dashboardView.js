@@ -1,10 +1,11 @@
-import { store, saveSession } from "../state/store.js";
+import { store } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
 import { exercises } from "../data/exercises.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { getProgressionRecommendation } from "../logic/progressionEngine.js";
 import { renderRecommendationBadge } from "../components/recommendationBadge.js";
 import { formatMethodData } from "../utils/format.js";
+import { calculateMethodExposure } from "../logic/methodCalculations.js";
 
 function getExerciseName(id) {
   return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
@@ -12,6 +13,17 @@ function getExerciseName(id) {
 
 function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
+}
+
+function renderExposureMeta(log) {
+  const exposure = calculateMethodExposure(log.methodId, log.data);
+
+  return `
+    <div class="exposure-row">
+      <span>${exposure.exposureLabel}</span>
+      <span>${exposure.densityLabel}</span>
+    </div>
+  `;
 }
 
 export function renderDashboard() {
@@ -80,6 +92,8 @@ export function renderDashboard() {
                         RPE ${log.rpe || "-"} ·
                         Pain ${log.pain || "0"}
                       </small>
+
+                      ${renderExposureMeta(log)}
 
                       ${log.notes ? `<p>${log.notes}</p>` : ""}
 
