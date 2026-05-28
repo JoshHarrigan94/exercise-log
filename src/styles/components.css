@@ -177,3 +177,75 @@
 .nav-item.active small {
   color: var(--accent);
 }
+.logger-card {
+  border: var(--border);
+  background: rgba(21, 27, 35, 0.86);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-field span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 13px 14px;
+  font: inherit;
+  outline: none;
+}
+
+.form-field textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: rgba(255, 122, 92, 0.55);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.primary-button,
+.complete-session-button {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #111827;
+  padding: 14px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.complete-session-button {
+  margin-top: 4px;
+}
+
+.primary-button:active,
+.complete-session-button:active {
+  transform: scale(0.98);
+}
