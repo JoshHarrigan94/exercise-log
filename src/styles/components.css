@@ -341,3 +341,28 @@ textarea {
 .recommendation-neutral {
   background: rgba(255, 255, 255, 0.06);
 }
+
+.method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.method-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: var(--border);
+  background: var(--surface-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.method-row span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.method-row strong {
+  color: var(--text);
+}
