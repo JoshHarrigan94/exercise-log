@@ -1,224 +1,366 @@
-import {
-  updateMethodMemoryPanel,
-  bindMethodMemoryActions
-} from "./components/methodMemoryPanel.js";
-import { updateMethodPreview } from "./components/methodPreview.js";
-import { bindQuickChips } from "./components/quickChips.js";
-import { renderDashboard } from "./ui/dashboardView.js";
-import { renderSession } from "./ui/sessionView.js";
-import { renderLibrary } from "./ui/exerciseLibraryView.js";
-import { renderProgress } from "./ui/progressView.js";
-import { renderHistory } from "./ui/historyView.js";
-import {
-  renderSessionDetail,
-  bindSessionDetailActions
-} from "./ui/sessionDetailView.js";
+const riskBands = [
+  {
+    id: "low",
+    label: "Low risk",
+    min: 0,
+    max: 24,
+    className: "green",
+    summary: "The use case appears low risk, provided normal business controls and documentation are maintained."
+  },
+  {
+    id: "medium",
+    label: "Medium risk",
+    min: 25,
+    max: 54,
+    className: "amber",
+    summary: "The use case has material risk indicators and should have defined controls, ownership, and review evidence."
+  },
+  {
+    id: "high",
+    label: "High risk",
+    min: 55,
+    max: 100,
+    className: "red",
+    summary: "The use case has significant risk indicators and should receive enhanced governance, assurance, and approval."
+  }
+];
 
-import { renderNav } from "./components/nav.js";
+function getQuestionScore(question, answerValue) {
+  if (!question || answerValue === undefined || answerValue === null || answerValue === "") {
+    return 0;
+  }
 
-import {
-  store,
-  setView,
-  startSession,
-  saveSession,
-  addExerciseLog,
-  removeExerciseLog,
-  cancelActiveSession,
-  selectSession
-} from "./state/store.js";
+  if (question.type === "select") {
+    const option = (question.options || []).find(item => String(item.value) === String(answerValue));
+    return Number(option?.score || 0);
+  }
 
-import { sessionTemplates } from "./data/sessionTemplates.js";
+  if (question.scoring) {
+    const text = String(answerValue).trim().toLowerCase();
 
-const app = document.querySelector("#app");
+    if (!text) return 0;
+    if (text.length < 30) return Number(question.scoring.unclear || 2);
+    if (text.length < 140) return Number(question.scoring.narrow || 1);
 
-const views = {
-  dashboard: renderDashboard,
-  session: renderSession,
-  library: renderLibrary,
-  progress: renderProgress,
-  history: renderHistory,
-  "session-detail": renderSessionDetail
+    return Number(question.scoring.broad || 2);
+  }
+
+  return 0;
+}
+
+function getMaxQuestionScore(question) {
+  if (!question) return 0;
+
+  if (question.type === "select") {
+    return Math.max(...(question.options || []).map(option => Number(option.score || 0)), 0);
+  }
+
+  if (question.scoring) {
+    return Math.max(...Object.values(question.scoring).map(Number), 0);
+  }
+
+  return 0;
+}
+const governanceRouteOrder = {
+  lightweight: 1,
+  standard: 2,
+  enhanced: 3,
+  critical: 4
 };
 
-function getViewTitle() {
-  const titles = {
-    dashboard: "Today",
-    session: "Start Session",
-    library: "Exercise Library",
-    progress: "Progress",
-    history: "Training History",
-    "session-detail": "Session Detail"
+function getGovernanceRouteById(routeId) {
+  return governanceRoutes.find(route => route.id === routeId) || governanceRoutes[0];
+}
+
+function getSelectedQuestionOption(question, answerValue) {
+  if (!question || question.type !== "select") return null;
+
+  return (question.options || []).find(option => String(option.value) === String(answerValue)) || null;
+}
+
+function getHighestGovernanceRoute(routeIds = []) {
+  if (!routeIds.length) return "lightweight";
+
+  return routeIds.reduce((highest, current) => {
+    const highestLevel = governanceRouteOrder[highest] || 1;
+    const currentLevel = governanceRouteOrder[current] || 1;
+
+    return currentLevel > highestLevel ? current : highest;
+  }, "lightweight");
+}
+
+function uniqueValues(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function getControlById(controlId) {
+  return controlLibrary[controlId] || null;
+}
+
+function calculateControlRecommendations(routing) {
+  const routeId = routing.routeId || "lightweight";
+  const triggerIds = (routing.triggers || []).map(trigger => trigger.id);
+
+  const baselineControlIds = routeBaselineControls[routeId] || [];
+  const triggeredControlIds = triggerIds.flatMap(triggerId => triggerControlMap[triggerId] || []);
+
+  const allControlIds = uniqueValues([
+    ...baselineControlIds,
+    ...triggeredControlIds
+  ]);
+
+  const controls = allControlIds
+    .map(controlId => {
+      const control = getControlById(controlId);
+      if (!control) return null;
+
+      const triggeredBy = (routing.triggers || [])
+        .filter(trigger => (triggerControlMap[trigger.id] || []).includes(controlId))
+        .map(trigger => trigger.id);
+
+      const savedEvidence = routing.assessment?.controlEvidence?.[controlId] || {};
+
+return {
+  id: controlId,
+  ...control,
+  triggeredBy,
+  evidenceStatus: savedEvidence.evidenceStatus || "not-started",
+  evidenceNotes: savedEvidence.evidenceNotes || "",
+  evidenceOwner: savedEvidence.evidenceOwner || "",
+  evidenceUpdatedAt: savedEvidence.updatedAt || "",
+  evidenceLinks: savedEvidence.evidenceLinks || [],
+  evidenceFiles: savedEvidence.evidenceFiles || []
+};
+    })
+    .filter(Boolean);
+
+  const required = controls.filter(control => control.priority === "required");
+  const recommended = controls.filter(control => control.priority === "recommended");
+  const optional = controls.filter(control => control.priority === "optional");
+
+  return {
+    all: controls,
+    required,
+    recommended,
+    optional
   };
-
-  return titles[store.activeView] || "Progression Lab";
 }
 
-function renderView() {
-  return views[store.activeView]();
-}
+function calculateGovernanceRouting(assessment) {
+  const answers = assessment.answers || {};
 
-function bindNavigation() {
-  document.querySelectorAll("[data-view]").forEach(button => {
-    button.addEventListener("click", () => {
-      setView(button.dataset.view);
-      renderApp();
-    });
-  });
-}
+  const triggeredRoutes = [];
+  const triggers = [];
+  const primarySignals = [];
+  const domainScores = {};
+  const unansweredPrimaryQuestions = [];
 
-function bindSessionStart() {
-  document.querySelectorAll("[data-template-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      const template = sessionTemplates.find(
-        item => item.id === button.dataset.templateId
-      );
+  assessmentQuestions.forEach(question => {
+    const answerValue = answers[question.id];
+    const answered = answerValue !== undefined && answerValue !== null && answerValue !== "";
 
-      startSession(template);
-      setView("dashboard");
-      renderApp();
-    });
-  });
-}
+    if (question.isPrimaryTrigger && !answered) {
+      unansweredPrimaryQuestions.push(question.id);
+    }
 
-function bindHistoryActions() {
-  document.querySelectorAll("[data-session-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      selectSession(button.dataset.sessionId);
-      renderApp();
-    });
-  });
-}
+    if (!answered) return;
 
-function bindDashboardActions() {
-  const completeButton = document.querySelector(".complete-session-button");
+    const selectedOption = getSelectedQuestionOption(question, answerValue);
+    const questionScore = getQuestionScore(question, answerValue);
+    const domainId = question.domainId || "general";
 
-  if (completeButton) {
-    completeButton.addEventListener("click", () => {
-      saveSession();
-      renderApp();
-    });
-  }
+    if (!domainScores[domainId]) {
+      domainScores[domainId] = {
+        domainId,
+        rawScore: 0,
+        maxScore: 0,
+        questions: 0
+      };
+    }
 
-  const cancelButton = document.querySelector(".cancel-session-button");
+    domainScores[domainId].rawScore += questionScore;
+    domainScores[domainId].maxScore += getMaxQuestionScore(question);
+    domainScores[domainId].questions += 1;
 
-  if (cancelButton) {
-    cancelButton.addEventListener("click", () => {
-      const confirmed = confirm("Discard this active session?");
+    if (selectedOption?.routeImpact) {
+      triggeredRoutes.push(selectedOption.routeImpact);
+    }
 
-      if (!confirmed) return;
-
-      cancelActiveSession();
-      renderApp();
-    });
-  }
-
-  document.querySelectorAll("[data-remove-log-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      removeExerciseLog(button.dataset.removeLogId);
-      renderApp();
-    });
-  });
-
-  const methodSelect = document.querySelector("#log-method");
-
-if (methodSelect) {
-  methodSelect.addEventListener("change", async event => {
-    const { renderMethodFields } = await import("./components/methodFields.js");
-
-    document.querySelector("#dynamic-method-fields").innerHTML =
-      renderMethodFields(event.target.value);
-
-    bindQuickChips();
-    bindPreviewInputs();
-    updateMethodPreview();
-    updateMethodMemoryPanel();
-    bindMethodMemoryActions();
-  });
-}
-
-const exerciseSelect = document.querySelector("#log-exercise");
-
-if (exerciseSelect) {
-  exerciseSelect.addEventListener("change", () => {
-    updateMethodMemoryPanel();
-    bindMethodMemoryActions();
-  });
-}
-
-  const addButton = document.querySelector("#add-exercise-log");
-
-  if (addButton) {
-    addButton.addEventListener("click", () => {
-      const exerciseId = document.querySelector("#log-exercise").value;
-      const methodId = document.querySelector("#log-method").value;
-      const rpe = document.querySelector("#log-rpe").value;
-      const pain = document.querySelector("#log-pain").value;
-      const notes = document.querySelector("#log-notes").value;
-
-      const dynamicData = {};
-
-      document.querySelectorAll("[id^='dynamic-']").forEach(field => {
-        dynamicData[field.id.replace("dynamic-", "")] = field.value;
+    if (selectedOption?.triggers?.length) {
+      selectedOption.triggers.forEach(triggerId => {
+        triggers.push({
+          id: triggerId,
+          questionId: question.id,
+          questionLabel: question.label,
+          answer: selectedOption.label,
+          domainId: question.domainId,
+          sectionId: question.sectionId,
+          routeImpact: selectedOption.routeImpact || "standard",
+          score: Number(selectedOption.score || 0),
+          isPrimaryTrigger: Boolean(question.isPrimaryTrigger)
+        });
       });
+    }
 
-      addExerciseLog({
-        exerciseId,
-        methodId,
-        rpe,
-        pain,
-        notes,
-        data: dynamicData
+    if (question.isPrimaryTrigger) {
+      primarySignals.push({
+        questionId: question.id,
+        questionLabel: question.label,
+        domainId: question.domainId,
+        answer: selectedOption?.label || getAnswerLabel(question, answerValue),
+        routeImpact: selectedOption?.routeImpact || "standard",
+        score: questionScore
       });
-
-      renderApp();
-    });
-  }
-}
-
-function bindPreviewInputs() {
-  document.querySelectorAll("[id^='dynamic-']").forEach(field => {
-    field.addEventListener("input", () => {
-      updateMethodPreview();
-    });
-
-    field.addEventListener("change", () => {
-      updateMethodPreview();
-    });
+    }
   });
+
+  const routeId = getHighestGovernanceRoute(triggeredRoutes);
+  const route = getGovernanceRouteById(routeId);
+
+  const domainProfile = Object.values(domainScores).map(domain => ({
+    ...domain,
+    percentage: domain.maxScore ? Math.round((domain.rawScore / domain.maxScore) * 100) : 0
+  }));
+
+  const criticalTriggers = triggers.filter(trigger => trigger.routeImpact === "critical");
+  const enhancedTriggers = triggers.filter(trigger => trigger.routeImpact === "enhanced");
+
+  let routingConfidence = "High";
+
+  if (unansweredPrimaryQuestions.length >= 3) {
+    routingConfidence = "Low";
+  } else if (unansweredPrimaryQuestions.length > 0) {
+    routingConfidence = "Medium";
+  }
+  const controlRecommendations = calculateControlRecommendations({
+  assessment,
+  routeId,
+  route,
+  triggers,
+  primarySignals,
+  domainProfile,
+  criticalTriggers,
+  enhancedTriggers
+});
+  return {
+    routeId,
+    route,
+    routeLabel: route.label,
+    routeLevel: route.level,
+    routeDescription: route.description,
+    approvalLevel: route.approvalLevel,
+    assuranceDepth: route.assuranceDepth,
+    triggers,
+    primarySignals,
+    domainProfile,
+    criticalTriggers,
+    enhancedTriggers,
+    unansweredPrimaryQuestions,
+        routingConfidence,
+    controlRecommendations
+  };
+}
+function calculateAssessmentScore(assessment) {
+  if (!assessmentQuestions.length) {
+    return {
+      rawScore: 0,
+      maxScore: 0,
+      weightedScore: 0,
+      riskLevel: "Not scored",
+      riskBand: null,
+      sectionScores: [],
+      drivers: []
+    };
+  }
+
+  let rawScore = 0;
+  let maxScore = 0;
+  const drivers = [];
+
+  const sectionScores = assessmentSections.map(section => {
+    const questions = getQuestionsForSection(section.id);
+    let sectionRaw = 0;
+    let sectionMax = 0;
+    let answered = 0;
+
+    questions.forEach(question => {
+      const answerValue = assessment.answers?.[question.id];
+      const questionScore = getQuestionScore(question, answerValue);
+      const questionMax = getMaxQuestionScore(question);
+
+      sectionRaw += questionScore;
+      sectionMax += questionMax;
+
+      if (answerValue !== undefined && answerValue !== null && answerValue !== "") {
+        answered += 1;
+      }
+
+      if (questionScore >= 4) {
+        drivers.push({
+          id: question.id,
+          sectionId: section.id,
+          sectionTitle: section.title,
+          label: question.label,
+          score: questionScore,
+          answer: getAnswerLabel(question, answerValue),
+          severity: questionScore >= 5 ? "High" : "Medium"
+        });
+      }
+    });
+
+    rawScore += sectionRaw;
+    maxScore += sectionMax;
+
+    return {
+      sectionId: section.id,
+      title: section.title,
+      rawScore: sectionRaw,
+      maxScore: sectionMax,
+      percentage: sectionMax ? Math.round((sectionRaw / sectionMax) * 100) : 0,
+      answered,
+      total: questions.length
+    };
+  });
+
+  const weightedScore = maxScore ? Math.round((rawScore / maxScore) * 100) : 0;
+  const riskBand = riskBands.find(band => weightedScore >= band.min && weightedScore <= band.max) || riskBands[0];
+
+  return {
+    rawScore,
+    maxScore,
+    weightedScore,
+    riskLevel: riskBand.label,
+    riskBand,
+    sectionScores,
+    drivers: drivers.sort((a, b) => b.score - a.score)
+  };
 }
 
-export function renderApp() {
-  app.innerHTML = `
-    <main class="app-shell">
-      <header class="top-bar">
-        <div>
-          <p class="eyebrow">Progression Lab</p>
-          <h1>${getViewTitle()}</h1>
-        </div>
+function getAnswerLabel(question, answerValue) {
+  if (!question) return "Unknown";
 
-        <button class="profile-button">JH</button>
-      </header>
+  if (question.type === "select") {
+    const option = (question.options || []).find(item => String(item.value) === String(answerValue));
+    return option?.label || "Not answered";
+  }
 
-      <div class="view-container">
-        ${renderView()}
-      </div>
+  if (!answerValue) return "Not answered";
 
-      ${store.activeView === "session-detail" ? "" : renderNav(store.activeView)}
-    </main>
-  `;
-
-  bindNavigation();
-  bindSessionStart();
-  bindHistoryActions();
-  bindDashboardActions();
-  bindSessionDetailActions(renderApp);
-  bindQuickChips();
-  bindPreviewInputs();
-  updateMethodPreview();
-  updateMethodMemoryPanel();
-  bindMethodMemoryActions();
+  return String(answerValue).length > 90
+    ? `${String(answerValue).slice(0, 90)}...`
+    : String(answerValue);
 }
 
-window.renderApp = renderApp;
+function getAssessmentStatus(assessment, progress, weightedScore) {
+  const routeId = assessment.governanceRouteId || "lightweight";
 
-renderApp();
+  if (progress < 100) return "Draft";
+
+  if (routeId === "critical") return "Senior review required";
+  if (routeId === "enhanced") return "Enhanced review required";
+
+  if (weightedScore >= 55) return "Enhanced review required";
+  if (weightedScore >= 25) return "Review required";
+
+  return "Complete";
+}
