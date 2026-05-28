@@ -503,3 +503,37 @@ textarea {
   color: var(--muted);
   line-height: 1.4;
 }
+
+.memory-panel {
+  border: var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.memory-panel span {
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.memory-panel strong {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.memory-panel small {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.compact-button {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+}
