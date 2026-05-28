@@ -1,5 +1,6 @@
 import { exercises } from "../data/exercises.js";
 import { methodTypes } from "../data/methodTypes.js";
+import { renderMethodFields } from "./methodFields.js";
 
 export function renderSetLogger() {
   return `
@@ -11,32 +12,30 @@ export function renderSetLogger() {
 
       <label class="form-field">
         <span>Exercise</span>
+
         <select id="log-exercise">
           ${exercises.map(exercise => `
-            <option value="${exercise.id}">${exercise.name}</option>
+            <option value="${exercise.id}">
+              ${exercise.name}
+            </option>
           `).join("")}
         </select>
       </label>
 
       <label class="form-field">
         <span>Method</span>
+
         <select id="log-method">
           ${methodTypes.map(method => `
-            <option value="${method.id}">${method.name}</option>
+            <option value="${method.id}">
+              ${method.name}
+            </option>
           `).join("")}
         </select>
       </label>
 
-      <div class="form-grid">
-        <label class="form-field">
-          <span>Load</span>
-          <input id="log-load" type="text" placeholder="+25kg / 80kg / BW" />
-        </label>
-
-        <label class="form-field">
-          <span>Reps / Structure</span>
-          <input id="log-reps" type="text" placeholder="5 / 1-2-3-4-5 / 10+3+2" />
-        </label>
+      <div id="dynamic-method-fields">
+        ${renderMethodFields("standard-sets")}
       </div>
 
       <div class="form-grid">
@@ -53,7 +52,11 @@ export function renderSetLogger() {
 
       <label class="form-field">
         <span>Notes</span>
-        <textarea id="log-notes" placeholder="Strict reps, good lockout, calf felt fine..."></textarea>
+
+        <textarea 
+          id="log-notes"
+          placeholder="Strict reps, good lockout, calf felt fine..."
+        ></textarea>
       </label>
 
       <button class="primary-button" id="add-exercise-log">
