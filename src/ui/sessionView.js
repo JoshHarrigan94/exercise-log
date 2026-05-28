@@ -1,9 +1,5 @@
 import { sessionTemplates } from "../data/sessionTemplates.js";
 
-import { startSession, setView } from "../state/store.js";
-
-import { renderApp } from "../app.js";
-
 export function renderSession() {
   return `
     <section class="screen active-screen">
@@ -30,20 +26,4 @@ export function renderSession() {
   `;
 }
 
-setTimeout(bindSessionButtons);
 
-function bindSessionButtons() {
-  document.querySelectorAll("[data-template-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      const template = sessionTemplates.find(
-        item => item.id === button.dataset.templateId
-      );
-
-      startSession(template);
-
-      setView("dashboard");
-
-      renderApp();
-    });
-  });
-}
