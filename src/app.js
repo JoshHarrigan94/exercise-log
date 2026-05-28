@@ -210,6 +210,25 @@ function bindLiveSessionActions() {
     });
   }
 
+const clearButton = document.querySelector("#clear-log-form");
+
+if (clearButton) {
+  clearButton.addEventListener("click", () => {
+    document.querySelectorAll("input, textarea").forEach(field => {
+      if (field.id === "editing-log-id") {
+        field.value = "";
+        return;
+      }
+
+      if (field.closest(".logger-card")) {
+        field.value = "";
+      }
+    });
+
+    updateMethodPreview();
+  });
+}
+  
   const cancelButton = document.querySelector(".cancel-session-button");
 
   if (cancelButton) {
