@@ -1,3 +1,5 @@
+import { createMethodSummary } from "../logic/methodParsers.js";
+
 export function formatDate(dateString, options = {}) {
   return new Date(dateString).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -6,7 +8,6 @@ export function formatDate(dateString, options = {}) {
   });
 }
 
-export function formatMethodData(data = {}) {
-  const values = Object.values(data).filter(Boolean);
-  return values.length ? values.join(" · ") : "No method data";
+export function formatMethodData(data = {}, methodId = "standard-sets") {
+  return createMethodSummary(methodId, data);
 }
