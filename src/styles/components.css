@@ -431,3 +431,20 @@ textarea {
 .mini-delete-button:active {
   transform: scale(0.96);
 }
+
+.exposure-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.exposure-row span {
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
