@@ -5,11 +5,9 @@ import { renderProgress } from "./ui/progressView.js";
 import { renderHistory } from "./ui/historyView.js";
 import { renderNav } from "./components/nav.js";
 
-const app = document.querySelector("#app");
+import { store, setView } from "./state/store.js";
 
-const state = {
-  activeView: "dashboard"
-};
+const app = document.querySelector("#app");
 
 const views = {
   dashboard: renderDashboard,
@@ -18,11 +16,6 @@ const views = {
   progress: renderProgress,
   history: renderHistory
 };
-
-function setView(viewId) {
-  state.activeView = viewId;
-  renderApp();
-}
 
 function getViewTitle() {
   const titles = {
@@ -33,22 +26,23 @@ function getViewTitle() {
     history: "Training History"
   };
 
-  return titles[state.activeView] || "Progression Lab";
+  return titles[store.activeView] || "Progression Lab";
 }
 
 function renderView() {
-  return views[state.activeView]();
+  return views[store.activeView]();
 }
 
 function bindNavigation() {
   document.querySelectorAll("[data-view]").forEach(button => {
     button.addEventListener("click", () => {
       setView(button.dataset.view);
+      renderApp();
     });
   });
 }
 
-function renderApp() {
+export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
       <header class="top-bar">
@@ -56,6 +50,7 @@ function renderApp() {
           <p class="eyebrow">Progression Lab</p>
           <h1>${getViewTitle()}</h1>
         </div>
+
         <button class="profile-button">JH</button>
       </header>
 
@@ -63,13 +58,11 @@ function renderApp() {
         ${renderView()}
       </div>
 
-      ${renderNav(state.activeView)}
+      ${renderNav(store.activeView)}
     </main>
   `;
 
   bindNavigation();
 }
-
-renderApp();
 
 renderApp();
