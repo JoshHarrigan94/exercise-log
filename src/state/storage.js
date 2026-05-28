@@ -3,6 +3,7 @@ const STORAGE_KEY = "progression-lab-data-v1";
 const defaultData = {
   sessions: [],
   customExercises: [],
+  customTemplates: [],
   settings: {
     unit: "kg"
   }
@@ -22,7 +23,8 @@ export function loadData() {
     return {
       ...defaultData,
       ...parsed,
-      customExercises: parsed.customExercises || []
+      customExercises: parsed.customExercises || [],
+      customTemplates: parsed.customTemplates || []
     };
   } catch (error) {
     console.error("Failed to load storage", error);
