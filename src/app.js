@@ -1,7 +1,3 @@
-import {
-  addCustomExercise,
-  deleteCustomExercise
-} from "./state/store.js";
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
@@ -32,6 +28,8 @@ import {
   selectSession,
   updateExerciseLog,
   duplicateExerciseLog,
+  addCustomExercise,
+  deleteCustomExercise,
   addCustomTemplate,
   deleteCustomTemplate,
   createTemplateFromSession
@@ -78,38 +76,6 @@ function bindNavigation() {
     });
   });
 }
-
-import { renderDashboard } from "./ui/dashboardView.js";
-import { renderSession } from "./ui/sessionView.js";
-import { renderLiveSession } from "./ui/liveSessionView.js";
-import { renderLibrary } from "./ui/exerciseLibraryView.js";
-import { renderProgress } from "./ui/progressView.js";
-import { renderHistory } from "./ui/historyView.js";
-import {
-  renderSessionDetail,
-  bindSessionDetailActions
-} from "./ui/sessionDetailView.js";
-
-import { renderNav } from "./components/nav.js";
-import { bindQuickChips } from "./components/quickChips.js";
-import { updateMethodPreview } from "./components/methodPreview.js";
-import {
-  updateMethodMemoryPanel,
-  bindMethodMemoryActions
-} from "./components/methodMemoryPanel.js";
-
-import {
-  store,
-  setView,
-  startSession,
-  saveSession,
-  addExerciseLog,
-  removeExerciseLog,
-  cancelActiveSession,
-  selectSession
-} from "./state/store.js";
-
-import { sessionTemplates } from "./data/sessionTemplates.js";
 
 const app = document.querySelector("#app");
 
