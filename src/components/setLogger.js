@@ -1,4 +1,4 @@
-import { exercises } from "../data/exercises.js";
+import { getAllExercises } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
@@ -6,6 +6,7 @@ import { renderMethodPreview } from "./methodPreview.js";
 import { renderMethodMemoryPanel } from "./methodMemoryPanel.js";
 
 export function renderSetLogger() {
+ const allExercises = getAllExercises();
   return `
     <article class="logger-card">
       <div class="section-header">
@@ -17,7 +18,7 @@ export function renderSetLogger() {
         <span>Exercise</span>
 
         <select id="log-exercise">
-          ${exercises.map(exercise => `
+          ${allExercises.map(exercise => `
             <option value="${exercise.id}">
               ${exercise.name}
             </option>
