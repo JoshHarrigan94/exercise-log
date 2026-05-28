@@ -79,11 +79,39 @@ function bindSessionStart() {
 
       if (!template) return;
 
-      startSession(template);
+      startSession({
+        templateId: template.id,
+        name: template.name,
+        goal: template.goal
+      });
+
       setView("live");
       renderApp();
     });
   });
+
+  const adhocButton = document.querySelector("#start-adhoc-session");
+
+  if (adhocButton) {
+    adhocButton.addEventListener("click", () => {
+      const nameInput = document.querySelector("#adhoc-session-name");
+      const goalInput = document.querySelector("#adhoc-session-goal");
+
+      const sessionName =
+        nameInput?.value?.trim() || "Ad Hoc Session";
+
+      const sessionGoal =
+        goalInput?.value?.trim() || "";
+
+      startSession({
+        name: sessionName,
+        goal: sessionGoal
+      });
+
+      setView("live");
+      renderApp();
+    });
+  }
 }
 
 function bindHistoryActions() {
