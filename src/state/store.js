@@ -4,9 +4,7 @@ const persistedData = loadData();
 
 export const store = {
   activeView: "dashboard",
-
   activeSession: null,
-
   data: persistedData
 };
 
@@ -28,14 +26,16 @@ export function saveSession() {
   if (!store.activeSession) return;
 
   store.data.sessions.unshift(store.activeSession);
-
   saveData(store.data);
-
   store.activeSession = null;
 }
 
 export function addExerciseLog(exerciseLog) {
   if (!store.activeSession) return;
 
-  store.activeSession.exercises.push(exerciseLog);
+  store.activeSession.exercises.push({
+    id: crypto.randomUUID(),
+    loggedAt: new Date().toISOString(),
+    ...exerciseLog
+  });
 }
