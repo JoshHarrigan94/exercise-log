@@ -1,6 +1,6 @@
 import { store } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
-import { exercises } from "../data/exercises.js";
+import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { getProgressionRecommendation } from "../logic/progressionEngine.js";
 import { renderRecommendationBadge } from "../components/recommendationBadge.js";
@@ -8,7 +8,7 @@ import { formatMethodData } from "../utils/format.js";
 import { calculateMethodExposure } from "../logic/methodCalculations.js";
 
 function getExerciseName(id) {
-  return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
+  return getExerciseById(id)?.name || "Exercise";
 }
 
 function getMethodName(id) {
