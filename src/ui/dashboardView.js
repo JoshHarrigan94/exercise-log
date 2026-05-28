@@ -2,6 +2,8 @@ import { store, saveSession } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
 import { exercises } from "../data/exercises.js";
 import { methodTypes } from "../data/methodTypes.js";
+import { getProgressionRecommendation } from "../logic/progressionEngine.js";
+import { renderRecommendationBadge } from "../components/recommendationBadge.js";
 
 function getExerciseName(id) {
   return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
@@ -53,18 +55,23 @@ export function renderDashboard() {
                     <p>Add your first movement above.</p>
                   </article>
                 `
-                : activeSession.exercises.map(log => `
-                  <article class="history-card">
-                    <span>${getMethodName(log.methodId)}</span>
-                    <strong>${getExerciseName(log.exerciseId)}</strong>
-                    <small>
-                      ${formatMethodData(log.data)} ·
-                      RPE ${log.rpe || "-"} ·
-                      Pain ${log.pain || "0"}
-                    </small>
-                    ${log.notes ? `<p>${log.notes}</p>` : ""}
-                  </article>
-                `).join("")
+                : activeSession.exercises.map(log => {
+                  const recommendation = getProgressionRecommendation(log);
+
+                  return `
+                    <article class="history-card">
+                      <span>${getMethodName(log.methodId)}</span>
+                      <strong>${getExerciseName(log.exerciseId)}</strong>
+                      <small>
+                        ${formatMethodData(log.data) || "No method data"} ·
+                        RPE ${log.rpe || "-"} ·
+                        Pain ${log.pain || "0"}
+                      </small>
+                      ${log.notes ? `<p>${log.notes}</p>` : ""}
+                      ${renderRecommendationBadge(recommendation)}
+                    </article>
+                  `;
+                }).join("")
               }
             </div>
           `
