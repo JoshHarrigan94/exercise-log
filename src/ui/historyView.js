@@ -23,13 +23,11 @@ export function renderHistory() {
           : `
             <div class="timeline">
               ${sessions.map(session => `
-                <article class="history-card">
+                <button class="history-card history-button" data-session-id="${session.id}">
                   <span>${formatDate(session.startedAt)}</span>
                   <strong>${session.name}</strong>
-                  <small>
-                    ${session.exercises.length} exercises logged
-                  </small>
-                </article>
+                  <small>${session.exercises.length} exercises logged</small>
+                </button>
               `).join("")}
             </div>
           `
