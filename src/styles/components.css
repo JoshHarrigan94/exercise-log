@@ -1,1 +1,179 @@
+.eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
 
+.profile-button {
+  width: 46px;
+  height: 46px;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.hero-card,
+.metric-card,
+.insight-card,
+.exercise-card,
+.history-card,
+.session-card {
+  border: var(--border);
+  background: rgba(21, 27, 35, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.hero-card {
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hero-card h1 {
+  font-size: 2.1rem;
+}
+
+.hero-text {
+  max-width: 30rem;
+}
+
+.target-box {
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 122, 92, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.target-box span,
+.metric-card span,
+.session-card span,
+.history-card span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.target-box strong {
+  color: var(--text);
+}
+
+.metric-card {
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 118px;
+}
+
+.metric-card strong {
+  font-size: 1.2rem;
+}
+
+.insight-card {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exercise-card {
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.exercise-card span {
+  background: var(--surface-soft);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.session-card {
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius-md);
+  padding: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.session-card:active,
+.nav-item:active {
+  transform: scale(0.98);
+}
+
+.history-card {
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 8px;
+  border-radius: 24px;
+  background: rgba(21, 27, 35, 0.92);
+  border: var(--border);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.nav-item {
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--muted);
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-item span {
+  font-size: 1.15rem;
+}
+
+.nav-item small {
+  font-size: 0.66rem;
+}
+
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.nav-item.active small {
+  color: var(--accent);
+}
