@@ -1,23 +1,30 @@
 import { store, saveSession } from "../state/store.js";
+import { renderSetLogger } from "../components/setLogger.js";
+import { exercises } from "../data/exercises.js";
+import { methodTypes } from "../data/methodTypes.js";
 
-import { renderApp } from "../app.js";
+function getExerciseName(id) {
+  return exercises.find(exercise => exercise.id === id)?.name || "Exercise";
+}
+
+function getMethodName(id) {
+  return methodTypes.find(method => method.id === id)?.name || "Method";
+}
 
 export function renderDashboard() {
   const activeSession = store.activeSession;
 
   return `
     <section class="screen active-screen">
-
       ${
         activeSession
           ? `
             <article class="hero-card">
               <p class="eyebrow">Active session</p>
-
               <h1>${activeSession.name}</h1>
-
               <p class="hero-text">
-                Session started and ready for exercise logging.
+                Log each exercise with its actual method: top set, ladder, cluster,
+                rest-pause, isometric, or interval.
               </p>
 
               <div class="target-box">
@@ -29,13 +36,34 @@ export function renderDashboard() {
                 Complete Session
               </button>
             </article>
+
+            ${renderSetLogger()}
+
+            <div class="stack">
+              ${activeSession.exercises.length === 0
+                ? `
+                  <article class="insight-card">
+                    <h2>No exercises logged yet</h2>
+                    <p>Add your first movement above.</p>
+                  </article>
+                `
+                : activeSession.exercises.map(log => `
+                  <article class="history-card">
+                    <span>${getMethodName(log.methodId)}</span>
+                    <strong>${getExerciseName(log.exerciseId)}</strong>
+                    <small>
+                      ${log.load || "No load"} · ${log.reps || "No reps"} · RPE ${log.rpe || "-"} · Pain ${log.pain || "0"}
+                    </small>
+                    ${log.notes ? `<p>${log.notes}</p>` : ""}
+                  </article>
+                `).join("")
+              }
+            </div>
           `
           : `
             <div class="hero-card">
               <p class="eyebrow">Next planned session</p>
-
               <h1>Pull Strength</h1>
-
               <p class="hero-text">
                 Heavy top set, strict pull-up ladder, then controlled rows.
               </p>
@@ -45,44 +73,29 @@ export function renderDashboard() {
                 <strong>+25kg × 3 or ladder to rung 5</strong>
               </div>
             </div>
+
+            <div class="grid two-col">
+              <article class="metric-card">
+                <span>Total Sessions</span>
+                <strong>${store.data.sessions.length}</strong>
+                <small>Saved locally</small>
+              </article>
+
+              <article class="metric-card">
+                <span>Active Block</span>
+                <strong>Strength</strong>
+                <small>Top sets + ladders</small>
+              </article>
+            </div>
+
+            <article class="insight-card">
+              <h2>Start training</h2>
+              <p>
+                Go to Train, choose a session, then log exercises from the dashboard.
+              </p>
+            </article>
           `
       }
-
-      <div class="grid two-col">
-        <article class="metric-card">
-          <span>Total Sessions</span>
-          <strong>${store.data.sessions.length}</strong>
-          <small>Saved locally</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Active Block</span>
-          <strong>Strength</strong>
-          <small>Top sets + ladders</small>
-        </article>
-      </div>
-
-      <article class="insight-card">
-        <h2>Progression note</h2>
-
-        <p>
-          The app now has real persistence. Next step is exercise-by-exercise
-          logging and advanced set capture.
-        </p>
-      </article>
     </section>
   `;
-}
-
-setTimeout(bindDashboardButtons);
-
-function bindDashboardButtons() {
-  const completeButton = document.querySelector(".complete-session-button");
-
-  if (!completeButton) return;
-
-  completeButton.addEventListener("click", () => {
-    saveSession();
-    renderApp();
-  });
 }
