@@ -33,7 +33,8 @@ import {
   updateExerciseLog,
   duplicateExerciseLog,
   addCustomTemplate,
-  deleteCustomTemplate
+  deleteCustomTemplate,
+  createTemplateFromSession
 } from "./state/store.js";
 
 import { getTemplateById } from "./logic/templateLibrary.js";
@@ -185,7 +186,17 @@ function bindLiveSessionActions() {
       renderApp();
     });
   }
+const saveTemplateButton = document.querySelector("#save-active-as-template");
 
+if (saveTemplateButton) {
+  saveTemplateButton.addEventListener("click", () => {
+    if (!store.activeSession) return;
+
+    createTemplateFromSession(store.activeSession.id);
+    alert("Saved as template.");
+    renderApp();
+  });
+}
   const cancelButton = document.querySelector(".cancel-session-button");
 
   if (cancelButton) {
