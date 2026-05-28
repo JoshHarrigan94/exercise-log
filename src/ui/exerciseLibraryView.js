@@ -1,4 +1,10 @@
+import { exercises } from "../data/exercises.js";
+import { methodTypes } from "../data/methodTypes.js";
 import { renderExerciseCard } from "../components/exerciseCard.js";
+
+function getMethodName(methodId) {
+  return methodTypes.find(method => method.id === methodId)?.name || "Custom";
+}
 
 export function renderLibrary() {
   return `
@@ -9,12 +15,13 @@ export function renderLibrary() {
       </div>
 
       <div class="stack">
-        ${renderExerciseCard("Weighted Pull-Up", "Vertical Pull", "Top Set + Ladder")}
-        ${renderExerciseCard("Weighted Dip", "Vertical Push", "Top Set + Ladder")}
-        ${renderExerciseCard("Push-Up", "Horizontal Push", "Volume Ladder")}
-        ${renderExerciseCard("Hack Squat", "Squat", "Heavy Set + Back-Off")}
-        ${renderExerciseCard("Reverse Hyper", "Posterior Chain", "Controlled Sets")}
-        ${renderExerciseCard("Calf Isometric", "Rehab", "Timed Hold")}
+        ${exercises.map(exercise => 
+          renderExerciseCard(
+            exercise.name,
+            exercise.pattern,
+            getMethodName(exercise.defaultMethod)
+          )
+        ).join("")}
       </div>
     </section>
   `;
