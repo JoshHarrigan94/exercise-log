@@ -3,6 +3,7 @@ import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
 import { renderMethodPreview } from "./methodPreview.js";
+import { renderMethodMemoryPanel } from "./methodMemoryPanel.js";
 
 export function renderSetLogger() {
   return `
@@ -35,6 +36,8 @@ export function renderSetLogger() {
           `).join("")}
         </select>
       </label>
+
+      ${renderMethodMemoryPanel()}
 
       <div id="dynamic-method-fields">
         ${renderMethodFields("standard-sets")}
