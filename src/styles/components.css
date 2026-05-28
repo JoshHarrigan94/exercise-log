@@ -249,3 +249,36 @@
 .complete-session-button:active {
   transform: scale(0.98);
 }
+
+select {
+  appearance: none;
+}
+
+input,
+select,
+textarea {
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: rgba(255,255,255,0.04);
+}
+
+textarea {
+  line-height: 1.5;
+}
+
+.logger-card {
+  overflow: hidden;
+}
+
+#dynamic-method-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
