@@ -123,6 +123,18 @@ export function bindSessionDetailActions(renderApp) {
     });
   }
 
+const saveTemplateButton = document.querySelector("#save-session-as-template");
+
+if (saveTemplateButton) {
+  saveTemplateButton.addEventListener("click", () => {
+    if (!store.selectedSessionId) return;
+
+    createTemplateFromSession(store.selectedSessionId);
+    alert("Saved as template.");
+    renderApp();
+  });
+}
+  
   const deleteButton = document.querySelector("#delete-session");
 
   if (deleteButton) {
