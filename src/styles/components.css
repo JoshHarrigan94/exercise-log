@@ -366,3 +366,25 @@ textarea {
 .method-row strong {
   color: var(--text);
 }
+
+.secondary-button {
+  border: var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 13px 15px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+}
+
+.history-button {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-button:active,
+.secondary-button:active {
+  transform: scale(0.98);
+}
