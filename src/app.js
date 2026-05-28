@@ -3,6 +3,11 @@ import { renderSession } from "./ui/sessionView.js";
 import { renderLibrary } from "./ui/exerciseLibraryView.js";
 import { renderProgress } from "./ui/progressView.js";
 import { renderHistory } from "./ui/historyView.js";
+import {
+  renderSessionDetail,
+  bindSessionDetailActions
+} from "./ui/sessionDetailView.js";
+
 import { renderNav } from "./components/nav.js";
 
 import {
@@ -10,7 +15,8 @@ import {
   setView,
   startSession,
   saveSession,
-  addExerciseLog
+  addExerciseLog,
+  selectSession
 } from "./state/store.js";
 
 import { sessionTemplates } from "./data/sessionTemplates.js";
@@ -22,7 +28,8 @@ const views = {
   session: renderSession,
   library: renderLibrary,
   progress: renderProgress,
-  history: renderHistory
+  history: renderHistory,
+  "session-detail": renderSessionDetail
 };
 
 function getViewTitle() {
@@ -31,7 +38,8 @@ function getViewTitle() {
     session: "Start Session",
     library: "Exercise Library",
     progress: "Progress",
-    history: "Training History"
+    history: "Training History",
+    "session-detail": "Session Detail"
   };
 
   return titles[store.activeView] || "Progression Lab";
@@ -59,6 +67,15 @@ function bindSessionStart() {
 
       startSession(template);
       setView("dashboard");
+      renderApp();
+    });
+  });
+}
+
+function bindHistoryActions() {
+  document.querySelectorAll("[data-session-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectSession(button.dataset.sessionId);
       renderApp();
     });
   });
@@ -97,13 +114,9 @@ function bindDashboardActions() {
   if (addButton) {
     addButton.addEventListener("click", () => {
       const exerciseId = document.querySelector("#log-exercise").value;
-
       const methodId = document.querySelector("#log-method").value;
-
       const rpe = document.querySelector("#log-rpe").value;
-
       const pain = document.querySelector("#log-pain").value;
-
       const notes = document.querySelector("#log-notes").value;
 
       const dynamicData = {};
@@ -142,13 +155,15 @@ export function renderApp() {
         ${renderView()}
       </div>
 
-      ${renderNav(store.activeView)}
+      ${store.activeView === "session-detail" ? "" : renderNav(store.activeView)}
     </main>
   `;
 
   bindNavigation();
   bindSessionStart();
+  bindHistoryActions();
   bindDashboardActions();
+  bindSessionDetailActions(renderApp);
 }
 
 window.renderApp = renderApp;
