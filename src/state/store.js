@@ -5,11 +5,21 @@ const persistedData = loadData();
 export const store = {
   activeView: "dashboard",
   activeSession: null,
+  selectedSessionId: null,
   data: persistedData
 };
 
 export function setView(viewId) {
   store.activeView = viewId;
+}
+
+export function selectSession(sessionId) {
+  store.selectedSessionId = sessionId;
+  store.activeView = "session-detail";
+}
+
+export function clearSelectedSession() {
+  store.selectedSessionId = null;
 }
 
 export function startSession(template) {
