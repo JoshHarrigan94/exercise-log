@@ -69,9 +69,17 @@ export function renderSetLogger() {
         ></textarea>
       </label>
 
-      <button class="primary-button" id="add-exercise-log">
-        Add to Session
-      </button>
+      <input id="editing-log-id" type="hidden" value="" />
+
+<div class="action-row">
+  <button class="primary-button" id="add-exercise-log">
+    Save Log
+  </button>
+
+  <button class="secondary-button" id="clear-log-form" type="button">
+    Clear
+  </button>
+</div>
     </article>
   `;
 }
