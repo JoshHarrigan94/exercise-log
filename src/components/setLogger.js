@@ -2,6 +2,7 @@ import { exercises } from "../data/exercises.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
+import { renderMethodPreview } from "./methodPreview.js";
 
 export function renderSetLogger() {
   return `
@@ -39,6 +40,8 @@ export function renderSetLogger() {
         ${renderMethodFields("standard-sets")}
       </div>
 
+      ${renderMethodPreview()}
+
       <div class="form-grid">
         <label class="form-field">
           <span>RPE</span>
@@ -49,7 +52,7 @@ export function renderSetLogger() {
         <label class="form-field">
           <span>Pain</span>
           <input id="log-pain" type="number" min="0" max="10" step="1" placeholder="0" />
-          ${renderQuickChips("log-pain", ["0", "1", "2", "3", "4+"])}
+          ${renderQuickChips("log-pain", ["0", "1", "2", "3", "4"])}
         </label>
       </div>
 
