@@ -65,4 +65,6 @@ export function renderApp() {
   bindNavigation();
 }
 
+window.renderApp = renderApp;
+
 renderApp();
