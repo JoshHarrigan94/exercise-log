@@ -1,3 +1,4 @@
+import { updateMethodPreview } from "./components/methodPreview.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
@@ -117,13 +118,17 @@ function bindDashboardActions() {
   const methodSelect = document.querySelector("#log-method");
 
   if (methodSelect) {
-    methodSelect.addEventListener("change", async event => {
-      const { renderMethodFields } = await import("./components/methodFields.js");
+  methodSelect.addEventListener("change", async event => {
+    const { renderMethodFields } = await import("./components/methodFields.js");
 
-      document.querySelector("#dynamic-method-fields").innerHTML =
-        renderMethodFields(event.target.value);
-    });
-  }
+    document.querySelector("#dynamic-method-fields").innerHTML =
+      renderMethodFields(event.target.value);
+
+    bindQuickChips();
+    bindPreviewInputs();
+    updateMethodPreview();
+  });
+}
 
   const addButton = document.querySelector("#add-exercise-log");
 
@@ -155,6 +160,18 @@ function bindDashboardActions() {
   }
 }
 
+function bindPreviewInputs() {
+  document.querySelectorAll("[id^='dynamic-']").forEach(field => {
+    field.addEventListener("input", () => {
+      updateMethodPreview();
+    });
+
+    field.addEventListener("change", () => {
+      updateMethodPreview();
+    });
+  });
+}
+
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
@@ -181,6 +198,8 @@ export function renderApp() {
   bindDashboardActions();
   bindSessionDetailActions(renderApp);
   bindQuickChips();
+  bindPreviewInputs();
+  updateMethodPreview();
 }
 
 window.renderApp = renderApp;
