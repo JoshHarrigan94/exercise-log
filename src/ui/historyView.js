@@ -1,4 +1,8 @@
+import { store } from "../state/store.js";
+
 export function renderHistory() {
+  const sessions = store.data.sessions;
+
   return `
     <section class="screen active-screen">
       <div class="section-header">
@@ -6,25 +10,37 @@ export function renderHistory() {
         <h1>Recent sessions</h1>
       </div>
 
-      <div class="timeline">
-        <article class="history-card">
-          <span>Pull Strength</span>
-          <strong>Weighted pull-up + ladder</strong>
-          <small>Top set: +25kg × 2 @ RPE 9</small>
-        </article>
-
-        <article class="history-card">
-          <span>Dip Strength</span>
-          <strong>Weighted dips</strong>
-          <small>Top set: +20kg × 5</small>
-        </article>
-
-        <article class="history-card">
-          <span>Push Volume</span>
-          <strong>Push-up ladder</strong>
-          <small>Rung 8 / 64 reps</small>
-        </article>
-      </div>
+      ${
+        sessions.length === 0
+          ? `
+            <article class="insight-card">
+              <h2>No sessions yet</h2>
+              <p>
+                Complete and save a session to build your progression history.
+              </p>
+            </article>
+          `
+          : `
+            <div class="timeline">
+              ${sessions.map(session => `
+                <article class="history-card">
+                  <span>${formatDate(session.startedAt)}</span>
+                  <strong>${session.name}</strong>
+                  <small>
+                    ${session.exercises.length} exercises logged
+                  </small>
+                </article>
+              `).join("")}
+            </div>
+          `
+      }
     </section>
   `;
+}
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short"
+  });
 }
