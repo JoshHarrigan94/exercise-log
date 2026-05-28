@@ -77,14 +77,16 @@ ${
         </div>
 
         <div class="action-row">
-          <button class="complete-session-button">
-            Complete
-          </button>
+  <button class="complete-session-button">Complete</button>
+  <button class="cancel-session-button danger-button">Discard</button>
+</div>
 
-          <button class="cancel-session-button danger-button">
-            Discard
-          </button>
-        </div>
+<button 
+  class="secondary-button"
+  id="save-active-as-template"
+>
+  Save as Template
+</button>
       </article>
 
       ${renderSetLogger()}
