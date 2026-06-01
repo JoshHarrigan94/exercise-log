@@ -29,8 +29,39 @@ export function startSession(sessionData = {}) {
     name: sessionData.name || "Untitled Session",
     goal: sessionData.goal || "",
     startedAt: new Date().toISOString(),
+    plannedExercises: sessionData.exercises || [],
     exercises: []
   };
+}
+
+export function addExerciseToTemplate(templateId, exercisePlan) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = template.exercises || [];
+
+  template.exercises.push({
+    id: crypto.randomUUID(),
+    exerciseId: exercisePlan.exerciseId,
+    methodId: exercisePlan.methodId,
+    target: exercisePlan.target || "",
+    notes: exercisePlan.notes || ""
+  });
+
+  saveData(store.data);
+}
+
+export function removeExerciseFromTemplate(templateId, plannedExerciseId) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = (template.exercises || []).filter(
+    item => item.id !== plannedExerciseId
+  );
+
+  saveData(store.data);
 }
 
 export function cancelActiveSession() {
