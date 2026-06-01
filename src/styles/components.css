@@ -1737,3 +1737,76 @@ select {
   background: rgba(35, 35, 35, 0.055);
   color: var(--text);
 }
+
+.engine-card {
+  border-radius: 22px;
+  background: var(--surface);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.engine-card h2 {
+  margin-top: 4px;
+  font-size: 1.25rem;
+}
+
+.engine-card p {
+  margin-top: 4px;
+}
+
+.engine-score-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.engine-score-row div {
+  background: rgba(35, 35, 35, 0.035);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.engine-score-row span,
+.engine-recommendation span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.engine-score-row strong {
+  font-size: 1.1rem;
+}
+
+.engine-bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.engine-bullet-list p {
+  border-top: 1px solid rgba(35, 35, 35, 0.07);
+  padding-top: 8px;
+}
+
+.engine-recommendation {
+  background: rgba(35, 35, 35, 0.035);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.deviation-warning strong {
+  color: var(--red);
+}
+
+.deviation-positive strong {
+  color: var(--green);
+}
+
+.deviation-info strong {
+  color: var(--muted);
+}
