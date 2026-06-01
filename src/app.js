@@ -34,7 +34,8 @@ import {
   deleteCustomTemplate,
   createTemplateFromSession,
   addExerciseToTemplate,
-removeExerciseFromTemplate
+removeExerciseFromTemplate,
+updateCustomTemplate
 } from "./state/store.js";
 
 import { getTemplateById } from "./logic/templateLibrary.js";
@@ -124,7 +125,21 @@ function bindSessionStart() {
         return;
       }
 
-      addCustomTemplate({ name, goal, priority });
+      const editingTemplateId = document.querySelector("#editing-template-id")?.value;
+
+if (editingTemplateId) {
+  updateCustomTemplate(editingTemplateId, {
+    name,
+    goal,
+    priority
+  });
+} else {
+  addCustomTemplate({
+    name,
+    goal,
+    priority
+  });
+}
       renderApp();
     });
   }
@@ -336,6 +351,22 @@ function bindTemplateBuilderActions() {
       renderApp();
     });
   }
+
+    document.querySelectorAll("[data-edit-template-id]").forEach(button => {
+  button.addEventListener("click", () => {
+    const templateId = button.dataset.editTemplateId;
+    const template = getTemplateById(templateId);
+
+    if (!template) return;
+
+    document.querySelector("#custom-template-name").value = template.name || "";
+    document.querySelector("#custom-template-goal").value = template.goal || "";
+    document.querySelector("#custom-template-priority").value = template.priority || "";
+    document.querySelector("#editing-template-id").value = template.id;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
 
   document.querySelectorAll("[data-remove-template-exercise]").forEach(button => {
     button.addEventListener("click", () => {
