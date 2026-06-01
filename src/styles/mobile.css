@@ -1,18 +1,53 @@
+@media (max-width: 859px) {
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .workspace-shell {
+    width: 100%;
+  }
+
+  .today-hero h1 {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .quiet-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .quiet-card button {
+    width: 100%;
+  }
+
+  .today-link-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .session-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 380px) {
   .app-shell {
     padding-inline: 12px;
   }
 
   .top-bar h1 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
-  .hero-card h1 {
-    font-size: 1.8rem;
-  }
-
-  .two-col {
-    grid-template-columns: 1fr;
+  .today-hero h1 {
+    font-size: 2.2rem;
   }
 
   .bottom-nav {
@@ -22,14 +57,8 @@
   .nav-item small {
     display: none;
   }
-}
 
-@media (max-width: 859px) {
-  .desktop-sidebar {
-    display: none;
-  }
-
-  .workspace-shell {
-    width: 100%;
+  .quiet-card {
+    padding: 16px;
   }
 }
