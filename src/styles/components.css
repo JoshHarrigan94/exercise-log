@@ -1,4 +1,4 @@
-=.eyebrow {
+.eyebrow {
   color: var(--accent);
   text-transform: uppercase;
   font-size: 0.68rem;
@@ -1422,4 +1422,107 @@ select {
   .execution-line button {
     grid-column: 1 / -1;
   }
+}
+
+/* 26A — off-white / graphite override */
+
+.bottom-nav {
+  background: rgba(251, 250, 246, 0.92);
+  border: 1px solid rgba(35, 35, 35, 0.08);
+  box-shadow: none;
+}
+
+.primary-button,
+.complete-session-button {
+  background: #232323;
+  color: #fbfaf6;
+}
+
+.secondary-button,
+.line-log-button {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.log-all-minimal-button,
+.nav-item.active small,
+.calendar-day.today span,
+.plan-title-button span,
+.method-preview span,
+.memory-panel span,
+.planned-session-card > span {
+  color: #232323;
+}
+
+.nav-item.active,
+.calendar-day.active,
+.execution-item-complete .execution-index {
+  background: rgba(35, 35, 35, 0.08);
+}
+
+.execution-item-complete .execution-index {
+  color: #232323;
+}
+
+.soft-link-card,
+.method-preview,
+.memory-panel,
+.planned-session-card,
+.desktop-list-row,
+.method-row,
+.planned-exercise-row,
+.planned-session-row,
+.plan-row,
+.plan-empty-row,
+.logged-summary-row {
+  background: rgba(35, 35, 35, 0.035);
+}
+
+.execution-item,
+.execution-block-header,
+.execution-row,
+.session-execution-header,
+.logged-summary-panel,
+.execution-empty {
+  border-color: rgba(35, 35, 35, 0.08);
+}
+
+.logger-details {
+  background: rgba(35, 35, 35, 0.035);
+}
+
+.quick-chip,
+.exposure-row span,
+.mini-action-button {
+  background: rgba(35, 35, 35, 0.055);
+}
+
+.mini-delete-button {
+  background: rgba(178, 59, 50, 0.09);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea,
+.compact-field input,
+.compact-field select,
+.inline-session-form input,
+.inline-template-form input,
+.compact-plan-builder-row input,
+.compact-plan-builder-row select,
+.execution-line input,
+.set-table-row input {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  background: #e2ddd3;
+}
+
+.danger-button {
+  background: rgba(178, 59, 50, 0.09);
+  color: var(--red);
 }
