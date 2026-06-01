@@ -220,6 +220,74 @@ function bindLiveSessionActions() {
     });
   });
   
+  document.querySelectorAll("[data-log-execution-row]").forEach(button => {
+  button.addEventListener("click", () => {
+    const exerciseId = button.dataset.logExecutionRow;
+    const methodId = button.dataset.methodId;
+    const rowId = button.dataset.rowId;
+    const rowLabel = button.dataset.rowLabel;
+
+    const key = `${exerciseId}-${rowId}`;
+
+    const load = document.querySelector(`[data-exec-load="${key}"]`)?.value || "";
+    const result = document.querySelector(`[data-exec-result="${key}"]`)?.value || "";
+    const rest = document.querySelector(`[data-exec-rest="${key}"]`)?.value || "";
+    const rpe = document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "";
+
+    addExerciseLog({
+      exerciseId,
+      methodId,
+      rpe,
+      pain: "",
+      notes: "",
+      data: {
+        label: rowLabel,
+        load,
+        result,
+        rest
+      }
+    });
+
+    renderApp();
+  });
+});
+
+document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
+  button.addEventListener("click", () => {
+    const exerciseId = button.dataset.logAllExecutionRows;
+    const methodId = button.dataset.methodId;
+
+    document
+      .querySelectorAll(`[data-log-execution-row="${exerciseId}"]`)
+      .forEach(rowButton => {
+        const rowId = rowButton.dataset.rowId;
+        const rowLabel = rowButton.dataset.rowLabel;
+        const key = `${exerciseId}-${rowId}`;
+
+        const load = document.querySelector(`[data-exec-load="${key}"]`)?.value || "";
+        const result = document.querySelector(`[data-exec-result="${key}"]`)?.value || "";
+        const rest = document.querySelector(`[data-exec-rest="${key}"]`)?.value || "";
+        const rpe = document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "";
+
+        addExerciseLog({
+          exerciseId,
+          methodId,
+          rpe,
+          pain: "",
+          notes: "",
+          data: {
+            label: rowLabel,
+            load,
+            result,
+            rest
+          }
+        });
+      });
+
+    renderApp();
+  });
+});
+  
   document.querySelectorAll("[data-log-planned-exercise]").forEach(button => {
   button.addEventListener("click", () => {
     const exerciseId = button.dataset.logPlannedExercise;
