@@ -634,3 +634,11 @@ select {
     width: 100%;
   }
 }
+
+.calendar-day.today span {
+  color: var(--accent);
+}
+
+.calendar-day.active {
+  background: var(--accent-soft);
+}
