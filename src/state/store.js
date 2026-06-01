@@ -21,6 +21,12 @@ function normalisePlannedExercise(exercisePlan = {}) {
   };
 }
 
+function getWorkout(template, workoutId) {
+  return template?.weeks
+    ?.flatMap(week => week.workouts || [])
+    .find(workout => workout.id === workoutId);
+}
+
 function buildSetsFromLegacyTarget(target = "") {
   const text = String(target || "").trim();
 
@@ -349,13 +355,17 @@ export function addExerciseToTemplate(templateId, exercisePlan) {
   const template = store.data.customTemplates.find(item => item.id === templateId);
   if (!template) return;
 
-  const workout = getFirstWorkout(template);
+  const workout =
+    exercisePlan.workoutId
+      ? getWorkout(template, exercisePlan.workoutId)
+      : getFirstWorkout(template);
+
   if (!workout) return;
 
   workout.exercises = workout.exercises || [];
   workout.exercises.push(normalisePlannedExercise(exercisePlan));
 
-  template.exercises = workout.exercises;
+  template.exercises = getFirstWorkout(template)?.exercises || [];
   saveData(store.data);
 }
 
