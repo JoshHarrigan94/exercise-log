@@ -1,122 +1,245 @@
 export const exerciseVariants = [
 
+  // Pull Up Family
+
   {
     id: "weighted-pull-up",
-
     name: "Weighted Pull Up",
-
     baseMovementId: "pull-up",
-
-    modifiers: [
-      "weighted"
-    ]
+    modifiers: ["weighted"]
   },
 
   {
     id: "tempo-pull-up",
-
     name: "Tempo Pull Up",
-
     baseMovementId: "pull-up",
-
-    modifiers: [
-      "tempo"
-    ]
+    modifiers: ["tempo"]
   },
 
   {
     id: "pause-pull-up",
-
     name: "Pause Pull Up",
-
     baseMovementId: "pull-up",
-
-    modifiers: [
-      "pause"
-    ]
+    modifiers: ["pause"]
   },
 
   {
-    id: "assisted-pull-up",
-
-    name: "Assisted Pull Up",
-
+    id: "isometric-pull-up",
+    name: "Pull Up Isometric",
     baseMovementId: "pull-up",
-
-    modifiers: [
-      "assisted"
-    ]
+    modifiers: ["isometric"]
   },
 
   {
-    id: "weighted-dip",
-
-    name: "Weighted Dip",
-
-    baseMovementId: "dip",
-
-    modifiers: [
-      "weighted"
-    ]
+    id: "eccentric-pull-up",
+    name: "Eccentric Pull Up",
+    baseMovementId: "pull-up",
+    modifiers: ["eccentric"]
   },
+
+  {
+    id: "band-assisted-pull-up",
+    name: "Band Assisted Pull Up",
+    baseMovementId: "pull-up",
+    modifiers: ["band-assisted"]
+  },
+
+  // Chin Up Family
+
+  {
+    id: "weighted-chin-up",
+    name: "Weighted Chin Up",
+    baseMovementId: "chin-up",
+    modifiers: ["weighted"]
+  },
+
+  {
+    id: "tempo-chin-up",
+    name: "Tempo Chin Up",
+    baseMovementId: "chin-up",
+    modifiers: ["tempo"]
+  },
+
+  // Push Up Family
 
   {
     id: "tempo-push-up",
-
     name: "Tempo Push Up",
-
     baseMovementId: "push-up",
-
-    modifiers: [
-      "tempo"
-    ]
+    modifiers: ["tempo"]
   },
 
   {
+    id: "pause-push-up",
+    name: "Pause Push Up",
+    baseMovementId: "push-up",
+    modifiers: ["pause"]
+  },
+
+  {
+    id: "weighted-push-up",
+    name: "Weighted Push Up",
+    baseMovementId: "push-up",
+    modifiers: ["weighted"]
+  },
+
+  // Dip Family
+
+  {
+    id: "weighted-dip",
+    name: "Weighted Dip",
+    baseMovementId: "dip",
+    modifiers: ["weighted"]
+  },
+
+  {
+    id: "tempo-dip",
+    name: "Tempo Dip",
+    baseMovementId: "dip",
+    modifiers: ["tempo"]
+  },
+
+  {
+    id: "pause-dip",
+    name: "Pause Dip",
+    baseMovementId: "dip",
+    modifiers: ["pause"]
+  },
+
+  // Squat Family
+
+  {
     id: "pause-squat",
-
     name: "Pause Squat",
-
     baseMovementId: "squat",
-
-    modifiers: [
-      "pause"
-    ]
+    modifiers: ["pause"]
   },
 
   {
     id: "tempo-squat",
-
     name: "Tempo Squat",
-
     baseMovementId: "squat",
-
-    modifiers: [
-      "tempo"
-    ]
+    modifiers: ["tempo"]
   },
 
   {
+    id: "box-squat",
+    name: "Box Squat",
+    baseMovementId: "squat",
+    modifiers: ["depth-limited"]
+  },
+
+  // Split Squat Family
+
+  {
+    id: "tempo-split-squat",
+    name: "Tempo Split Squat",
+    baseMovementId: "split-squat",
+    modifiers: ["tempo"]
+  },
+
+  {
+    id: "rear-foot-elevated-split-squat",
+    name: "Rear Foot Elevated Split Squat",
+    baseMovementId: "split-squat",
+    modifiers: ["full-rom"]
+  },
+
+  // Deadlift Family
+
+  {
+    id: "pause-deadlift",
+    name: "Pause Deadlift",
+    baseMovementId: "deadlift",
+    modifiers: ["pause"]
+  },
+
+  {
+    id: "tempo-deadlift",
+    name: "Tempo Deadlift",
+    baseMovementId: "deadlift",
+    modifiers: ["tempo"]
+  },
+
+  // RDL Family
+
+  {
+    id: "single-leg-rdl",
+    name: "Single Leg RDL",
+    baseMovementId: "rdl",
+    modifiers: ["single-leg"]
+  },
+
+  {
+    id: "tempo-rdl",
+    name: "Tempo RDL",
+    baseMovementId: "rdl",
+    modifiers: ["tempo"]
+  },
+
+  // Pogo Family
+
+  {
     id: "single-leg-pogo",
-
     name: "Single Leg Pogo",
-
     baseMovementId: "pogo",
-
-    modifiers: [
-      "single-leg"
-    ]
+    modifiers: ["single-leg"]
   },
 
   {
     id: "reactive-pogo",
-
     name: "Reactive Pogo",
-
     baseMovementId: "pogo",
+    modifiers: ["reactive"]
+  },
 
-    modifiers: [
-      "reactive"
-    ]
+  {
+    id: "continuous-pogo",
+    name: "Continuous Pogo",
+    baseMovementId: "pogo",
+    modifiers: ["continuous"]
+  },
+
+  // Broad Jump Family
+
+  {
+    id: "single-leg-broad-jump",
+    name: "Single Leg Broad Jump",
+    baseMovementId: "broad-jump",
+    modifiers: ["single-leg"]
+  },
+
+  // Drop Jump Family
+
+  {
+    id: "reactive-drop-jump",
+    name: "Reactive Drop Jump",
+    baseMovementId: "drop-jump",
+    modifiers: ["reactive"]
+  },
+
+  // Sprint Family
+
+  {
+    id: "hill-sprint",
+    name: "Hill Sprint",
+    baseMovementId: "sprint",
+    modifiers: ["external-load"]
+  },
+
+  {
+    id: "resisted-sprint",
+    name: "Resisted Sprint",
+    baseMovementId: "sprint",
+    modifiers: ["band-resisted"]
+  },
+
+  // Zone 2 Family
+
+  {
+    id: "trail-zone2-run",
+    name: "Trail Zone 2 Run",
+    baseMovementId: "zone2-run",
+    modifiers: ["continuous"]
   }
 ];
