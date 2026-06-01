@@ -34,6 +34,11 @@ import {
   makeCoachingDecision
 } from "./programming/index.js";
 
+import {
+  analyseBlockMetrics,
+  analyseBlocksMetrics
+} from "./metrics/blockMetrics.js";
+
 export function analyseSession(session = {}) {
   const compliance = calculateSessionCompliance(session);
   const deviations = getSessionDeviations(compliance);
@@ -80,6 +85,8 @@ export {
 
   analyseBlockDomain,
   analyseBlocksDomain,
+  analyseBlockMetrics,
+  analyseBlocksMetrics,
   classifyExerciseDomain,
   classifyWorkoutDomain,
   classifyBlockDomain,
