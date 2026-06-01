@@ -642,3 +642,103 @@ select {
 .calendar-day.active {
   background: var(--accent-soft);
 }
+
+.compact-logger {
+  gap: 14px;
+}
+
+.compact-logger-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.compact-logger-header h2 {
+  margin-top: 4px;
+}
+
+.compact-log-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr) 82px 82px auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.compact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compact-field span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.compact-field input,
+.compact-field select {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 12px;
+  font: inherit;
+  outline: none;
+}
+
+.compact-save-button {
+  height: 44px;
+  padding-inline: 18px;
+}
+
+.logger-details {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 12px;
+}
+
+.logger-details summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 850;
+  list-style: none;
+}
+
+.logger-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.logger-details summary::after {
+  content: "↓";
+  float: right;
+  color: var(--muted);
+}
+
+.logger-details[open] summary::after {
+  content: "↑";
+}
+
+.logger-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+@media (max-width: 760px) {
+  .compact-log-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .compact-field-wide,
+  .compact-save-button {
+    grid-column: 1 / -1;
+  }
+
+  .compact-save-button {
+    width: 100%;
+  }
+}
