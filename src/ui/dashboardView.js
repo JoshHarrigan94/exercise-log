@@ -9,6 +9,10 @@ function toDateKey(date) {
   return date.toISOString().slice(0, 10);
 }
 
+function dateFromKey(dateKey) {
+  return new Date(`${dateKey}T12:00:00`);
+}
+
 function formatDateLabel(date) {
   return date.toLocaleDateString("en-GB", {
     weekday: "long",
@@ -17,20 +21,26 @@ function formatDateLabel(date) {
   });
 }
 
+function getSelectedDate() {
+  return dateFromKey(store.selectedCalendarDate || getTodayKey());
+}
+
 function getMonthDays() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const selected = getSelectedDate();
+  const year = selected.getFullYear();
+  const month = selected.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   return Array.from({ length: daysInMonth }, (_, index) => {
     const date = new Date(year, month, index + 1);
+    const key = toDateKey(date);
 
     return {
       date,
-      key: toDateKey(date),
+      key,
       day: index + 1,
-      isToday: toDateKey(date) === getTodayKey()
+      isToday: key === getTodayKey(),
+      isSelected: key === store.selectedCalendarDate
     };
   });
 }
@@ -41,30 +51,30 @@ function getCompletedSessionForDate(dateKey) {
   );
 }
 
-function getSuggestedPlan() {
+function getSuggestedPlanForDate(dateKey) {
+  if (dateKey !== getTodayKey()) return null;
+
   const templates = getAllTemplates();
   return templates[0] || null;
 }
 
 function renderCalendarDots(days) {
-  const todayKey = getTodayKey();
-
   return `
     <div class="dot-calendar">
       ${days.map(day => {
         const completedSession = getCompletedSessionForDate(day.key);
-        const hasPlannedSession = day.key === todayKey && getSuggestedPlan();
+        const plannedSession = getSuggestedPlanForDate(day.key);
 
         return `
           <button
-            class="calendar-day ${day.isToday ? "active" : ""}"
+            class="calendar-day ${day.isToday ? "today" : ""} ${day.isSelected ? "active" : ""}"
             data-calendar-day="${day.key}"
             type="button"
           >
             <span>${day.day}</span>
 
             <div class="calendar-dots">
-              ${hasPlannedSession ? `<i class="dot dot-planned"></i>` : ""}
+              ${plannedSession ? `<i class="dot dot-planned"></i>` : ""}
               ${completedSession ? `<i class="dot dot-completed"></i>` : ""}
             </div>
           </button>
@@ -75,40 +85,43 @@ function renderCalendarDots(days) {
 }
 
 function renderSelectedDayPanel() {
-  const today = new Date();
-  const todayKey = getTodayKey();
-  const completedSession = getCompletedSessionForDate(todayKey);
-  const suggestedPlan = getSuggestedPlan();
+  const selectedDate = getSelectedDate();
+  const selectedKey = toDateKey(selectedDate);
+  const completedSession = getCompletedSessionForDate(selectedKey);
+  const plannedSession = getSuggestedPlanForDate(selectedKey);
+  const isToday = selectedKey === getTodayKey();
 
   return `
     <article class="calendar-focus-card">
       <div>
-        <span class="quiet-label">${formatDateLabel(today)}</span>
-        <h2>${suggestedPlan ? suggestedPlan.name : "No planned session"}</h2>
+        <span class="quiet-label">${formatDateLabel(selectedDate)}</span>
+
+        <h2>
+          ${
+            completedSession
+              ? completedSession.name
+              : plannedSession
+                ? plannedSession.name
+                : isToday
+                  ? "No planned session"
+                  : "No session logged"
+          }
+        </h2>
+
         <p>
           ${
-            suggestedPlan
-              ? suggestedPlan.goal || "Planned session ready to log."
-              : "Start an empty session or build a plan."
+            completedSession
+              ? `${completedSession.exercises.length} logged exposures`
+              : plannedSession
+                ? plannedSession.goal || "Planned session ready to log."
+                : isToday
+                  ? "Start an empty session or build a plan."
+                  : "Select today to start logging, or review completed sessions."
           }
         </p>
       </div>
 
       <div class="calendar-focus-actions">
-        ${
-          suggestedPlan
-            ? `
-              <button class="primary-button" data-template-id="${suggestedPlan.id}">
-                Start Session
-              </button>
-            `
-            : `
-              <button class="primary-button" data-view="session">
-                Create Plan
-              </button>
-            `
-        }
-
         ${
           completedSession
             ? `
@@ -118,12 +131,29 @@ function renderSelectedDayPanel() {
             `
             : ""
         }
+
+        ${
+          plannedSession
+            ? `
+              <button class="primary-button" data-template-id="${plannedSession.id}">
+                Start Session
+              </button>
+            `
+            : isToday
+              ? `
+                <button class="primary-button" data-view="session">
+                  Create Plan
+                </button>
+              `
+              : ""
+        }
       </div>
     </article>
   `;
 }
 
 export function renderDashboard() {
+  const selectedDate = getSelectedDate();
   const days = getMonthDays();
   const completedCount = store.data.sessions.length;
 
@@ -143,8 +173,9 @@ export function renderDashboard() {
         <div class="calendar-feature-header">
           <div>
             <span class="quiet-label">
-              ${new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+              ${selectedDate.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
             </span>
+
             <h2>Training calendar</h2>
           </div>
 
