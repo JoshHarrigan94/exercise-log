@@ -26,6 +26,25 @@ function renderExposureMeta(log) {
   `;
 }
 
+function renderPlannedExercises(session) {
+  const planned = session.plannedExercises || [];
+
+  if (planned.length === 0) return "";
+
+  return `
+    <div class="planned-session-card">
+      <span>Planned</span>
+
+      ${planned.map(item => `
+        <div class="planned-session-row">
+          <strong>${getExerciseName(item.exerciseId)}</strong>
+          <small>${getMethodName(item.methodId)} · ${item.target || "No target"}</small>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 export function renderLiveSession() {
   const activeSession = store.activeSession;
 
@@ -38,6 +57,8 @@ export function renderLiveSession() {
           <p class="hero-text">
             Choose a session from Train to open the live logger.
           </p>
+
+            ${renderPlannedExercises(activeSession)}
 
           <button class="secondary-button" data-view="session">
             Go to Train
