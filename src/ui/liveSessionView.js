@@ -2,7 +2,7 @@ import { store } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
 import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
-//import { getExecutionRows } from "../logic/executionRows.js";
+import { getExecutionRows } from "../logic/executionRows.js";
 function getExecutionRows() {
   return [];
 }
@@ -78,8 +78,8 @@ function renderExerciseBlock(session, item, index) {
   const isComplete = loggedCount >= rows.length;
 
   return `
-    <article class="execution-item ${isComplete ? "execution-item-complete" : ""}">
-      <div class="execution-item-top">
+    <details class="execution-item ${isComplete ? "execution-item-complete" : ""}" open>
+      <summary class="execution-item-top">
         <div class="execution-index">
           ${isComplete ? "✓" : index + 1}
         </div>
@@ -92,7 +92,7 @@ function renderExerciseBlock(session, item, index) {
         <span class="execution-status">
           ${loggedCount}/${rows.length}
         </span>
-      </div>
+      </summary>
 
       ${
         item.notes
@@ -111,7 +111,7 @@ function renderExerciseBlock(session, item, index) {
       >
         Log all as planned
       </button>
-    </article>
+    </details>
   `;
 }
 
