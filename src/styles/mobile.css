@@ -23,3 +23,13 @@
     display: none;
   }
 }
+
+@media (max-width: 859px) {
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .workspace-shell {
+    width: 100%;
+  }
+}
