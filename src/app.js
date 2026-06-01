@@ -168,8 +168,21 @@ function populateLoggerFromLog(log) {
       if (field) field.value = value;
     });
 
-    document.querySelector("#log-rpe").value = log.rpe || "";
-    document.querySelector("#log-pain").value = log.pain || "";
+    if (document.querySelector("#log-rpe")) {
+  document.querySelector("#log-rpe").value = log.rpe || "";
+}
+
+if (document.querySelector("#log-rpe-detail")) {
+  document.querySelector("#log-rpe-detail").value = log.rpe || "";
+}
+
+if (document.querySelector("#log-pain")) {
+  document.querySelector("#log-pain").value = log.pain || "";
+}
+
+if (document.querySelector("#log-pain-detail")) {
+  document.querySelector("#log-pain-detail").value = log.pain || "";
+}
     document.querySelector("#log-notes").value = log.notes || "";
     document.querySelector("#editing-log-id").value = log.id;
 
@@ -267,14 +280,24 @@ function bindLiveSessionActions() {
       dynamicData[field.id.replace("dynamic-", "")] = field.value;
     });
 
-    const payload = {
-      exerciseId,
-      methodId,
-      rpe: document.querySelector("#log-rpe")?.value || "",
-      pain: document.querySelector("#log-pain")?.value || "",
-      notes: document.querySelector("#log-notes")?.value || "",
-      data: dynamicData
-    };
+    const rpe =
+  document.querySelector("#log-rpe-detail")?.value ||
+  document.querySelector("#log-rpe")?.value ||
+  "";
+
+const pain =
+  document.querySelector("#log-pain-detail")?.value ||
+  document.querySelector("#log-pain")?.value ||
+  "";
+
+const payload = {
+  exerciseId,
+  methodId,
+  rpe,
+  pain,
+  notes: document.querySelector("#log-notes")?.value || "",
+  data: dynamicData
+};
 
     const editingLogId = document.querySelector("#editing-log-id")?.value;
 
