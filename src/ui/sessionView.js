@@ -1,4 +1,6 @@
 import { getAllTemplates } from "../logic/templateLibrary.js";
+import { getAllExercises, getExerciseById } from "../logic/exerciseLibrary.js";
+import { methodTypes } from "../data/methodTypes.js";
 
 function formatTemplatePriority(template) {
   if (!template.priority) return "Custom";
@@ -10,14 +12,134 @@ function formatTemplatePriority(template) {
   return template.priority;
 }
 
+function getMethodName(id) {
+  return methodTypes.find(method => method.id === id)?.name || "Method";
+}
+
+function renderTemplateBuilder(templates, exercises) {
+  const customTemplates = templates.filter(template =>
+    template.id.startsWith("custom-template-")
+  );
+
+  return `
+    <article class="workspace-card desktop-plan-builder">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Plan builder</p>
+          <h2>Add exercises to templates</h2>
+        </div>
+      </div>
+
+      ${
+        customTemplates.length === 0
+          ? `
+            <p>Create a custom template first, then add planned exercises here.</p>
+          `
+          : `
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Template</span>
+                <select id="template-builder-template">
+                  ${customTemplates.map(template => `
+                    <option value="${template.id}">${template.name}</option>
+                  `).join("")}
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span>Exercise</span>
+                <select id="template-builder-exercise">
+                  ${exercises.map(exercise => `
+                    <option value="${exercise.id}">${exercise.name}</option>
+                  `).join("")}
+                </select>
+              </label>
+            </div>
+
+            <label class="form-field">
+              <span>Method</span>
+              <select id="template-builder-method">
+                ${methodTypes.map(method => `
+                  <option value="${method.id}">${method.name}</option>
+                `).join("")}
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>Target</span>
+              <input
+                id="template-builder-target"
+                type="text"
+                placeholder="+25kg × 3 / 1-2-3-4-5 × 2 / 30s × 3"
+              />
+            </label>
+
+            <label class="form-field">
+              <span>Notes</span>
+              <textarea
+                id="template-builder-notes"
+                placeholder="Strict ROM, technical failure, pain cap, tempo..."
+              ></textarea>
+            </label>
+
+            <button class="primary-button" id="add-exercise-to-template">
+              Add to Template
+            </button>
+          `
+      }
+    </article>
+  `;
+}
+
+function renderTemplateExerciseList(template) {
+  const planned = template.exercises || [];
+
+  if (planned.length === 0) {
+    return `<small>No planned exercises yet.</small>`;
+  }
+
+  return `
+    <div class="planned-exercise-list">
+      ${planned.map(item => {
+        const exercise = getExerciseById(item.exerciseId);
+
+        return `
+          <div class="planned-exercise-row">
+            <div>
+              <strong>${exercise?.name || "Exercise"}</strong>
+              <small>${getMethodName(item.methodId)} · ${item.target || "No target"}</small>
+              ${item.notes ? `<p>${item.notes}</p>` : ""}
+            </div>
+
+            ${
+              template.id.startsWith("custom-template-")
+                ? `
+                  <button
+                    class="mini-delete-button"
+                    data-template-id="${template.id}"
+                    data-remove-template-exercise="${item.id}"
+                  >
+                    ×
+                  </button>
+                `
+                : ""
+            }
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 export function renderSession() {
   const templates = getAllTemplates();
+  const exercises = getAllExercises();
 
   return `
     <section class="screen active-screen">
       <div class="section-header">
         <p class="eyebrow">Session builder</p>
-        <h1>Start training</h1>
+        <h1>Plan or start training</h1>
       </div>
 
       <article class="ad-hoc-card">
@@ -91,6 +213,8 @@ export function renderSession() {
         </button>
       </article>
 
+      ${renderTemplateBuilder(templates, exercises)}
+
       <div class="section-header">
         <p class="eyebrow">Templates</p>
         <h2>Structured sessions</h2>
@@ -107,6 +231,10 @@ export function renderSession() {
               <strong>${formatTemplatePriority(template)}</strong>
               <small>${template.goal || "No goal set"}</small>
             </button>
+
+            <div class="template-plan-preview">
+              ${renderTemplateExerciseList(template)}
+            </div>
 
             ${
               template.id.startsWith("custom-template-")
