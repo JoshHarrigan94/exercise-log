@@ -158,3 +158,39 @@
     display: none;
   }
 }
+
+.desktop-dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.desktop-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.desktop-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 860px) {
+  .desktop-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .desktop-main-column {
+    gap: 18px;
+  }
+
+  .desktop-side-panel {
+    position: sticky;
+    top: 24px;
+  }
+}
