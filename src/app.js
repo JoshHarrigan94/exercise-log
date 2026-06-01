@@ -9,7 +9,7 @@ import {
   bindSessionDetailActions
 } from "./ui/sessionDetailView.js";
 
-import { renderNav } from "./components/nav.js";
+import { renderNav, renderSidebar } from "./components/nav.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
 import {
@@ -313,18 +313,22 @@ function bindPreviewInputs() {
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
-      <header class="top-bar">
-        <div>
-          <p class="eyebrow">Progression Lab</p>
-          <h1>${getViewTitle()}</h1>
+      ${renderSidebar(store.activeView)}
+
+      <section class="workspace-shell">
+        <header class="top-bar">
+          <div>
+            <p class="eyebrow">Progression Lab</p>
+            <h1>${getViewTitle()}</h1>
+          </div>
+
+          <button class="profile-button">JH</button>
+        </header>
+
+        <div class="view-container">
+          ${renderView()}
         </div>
-
-        <button class="profile-button">JH</button>
-      </header>
-
-      <div class="view-container">
-        ${renderView()}
-      </div>
+      </section>
 
       ${store.activeView === "session-detail" ? "" : renderNav(store.activeView)}
     </main>
