@@ -2,7 +2,11 @@ import { store } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
 import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
-import { getExecutionRows } from "../logic/executionRows.js";
+//import { getExecutionRows } from "../logic/executionRows.js";
+function getExecutionRows() {
+  return [];
+}
+
 
 function getExerciseName(id) {
   return getExerciseById(id)?.name || "Exercise";
