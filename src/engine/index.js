@@ -4,6 +4,13 @@ import {
   getDeviationSummary
 } from "./rules/deviationRules.js";
 import { composeSessionFeedback } from "./feedback/feedbackComposer.js";
+import {
+  analyseExerciseProgression,
+  getExerciseLogs,
+  getBestLoad,
+  getBestResult,
+  getRecentTrend
+} from "./metrics/progression.js";
 
 export function analyseSession(session = {}) {
   const compliance = calculateSessionCompliance(session);
@@ -28,3 +35,11 @@ export function analyseSession(session = {}) {
 export function analyseSessions(sessions = []) {
   return sessions.map(analyseSession);
 }
+
+export {
+  analyseExerciseProgression,
+  getExerciseLogs,
+  getBestLoad,
+  getBestResult,
+  getRecentTrend
+};
