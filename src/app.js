@@ -176,13 +176,6 @@ if (document.querySelector("#log-rpe-detail")) {
   document.querySelector("#log-rpe-detail").value = log.rpe || "";
 }
 
-if (document.querySelector("#log-pain")) {
-  document.querySelector("#log-pain").value = log.pain || "";
-}
-
-if (document.querySelector("#log-pain-detail")) {
-  document.querySelector("#log-pain-detail").value = log.pain || "";
-}
     document.querySelector("#log-notes").value = log.notes || "";
     document.querySelector("#editing-log-id").value = log.id;
 
@@ -238,7 +231,7 @@ function bindLiveSessionActions() {
       exerciseId,
       methodId,
       rpe,
-      pain: "",
+      
       notes: "",
       data: {
         label: rowLabel,
@@ -273,7 +266,7 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
           exerciseId,
           methodId,
           rpe,
-          pain: "",
+          
           notes: "",
           data: {
             label: rowLabel,
@@ -381,16 +374,12 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
   document.querySelector("#log-rpe")?.value ||
   "";
 
-const pain =
-  document.querySelector("#log-pain-detail")?.value ||
-  document.querySelector("#log-pain")?.value ||
-  "";
+
 
 const payload = {
   exerciseId,
   methodId,
   rpe,
-  pain,
   notes: document.querySelector("#log-notes")?.value || "",
   data: dynamicData
 };
