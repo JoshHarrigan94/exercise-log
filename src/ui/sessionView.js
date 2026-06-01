@@ -10,6 +10,18 @@ function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
 }
 
+function getWorkoutMovementCount(workout) {
+  return (workout.exercises || []).length;
+}
+
+function getBlockMovementCount(template) {
+  return (template.weeks || []).reduce((total, week) => {
+    return total + (week.workouts || []).reduce((weekTotal, workout) => {
+      return weekTotal + getWorkoutMovementCount(workout);
+    }, 0);
+  }, 0);
+}
+
 function renderSetSummary(item) {
   const sets = item.sets || [];
 
@@ -24,8 +36,8 @@ function renderSetSummary(item) {
   return `${sets.length} sets · ${first.load || "Load"} × ${first.reps || "Reps"}${first.rest ? ` · ${first.rest}` : ""}`;
 }
 
-function renderMovementRows(template) {
-  const planned = template.exercises || [];
+function renderMovementRows(template, workout) {
+  const planned = workout.exercises || [];
 
   if (planned.length === 0) {
     return `<div class="block-empty-row">No movements planned.</div>`;
@@ -65,8 +77,45 @@ function renderMovementRows(template) {
   `;
 }
 
+function renderWorkout(template, week, workout) {
+  return `
+    <details class="workout-panel">
+      <summary>
+        <span>${workout.name}</span>
+        <small>${getWorkoutMovementCount(workout)} movements</small>
+      </summary>
+
+      <div class="workout-panel-body">
+        <button
+          class="secondary-button compact-button"
+          data-template-id="${template.id}"
+          data-workout-id="${workout.id}"
+        >
+          Start workout
+        </button>
+
+        ${renderMovementRows(template, workout)}
+      </div>
+    </details>
+  `;
+}
+
+function renderWeek(template, week) {
+  return `
+    <details class="block-week-panel" open>
+      <summary>${week.name}</summary>
+
+      <div class="block-week-body">
+        ${(week.workouts || []).map(workout =>
+          renderWorkout(template, week, workout)
+        ).join("")}
+      </div>
+    </details>
+  `;
+}
+
 function renderBlockCard(template) {
-  const movementCount = (template.exercises || []).length;
+  const movementCount = getBlockMovementCount(template);
 
   return `
     <article class="training-block-card">
@@ -94,10 +143,11 @@ function renderBlockCard(template) {
         }
       </div>
 
-      <details class="block-detail-panel">
-        <summary>View movements</summary>
-        ${renderMovementRows(template)}
-      </details>
+      <div class="block-structure">
+        ${(template.weeks || []).map(week =>
+          renderWeek(template, week)
+        ).join("")}
+      </div>
     </article>
   `;
 }
@@ -144,7 +194,7 @@ function renderMovementBuilder(templates, exercises) {
 
   return `
     <details class="block-utility-panel" open>
-      <summary>Add movement to block</summary>
+      <summary>Add movement to Week 1 / Workout A</summary>
 
       ${
         customTemplates.length === 0
