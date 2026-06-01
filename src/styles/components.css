@@ -763,3 +763,158 @@ select {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.plans-screen {
+  gap: 14px;
+}
+
+.plan-create-card,
+.plan-builder-card,
+.plan-card {
+  border: 0;
+  border-radius: 28px;
+  background: var(--surface);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-create-card h2,
+.plan-builder-card h2 {
+  margin-top: 4px;
+}
+
+.plan-create-card p,
+.plan-builder-card p {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.inline-session-form,
+.inline-template-form,
+.compact-plan-builder-row {
+  display: grid;
+  gap: 8px;
+}
+
+.inline-session-form {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+}
+
+.inline-template-form {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr) auto;
+}
+
+.compact-plan-builder-row {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 0.8fr)
+    minmax(0, 0.8fr)
+    auto;
+}
+
+.inline-session-form input,
+.inline-template-form input,
+.compact-plan-builder-row input,
+.compact-plan-builder-row select {
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 12px;
+  font: inherit;
+  outline: none;
+}
+
+.plans-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.plan-title-button {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plan-title-button span {
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.plan-title-button strong {
+  font-size: 1.2rem;
+}
+
+.plan-title-button small {
+  color: var(--muted);
+}
+
+.plan-row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-row,
+.plan-empty-row {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+
+.plan-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.plan-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plan-row-main small,
+.plan-row p,
+.plan-empty-row {
+  color: var(--muted);
+}
+
+.plan-row p {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 860px) {
+  .inline-session-form,
+  .inline-template-form,
+  .compact-plan-builder-row {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-row {
+    grid-template-columns: 1fr;
+  }
+}
