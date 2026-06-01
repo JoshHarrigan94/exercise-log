@@ -50,7 +50,7 @@ function getViewTitle() {
 
   const titles = {
     dashboard: "Today",
-    session: "Plans",
+    session: "Blocks",
     library: "Library",
     history: "Review",
     "session-detail": "Session Detail"
@@ -120,7 +120,7 @@ function bindSessionStart() {
     const editingTemplateId = document.querySelector("#editing-template-id")?.value;
 
     if (!name) {
-      alert("Add a template name first.");
+      alert("Add a block name first.");
       return;
     }
 
@@ -135,7 +135,7 @@ function bindSessionStart() {
 
   document.querySelectorAll("[data-delete-custom-template]").forEach(button => {
     button.addEventListener("click", () => {
-      if (!confirm("Delete this custom template?")) return;
+      if (!confirm("Delete this block?")) return;
 
       deleteCustomTemplate(button.dataset.deleteCustomTemplate);
       renderApp();
@@ -150,6 +150,27 @@ function bindHistoryActions() {
       renderApp();
     });
   });
+}
+
+function readExecutionRow(button) {
+  const exerciseId = button.dataset.logExecutionRow;
+  const methodId = button.dataset.methodId;
+  const rowId = button.dataset.rowId;
+  const rowLabel = button.dataset.rowLabel;
+  const key = `${exerciseId}-${rowId}`;
+
+  return {
+    exerciseId,
+    methodId,
+    rpe: document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "",
+    notes: "",
+    data: {
+      label: rowLabel,
+      load: document.querySelector(`[data-exec-load="${key}"]`)?.value || "",
+      result: document.querySelector(`[data-exec-result="${key}"]`)?.value || "",
+      rest: document.querySelector(`[data-exec-rest="${key}"]`)?.value || ""
+    }
+  };
 }
 
 function populateLoggerFromLog(log) {
@@ -168,18 +189,13 @@ function populateLoggerFromLog(log) {
       if (field) field.value = value;
     });
 
-    if (document.querySelector("#log-rpe")) {
-  document.querySelector("#log-rpe").value = log.rpe || "";
-}
-
-if (document.querySelector("#log-rpe-detail")) {
-  document.querySelector("#log-rpe-detail").value = log.rpe || "";
-}
-
+    document.querySelector("#log-rpe").value = log.rpe || "";
     document.querySelector("#log-notes").value = log.notes || "";
     document.querySelector("#editing-log-id").value = log.id;
 
-    updateMethodPreview();
+    if (document.querySelector("#method-preview")) {
+      updateMethodPreview();
+    }
   }, 0);
 }
 
@@ -194,7 +210,7 @@ function bindLiveSessionActions() {
     if (!store.activeSession) return;
 
     createTemplateFromSession(store.activeSession.id);
-    alert("Saved as template.");
+    alert("Saved as block.");
     renderApp();
   });
 
@@ -212,74 +228,27 @@ function bindLiveSessionActions() {
       renderApp();
     });
   });
-  
+
   document.querySelectorAll("[data-log-execution-row]").forEach(button => {
-  button.addEventListener("click", () => {
-    const exerciseId = button.dataset.logExecutionRow;
-    const methodId = button.dataset.methodId;
-    const rowId = button.dataset.rowId;
-    const rowLabel = button.dataset.rowLabel;
-
-    const key = `${exerciseId}-${rowId}`;
-
-    const load = document.querySelector(`[data-exec-load="${key}"]`)?.value || "";
-    const result = document.querySelector(`[data-exec-result="${key}"]`)?.value || "";
-    const rest = document.querySelector(`[data-exec-rest="${key}"]`)?.value || "";
-    const rpe = document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "";
-
-    addExerciseLog({
-      exerciseId,
-      methodId,
-      rpe,
-      
-      notes: "",
-      data: {
-        label: rowLabel,
-        load,
-        result,
-        rest
-      }
+    button.addEventListener("click", () => {
+      addExerciseLog(readExecutionRow(button));
+      renderApp();
     });
-
-    renderApp();
   });
-});
 
-document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
-  button.addEventListener("click", () => {
-    const exerciseId = button.dataset.logAllExecutionRows;
-    const methodId = button.dataset.methodId;
+  document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
+    button.addEventListener("click", () => {
+      const exerciseId = button.dataset.logAllExecutionRows;
 
-    document
-      .querySelectorAll(`[data-log-execution-row="${exerciseId}"]`)
-      .forEach(rowButton => {
-        const rowId = rowButton.dataset.rowId;
-        const rowLabel = rowButton.dataset.rowLabel;
-        const key = `${exerciseId}-${rowId}`;
-
-        const load = document.querySelector(`[data-exec-load="${key}"]`)?.value || "";
-        const result = document.querySelector(`[data-exec-result="${key}"]`)?.value || "";
-        const rest = document.querySelector(`[data-exec-rest="${key}"]`)?.value || "";
-        const rpe = document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "";
-
-        addExerciseLog({
-          exerciseId,
-          methodId,
-          rpe,
-          
-          notes: "",
-          data: {
-            label: rowLabel,
-            load,
-            result,
-            rest
-          }
+      document
+        .querySelectorAll(`[data-log-execution-row="${exerciseId}"]`)
+        .forEach(rowButton => {
+          addExerciseLog(readExecutionRow(rowButton));
         });
-      });
 
-    renderApp();
+      renderApp();
+    });
   });
-});
 
   document.querySelectorAll("[data-edit-log-id]").forEach(button => {
     button.addEventListener("click", () => {
@@ -302,28 +271,36 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
   });
 
   document.querySelector("#log-method")?.addEventListener("change", async event => {
-  try {
-    const { renderMethodFields } = await import("./components/methodFields.js");
+    try {
+      const { renderMethodFields } = await import("./components/methodFields.js");
 
-    const container = document.querySelector("#dynamic-method-fields");
-    if (!container) return;
+      const container = document.querySelector("#dynamic-method-fields");
+      if (!container) return;
 
-    container.innerHTML = renderMethodFields(event.target.value);
+      container.innerHTML = renderMethodFields(event.target.value);
 
-    bindQuickChips();
-    bindPreviewInputs();
-    updateMethodPreview();
-    updateMethodMemoryPanel();
+      bindQuickChips();
+      bindPreviewInputs();
+
+      if (document.querySelector("#method-preview")) {
+        updateMethodPreview();
+      }
+
+      if (document.querySelector("#method-memory-panel")) {
+        updateMethodMemoryPanel();
         bindMethodMemoryActions();
-  } catch (error) {
-    console.error(error);
-    alert(error.message || "Failed to update method fields.");
-  }
-});
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Failed to update method fields.");
+    }
+  });
 
   document.querySelector("#log-exercise")?.addEventListener("change", () => {
-    updateMethodMemoryPanel();
-    bindMethodMemoryActions();
+    if (document.querySelector("#method-memory-panel")) {
+      updateMethodMemoryPanel();
+      bindMethodMemoryActions();
+    }
   });
 
   document.querySelector("#clear-log-form")?.addEventListener("click", () => {
@@ -331,7 +308,9 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
       field.value = "";
     });
 
-    updateMethodPreview();
+    if (document.querySelector("#method-preview")) {
+      updateMethodPreview();
+    }
   });
 
   document.querySelector("#add-exercise-log")?.addEventListener("click", () => {
@@ -346,20 +325,13 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
       dynamicData[field.id.replace("dynamic-", "")] = field.value;
     });
 
-    const rpe =
-  document.querySelector("#log-rpe-detail")?.value ||
-  document.querySelector("#log-rpe")?.value ||
-  "";
-
-
-
-const payload = {
-  exerciseId,
-  methodId,
-  rpe,
-  notes: document.querySelector("#log-notes")?.value || "",
-  data: dynamicData
-};
+    const payload = {
+      exerciseId,
+      methodId,
+      rpe: document.querySelector("#log-rpe")?.value || "",
+      notes: document.querySelector("#log-notes")?.value || "",
+      data: dynamicData
+    };
 
     const editingLogId = document.querySelector("#editing-log-id")?.value;
 
@@ -402,48 +374,55 @@ function bindLibraryActions() {
   });
 }
 
+function getPlannedSetsFromBuilder() {
+  const load = document.querySelector("#template-builder-load")?.value?.trim();
+  const sets = Number(document.querySelector("#template-builder-sets")?.value || 1);
+  const reps = document.querySelector("#template-builder-reps")?.value?.trim();
+  const rest = document.querySelector("#template-builder-rest")?.value?.trim();
+  const rpe = document.querySelector("#template-builder-rpe")?.value?.trim();
+
+  return Array.from({ length: Math.max(1, sets) }, (_, index) => ({
+    id: `set-${index + 1}`,
+    label: `Set ${index + 1}`,
+    load,
+    reps,
+    rest,
+    rpe
+  }));
+}
+
+function buildTargetFromSets(plannedSets) {
+  const first = plannedSets[0] || {};
+  const setCount = plannedSets.length;
+
+  return `${setCount} × ${first.reps || "?"}${first.load ? ` @ ${first.load}` : ""}${first.rest ? ` · ${first.rest}` : ""}`;
+}
+
 function bindTemplateBuilderActions() {
   document.querySelector("#add-exercise-to-template")?.addEventListener("click", () => {
     const templateId = document.querySelector("#template-builder-template")?.value;
     const exerciseId = document.querySelector("#template-builder-exercise")?.value;
     const methodId = document.querySelector("#template-builder-method")?.value;
-    const load = document.querySelector("#template-builder-load")?.value?.trim();
-const sets = Number(document.querySelector("#template-builder-sets")?.value || 1);
-const reps = document.querySelector("#template-builder-reps")?.value?.trim();
-const rest = document.querySelector("#template-builder-rest")?.value?.trim();
-const rpe = document.querySelector("#template-builder-rpe")?.value?.trim();
-const notes = document.querySelector("#template-builder-notes")?.value?.trim();
-const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
-
-const plannedSets = Array.from({ length: Math.max(1, sets) }, (_, index) => ({
-  id: `set-${index + 1}`,
-  label: `Set ${index + 1}`,
-  load,
-  reps,
-  rest,
-  rpe
-}));
-
-const target = `${sets || 1} × ${reps || "?"}${load ? ` @ ${load}` : ""}${rest ? ` · ${rest}` : ""}`;
+    const notes = document.querySelector("#template-builder-notes")?.value?.trim();
+    const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
 
     if (!templateId || !exerciseId || !methodId) return;
 
+    const plannedSets = getPlannedSetsFromBuilder();
+    const target = buildTargetFromSets(plannedSets);
+
+    const payload = {
+      exerciseId,
+      methodId,
+      target,
+      notes,
+      sets: plannedSets
+    };
+
     if (editingPlannedExerciseId) {
-      updateExerciseInTemplate(templateId, editingPlannedExerciseId, {
-  exerciseId,
-  methodId,
-  target,
-  notes,
-  sets: plannedSets
-});
+      updateExerciseInTemplate(templateId, editingPlannedExerciseId, payload);
     } else {
-      addExerciseToTemplate(templateId, {
-  exerciseId,
-  methodId,
-  target,
-  notes,
-  sets: plannedSets
-});
+      addExerciseToTemplate(templateId, payload);
     }
 
     renderApp();
@@ -475,10 +454,16 @@ const target = `${sets || 1} × ${reps || "?"}${load ? ` @ ${load}` : ""}${rest 
 
       if (!plannedExercise) return;
 
+      const firstSet = plannedExercise.sets?.[0] || {};
+
       document.querySelector("#template-builder-template").value = templateId;
       document.querySelector("#template-builder-exercise").value = plannedExercise.exerciseId;
       document.querySelector("#template-builder-method").value = plannedExercise.methodId;
-      document.querySelector("#template-builder-target").value = plannedExercise.target || "";
+      document.querySelector("#template-builder-load").value = firstSet.load || "";
+      document.querySelector("#template-builder-sets").value = plannedExercise.sets?.length || 1;
+      document.querySelector("#template-builder-reps").value = firstSet.reps || "";
+      document.querySelector("#template-builder-rest").value = firstSet.rest || "";
+      document.querySelector("#template-builder-rpe").value = firstSet.rpe || "";
       document.querySelector("#template-builder-notes").value = plannedExercise.notes || "";
       document.querySelector("#editing-planned-exercise-id").value = plannedExercise.id;
 
@@ -546,18 +531,18 @@ export function renderApp() {
   bindTemplateBuilderActions();
   bindSessionDetailActions(renderApp);
   bindQuickChips();
-bindPreviewInputs();
+  bindPreviewInputs();
 
-if (document.querySelector("#method-preview")) {
-  updateMethodPreview();
-}
+  if (document.querySelector("#method-preview")) {
+    updateMethodPreview();
+  }
 
-if (document.querySelector("#method-memory-panel")) {
-  updateMethodMemoryPanel();
-  bindMethodMemoryActions();
-}
+  if (document.querySelector("#method-memory-panel")) {
+    updateMethodMemoryPanel();
+    bindMethodMemoryActions();
+  }
 
-bindCalendarActions();
+  bindCalendarActions();
 }
 
 window.renderApp = renderApp;
@@ -591,14 +576,12 @@ function renderBootError(error) {
           letter-spacing: 0.12em;
           font-size: 12px;
           font-weight: 800;
-          color: #e85d3f;
+          color: #b23b32;
         ">
           Progression Lab boot error
         </p>
 
-        <h1 style="margin-top: 8px;">
-          The app failed to load.
-        </h1>
+        <h1 style="margin-top: 8px;">The app failed to load.</h1>
 
         <p style="margin-top: 8px; color: #5f6670;">
           Copy this error and send it back into ChatGPT.
