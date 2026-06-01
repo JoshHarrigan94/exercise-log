@@ -1,18 +1,26 @@
 const navItems = [
   { id: "dashboard", label: "Today", icon: "⌂" },
-  { id: "session", label: "Plan", icon: "＋" },
-  { id: "live", label: "Live", icon: "●" },
-  { id: "library", label: "Library", icon: "□" },
-  { id: "progress", label: "Progress", icon: "↗" },
-  { id: "history", label: "History", icon: "◷" }
+  { id: "session", label: "Plans", icon: "＋" },
+  { id: "history", label: "Review", icon: "↗" },
+  { id: "library", label: "Library", icon: "□" }
 ];
 
+function normaliseActiveView(activeView) {
+  if (activeView === "live") return "dashboard";
+  if (activeView === "progress") return "history";
+  if (activeView === "session-detail") return "history";
+
+  return activeView;
+}
+
 export function renderNav(activeView) {
+  const normalisedView = normaliseActiveView(activeView);
+
   return `
     <nav class="bottom-nav">
       ${navItems.map(item => `
         <button 
-          class="nav-item ${activeView === item.id ? "active" : ""}" 
+          class="nav-item ${normalisedView === item.id ? "active" : ""}" 
           data-view="${item.id}"
         >
           <span>${item.icon}</span>
@@ -24,6 +32,8 @@ export function renderNav(activeView) {
 }
 
 export function renderSidebar(activeView) {
+  const normalisedView = normaliseActiveView(activeView);
+
   return `
     <aside class="desktop-sidebar">
       <div class="sidebar-brand">
@@ -34,7 +44,7 @@ export function renderSidebar(activeView) {
       <nav class="sidebar-nav">
         ${navItems.map(item => `
           <button
-            class="sidebar-nav-item ${activeView === item.id ? "active" : ""}"
+            class="sidebar-nav-item ${normalisedView === item.id ? "active" : ""}"
             data-view="${item.id}"
           >
             <span>${item.icon}</span>
