@@ -7,6 +7,8 @@ export const exerciseBases = [
 
     name: "Pull Up",
 
+    domain: "calisthenics",
+
     family: "vertical-pull",
 
     primaryExpressions: [
@@ -29,6 +31,8 @@ export const exerciseBases = [
     id: "chin-up",
 
     name: "Chin Up",
+
+    domain: "calisthenics",
 
     family: "vertical-pull",
 
@@ -53,6 +57,8 @@ export const exerciseBases = [
 
     name: "Push Up",
 
+    domain: "calisthenics",
+
     family: "horizontal-push",
 
     primaryExpressions: [
@@ -75,6 +81,8 @@ export const exerciseBases = [
 
     name: "Bench Press",
 
+    domain: "strength",
+
     family: "horizontal-push",
 
     primaryExpressions: [
@@ -95,6 +103,8 @@ export const exerciseBases = [
     id: "dip",
 
     name: "Dip",
+
+    domain: "calisthenics",
 
     family: "vertical-push",
 
@@ -119,6 +129,8 @@ export const exerciseBases = [
 
     name: "Squat",
 
+    domain: "strength",
+
     family: "squat",
 
     primaryExpressions: [
@@ -139,6 +151,8 @@ export const exerciseBases = [
     id: "split-squat",
 
     name: "Split Squat",
+
+    domain: "strength",
 
     family: "lunge",
 
@@ -164,6 +178,8 @@ export const exerciseBases = [
 
     name: "Deadlift",
 
+    domain: "strength",
+
     family: "hinge",
 
     primaryExpressions: [
@@ -184,6 +200,8 @@ export const exerciseBases = [
     id: "rdl",
 
     name: "Romanian Deadlift",
+
+    domain: "strength",
 
     family: "hinge",
 
@@ -208,6 +226,8 @@ export const exerciseBases = [
 
     name: "Pogo",
 
+    domain: "plyometric",
+
     family: "hop",
 
     primaryExpressions: [
@@ -230,6 +250,8 @@ export const exerciseBases = [
 
     name: "Broad Jump",
 
+    domain: "plyometric",
+
     family: "jump",
 
     primaryExpressions: [
@@ -250,6 +272,8 @@ export const exerciseBases = [
     id: "drop-jump",
 
     name: "Drop Jump",
+
+    domain: "plyometric",
 
     family: "jump",
 
@@ -274,6 +298,8 @@ export const exerciseBases = [
 
     name: "Sprint",
 
+    domain: "running",
+
     family: "sprint",
 
     primaryExpressions: [
@@ -294,6 +320,8 @@ export const exerciseBases = [
     id: "zone2-run",
 
     name: "Zone 2 Run",
+
+    domain: "running",
 
     family: "locomotion",
 
