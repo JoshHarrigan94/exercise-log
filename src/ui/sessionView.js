@@ -200,17 +200,19 @@ export function renderSession() {
         </label>
 
         <label class="form-field">
-          <span>Priority</span>
-          <input
-            id="custom-template-priority"
-            type="text"
-            placeholder="Weighted Pull-Up / Hack Squat / Conditioning"
-          />
-        </label>
+  <span>Priority</span>
+  <input
+    id="custom-template-priority"
+    type="text"
+    placeholder="Weighted Pull-Up / Hack Squat / Conditioning"
+  />
+</label>
 
-        <button class="primary-button" id="add-custom-template">
-          Save Template
-        </button>
+<input id="editing-template-id" type="hidden" value="" />
+
+<button class="primary-button" id="add-custom-template">
+  Save Template
+</button>
       </article>
 
       ${renderTemplateBuilder(templates, exercises)}
@@ -237,17 +239,26 @@ export function renderSession() {
             </div>
 
             ${
-              template.id.startsWith("custom-template-")
-                ? `
-                  <button 
-                    class="mini-delete-button template-delete"
-                    data-delete-custom-template="${template.id}"
-                  >
-                    ×
-                  </button>
-                `
-                : ""
-            }
+  template.id.startsWith("custom-template-")
+    ? `
+      <div class="template-actions">
+        <button
+          class="mini-action-button"
+          data-edit-template-id="${template.id}"
+        >
+          Edit
+        </button>
+
+        <button 
+          class="mini-delete-button"
+          data-delete-custom-template="${template.id}"
+        >
+          ×
+        </button>
+      </div>
+    `
+    : ""
+}
           </div>
         `).join("")}
       </div>
