@@ -6,6 +6,10 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function makeId(prefix) {
+  return `${prefix}-${crypto.randomUUID()}`;
+}
+
 function normalisePlannedExercise(exercisePlan = {}) {
   return {
     id: exercisePlan.id || crypto.randomUUID(),
@@ -54,11 +58,62 @@ function buildSetsFromLegacyTarget(target = "") {
   ];
 }
 
-function normaliseTemplate(template) {
+function normaliseWorkout(workout = {}, fallbackName = "Workout A") {
+  return {
+    id: workout.id || makeId("workout"),
+    name: workout.name || fallbackName,
+    goal: workout.goal || "",
+    exercises: (workout.exercises || []).map(normalisePlannedExercise)
+  };
+}
+
+function normaliseWeek(week = {}, index = 0) {
+  return {
+    id: week.id || makeId("week"),
+    name: week.name || `Week ${index + 1}`,
+    workouts: (week.workouts || [normaliseWorkout({}, "Workout A")]).map((workout, workoutIndex) =>
+      normaliseWorkout(workout, `Workout ${String.fromCharCode(65 + workoutIndex)}`)
+    )
+  };
+}
+
+function normaliseTemplate(template = {}) {
+  const legacyExercises = (template.exercises || []).map(normalisePlannedExercise);
+
+  const weeks =
+    template.weeks && template.weeks.length > 0
+      ? template.weeks.map(normaliseWeek)
+      : [
+          normaliseWeek(
+            {
+              name: "Week 1",
+              workouts: [
+                {
+                  name: template.name || "Workout A",
+                  goal: template.goal || "",
+                  exercises: legacyExercises
+                }
+              ]
+            },
+            0
+          )
+        ];
+
   return {
     ...template,
-    exercises: (template.exercises || []).map(normalisePlannedExercise)
+    id: template.id || makeId("custom-template"),
+    name: template.name || "Untitled Block",
+    goal: template.goal || "",
+    priority: template.priority || "Custom",
+    estimatedMinutes: template.estimatedMinutes || "",
+    createdAt: template.createdAt || new Date().toISOString(),
+    weeks,
+    exercises: legacyExercises
   };
+}
+
+function getFirstWorkout(template) {
+  return template?.weeks?.[0]?.workouts?.[0] || null;
 }
 
 export const store = {
@@ -95,6 +150,7 @@ export function startSession(sessionData = {}) {
   store.activeSession = {
     id: crypto.randomUUID(),
     templateId: sessionData.templateId || null,
+    workoutId: sessionData.workoutId || null,
     name: sessionData.name || "Untitled Session",
     goal: sessionData.goal || "",
     startedAt: new Date().toISOString(),
@@ -197,12 +253,23 @@ export function deleteCustomExercise(exerciseId) {
 
 export function addCustomTemplate(template) {
   const newTemplate = normaliseTemplate({
-    id: `custom-template-${crypto.randomUUID()}`,
+    id: makeId("custom-template"),
     name: template.name,
     goal: template.goal || "",
     priority: template.priority || "Custom",
     estimatedMinutes: template.estimatedMinutes || "",
-    exercises: template.exercises || [],
+    weeks: [
+      {
+        name: "Week 1",
+        workouts: [
+          {
+            name: "Workout A",
+            goal: template.goal || "",
+            exercises: []
+          }
+        ]
+      }
+    ],
     createdAt: new Date().toISOString()
   });
 
@@ -235,33 +302,41 @@ export function updateCustomTemplate(templateId, updates) {
 
 export function addExerciseToTemplate(templateId, exercisePlan) {
   const template = store.data.customTemplates.find(item => item.id === templateId);
-
   if (!template) return;
 
-  template.exercises = template.exercises || [];
-  template.exercises.push(normalisePlannedExercise(exercisePlan));
+  const workout = getFirstWorkout(template);
+  if (!workout) return;
 
+  workout.exercises = workout.exercises || [];
+  workout.exercises.push(normalisePlannedExercise(exercisePlan));
+
+  template.exercises = workout.exercises;
   saveData(store.data);
 }
 
 export function removeExerciseFromTemplate(templateId, plannedExerciseId) {
   const template = store.data.customTemplates.find(item => item.id === templateId);
-
   if (!template) return;
 
-  template.exercises = (template.exercises || []).filter(
+  const workout = getFirstWorkout(template);
+  if (!workout) return;
+
+  workout.exercises = (workout.exercises || []).filter(
     item => item.id !== plannedExerciseId
   );
 
+  template.exercises = workout.exercises;
   saveData(store.data);
 }
 
 export function updateExerciseInTemplate(templateId, plannedExerciseId, updates) {
   const template = store.data.customTemplates.find(item => item.id === templateId);
-
   if (!template) return;
 
-  template.exercises = (template.exercises || []).map(item =>
+  const workout = getFirstWorkout(template);
+  if (!workout) return;
+
+  workout.exercises = (workout.exercises || []).map(item =>
     item.id === plannedExerciseId
       ? normalisePlannedExercise({
           ...item,
@@ -271,6 +346,7 @@ export function updateExerciseInTemplate(templateId, plannedExerciseId, updates)
       : item
   );
 
+  template.exercises = workout.exercises;
   saveData(store.data);
 }
 
@@ -282,30 +358,43 @@ export function createTemplateFromSession(sessionId) {
 
   if (!session) return;
 
+  const exercises = session.exercises.map(log => ({
+    exerciseId: log.exerciseId,
+    methodId: log.methodId,
+    target: log.data?.target || "",
+    notes: log.notes || "",
+    sets: [
+      {
+        id: "set-1",
+        label: log.data?.label || "Set 1",
+        load: log.data?.load || "",
+        reps: log.data?.result || log.data?.reps || "",
+        rest: log.data?.rest || "",
+        rpe: log.rpe || ""
+      }
+    ]
+  }));
+
   const template = normaliseTemplate({
-    id: `custom-template-${crypto.randomUUID()}`,
-    name: `${session.name} Template`,
+    id: makeId("custom-template"),
+    name: `${session.name} Block`,
     goal: session.goal || "",
     priority: session.exercises[0]?.exerciseId || "Custom",
     estimatedMinutes: "",
     createdFromSessionId: session.id,
     createdAt: new Date().toISOString(),
-    exercises: session.exercises.map(log => ({
-      exerciseId: log.exerciseId,
-      methodId: log.methodId,
-      target: log.data?.target || "",
-      notes: log.notes || "",
-      sets: [
-        {
-          id: "set-1",
-          label: log.data?.label || "Set 1",
-          load: log.data?.load || "",
-          reps: log.data?.result || log.data?.reps || "",
-          rest: log.data?.rest || "",
-          rpe: log.rpe || ""
-        }
-      ]
-    }))
+    weeks: [
+      {
+        name: "Week 1",
+        workouts: [
+          {
+            name: session.name || "Workout A",
+            goal: session.goal || "",
+            exercises
+          }
+        ]
+      }
+    ]
   });
 
   store.data.customTemplates.push(template);
