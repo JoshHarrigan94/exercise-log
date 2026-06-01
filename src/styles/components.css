@@ -1377,3 +1377,49 @@ select {
     width: 100%;
   }
 }
+
+.execution-item {
+  display: block;
+}
+
+.execution-item summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.execution-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.execution-lines {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.execution-line {
+  display: grid !important;
+  grid-template-columns: 70px 1fr 1fr 80px 70px 56px;
+  gap: 6px;
+  align-items: center;
+}
+
+.execution-line input {
+  min-width: 0;
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .execution-line {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .execution-set-label {
+    grid-column: 1 / -1;
+  }
+
+  .execution-line button {
+    grid-column: 1 / -1;
+  }
+}
