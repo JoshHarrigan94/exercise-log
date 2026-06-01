@@ -106,10 +106,24 @@ function renderWeek(template, week) {
       <summary>${week.name}</summary>
 
       <div class="block-week-body">
-        ${(week.workouts || []).map(workout =>
-          renderWorkout(template, week, workout)
-        ).join("")}
-      </div>
+  ${(week.workouts || []).map(workout =>
+    renderWorkout(template, week, workout)
+  ).join("")}
+
+  ${
+    isCustomTemplate(template)
+      ? `
+        <button
+          class="mini-action-button block-add-button"
+          data-template-id="${template.id}"
+          data-add-workout-to-week="${week.id}"
+        >
+          + Add workout
+        </button>
+      `
+      : ""
+  }
+</div>
     </details>
   `;
 }
@@ -144,10 +158,23 @@ function renderBlockCard(template) {
       </div>
 
       <div class="block-structure">
-        ${(template.weeks || []).map(week =>
-          renderWeek(template, week)
-        ).join("")}
-      </div>
+  ${(template.weeks || []).map(week =>
+    renderWeek(template, week)
+  ).join("")}
+
+  ${
+    isCustomTemplate(template)
+      ? `
+        <button
+          class="mini-action-button block-add-button"
+          data-add-week-to-template="${template.id}"
+        >
+          + Add week
+        </button>
+      `
+      : ""
+  }
+</div>
     </article>
   `;
 }
