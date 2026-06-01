@@ -6,12 +6,72 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function normalisePlannedExercise(exercisePlan = {}) {
+  return {
+    id: exercisePlan.id || crypto.randomUUID(),
+    exerciseId: exercisePlan.exerciseId,
+    methodId: exercisePlan.methodId,
+    target: exercisePlan.target || "",
+    notes: exercisePlan.notes || "",
+    sets: exercisePlan.sets || buildSetsFromLegacyTarget(exercisePlan.target)
+  };
+}
+
+function buildSetsFromLegacyTarget(target = "") {
+  const text = String(target || "").trim();
+
+  const loadMatch = text.match(/(?:BW|\+?\d+(?:\.\d+)?\s?kg)/i);
+  const load = loadMatch ? loadMatch[0].replace(/\s/g, "") : "";
+
+  const restMatch = text.match(/(?:rest\s*)?(\d+)\s?(?:s|sec|seconds|m|min|minutes)/i);
+  const rest = restMatch ? restMatch[0].replace(/^rest\s*/i, "") : "";
+
+  const setsMatch = text.match(/(\d+)\s?[x×]\s?(\d+)/i);
+
+  if (setsMatch) {
+    const sets = Number(setsMatch[1]);
+    const reps = setsMatch[2];
+
+    return Array.from({ length: sets }, (_, index) => ({
+      id: `set-${index + 1}`,
+      label: `Set ${index + 1}`,
+      load,
+      reps,
+      rest,
+      rpe: ""
+    }));
+  }
+
+  return [
+    {
+      id: "set-1",
+      label: "Set 1",
+      load,
+      reps: text,
+      rest,
+      rpe: ""
+    }
+  ];
+}
+
+function normaliseTemplate(template) {
+  return {
+    ...template,
+    exercises: (template.exercises || []).map(normalisePlannedExercise)
+  };
+}
+
 export const store = {
   activeView: "dashboard",
   activeSession: null,
   selectedSessionId: null,
   selectedCalendarDate: todayKey(),
-  data: persistedData
+  data: {
+    ...persistedData,
+    sessions: persistedData.sessions || [],
+    customExercises: persistedData.customExercises || [],
+    customTemplates: (persistedData.customTemplates || []).map(normaliseTemplate)
+  }
 };
 
 export function setView(viewId) {
@@ -38,7 +98,7 @@ export function startSession(sessionData = {}) {
     name: sessionData.name || "Untitled Session",
     goal: sessionData.goal || "",
     startedAt: new Date().toISOString(),
-    plannedExercises: sessionData.exercises || [],
+    plannedExercises: (sessionData.exercises || []).map(normalisePlannedExercise),
     exercises: []
   };
 }
@@ -136,7 +196,7 @@ export function deleteCustomExercise(exerciseId) {
 }
 
 export function addCustomTemplate(template) {
-  const newTemplate = {
+  const newTemplate = normaliseTemplate({
     id: `custom-template-${crypto.randomUUID()}`,
     name: template.name,
     goal: template.goal || "",
@@ -144,7 +204,7 @@ export function addCustomTemplate(template) {
     estimatedMinutes: template.estimatedMinutes || "",
     exercises: template.exercises || [],
     createdAt: new Date().toISOString()
-  };
+  });
 
   store.data.customTemplates.push(newTemplate);
   saveData(store.data);
@@ -179,14 +239,7 @@ export function addExerciseToTemplate(templateId, exercisePlan) {
   if (!template) return;
 
   template.exercises = template.exercises || [];
-
-  template.exercises.push({
-    id: crypto.randomUUID(),
-    exerciseId: exercisePlan.exerciseId,
-    methodId: exercisePlan.methodId,
-    target: exercisePlan.target || "",
-    notes: exercisePlan.notes || ""
-  });
+  template.exercises.push(normalisePlannedExercise(exercisePlan));
 
   saveData(store.data);
 }
@@ -210,11 +263,11 @@ export function updateExerciseInTemplate(templateId, plannedExerciseId, updates)
 
   template.exercises = (template.exercises || []).map(item =>
     item.id === plannedExerciseId
-      ? {
+      ? normalisePlannedExercise({
           ...item,
           ...updates,
           updatedAt: new Date().toISOString()
-        }
+        })
       : item
   );
 
@@ -229,7 +282,7 @@ export function createTemplateFromSession(sessionId) {
 
   if (!session) return;
 
-  const template = {
+  const template = normaliseTemplate({
     id: `custom-template-${crypto.randomUUID()}`,
     name: `${session.name} Template`,
     goal: session.goal || "",
@@ -240,10 +293,20 @@ export function createTemplateFromSession(sessionId) {
     exercises: session.exercises.map(log => ({
       exerciseId: log.exerciseId,
       methodId: log.methodId,
-      target: log.data || {},
-      notes: log.notes || ""
+      target: log.data?.target || "",
+      notes: log.notes || "",
+      sets: [
+        {
+          id: "set-1",
+          label: log.data?.label || "Set 1",
+          load: log.data?.load || "",
+          reps: log.data?.result || log.data?.reps || "",
+          rest: log.data?.rest || "",
+          rpe: log.rpe || ""
+        }
+      ]
     }))
-  };
+  });
 
   store.data.customTemplates.push(template);
   saveData(store.data);
