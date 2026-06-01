@@ -206,3 +206,18 @@ export function createTemplateFromSession(sessionId) {
   store.data.customTemplates.push(template);
   saveData(store.data);
 }
+
+export function updateCustomTemplate(templateId, updates) {
+  const template = store.data.customTemplates.find(
+    item => item.id === templateId
+  );
+
+  if (!template) return;
+
+  Object.assign(template, {
+    ...updates,
+    updatedAt: new Date().toISOString()
+  });
+
+  saveData(store.data);
+}
