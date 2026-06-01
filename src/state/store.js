@@ -2,10 +2,15 @@ import { loadData, saveData } from "./storage.js";
 
 const persistedData = loadData();
 
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export const store = {
   activeView: "dashboard",
   activeSession: null,
   selectedSessionId: null,
+  selectedCalendarDate: todayKey(),
   data: persistedData
 };
 
@@ -13,22 +18,8 @@ export function setView(viewId) {
   store.activeView = viewId;
 }
 
-export function updateExerciseInTemplate(templateId, plannedExerciseId, updates) {
-  const template = store.data.customTemplates.find(item => item.id === templateId);
-
-  if (!template) return;
-
-  template.exercises = (template.exercises || []).map(item =>
-    item.id === plannedExerciseId
-      ? {
-          ...item,
-          ...updates,
-          updatedAt: new Date().toISOString()
-        }
-      : item
-  );
-
-  saveData(store.data);
+export function selectCalendarDate(dateKey) {
+  store.selectedCalendarDate = dateKey;
 }
 
 export function selectSession(sessionId) {
@@ -52,36 +43,6 @@ export function startSession(sessionData = {}) {
   };
 }
 
-export function addExerciseToTemplate(templateId, exercisePlan) {
-  const template = store.data.customTemplates.find(item => item.id === templateId);
-
-  if (!template) return;
-
-  template.exercises = template.exercises || [];
-
-  template.exercises.push({
-    id: crypto.randomUUID(),
-    exerciseId: exercisePlan.exerciseId,
-    methodId: exercisePlan.methodId,
-    target: exercisePlan.target || "",
-    notes: exercisePlan.notes || ""
-  });
-
-  saveData(store.data);
-}
-
-export function removeExerciseFromTemplate(templateId, plannedExerciseId) {
-  const template = store.data.customTemplates.find(item => item.id === templateId);
-
-  if (!template) return;
-
-  template.exercises = (template.exercises || []).filter(
-    item => item.id !== plannedExerciseId
-  );
-
-  saveData(store.data);
-}
-
 export function cancelActiveSession() {
   store.activeSession = null;
 }
@@ -101,30 +62,6 @@ export function deleteSession(sessionId) {
 
   saveData(store.data);
   clearSelectedSession();
-}
-
-export function addCustomExercise(exercise) {
-  const newExercise = {
-    id: `custom-${crypto.randomUUID()}`,
-    name: exercise.name,
-    category: exercise.category || "Custom",
-    pattern: exercise.pattern || "Custom",
-    equipment: exercise.equipment || [],
-    loadType: exercise.loadType || "custom",
-    defaultMethod: exercise.defaultMethod || "standard-sets",
-    cues: exercise.cues || []
-  };
-
-  store.data.customExercises.push(newExercise);
-  saveData(store.data);
-}
-
-export function deleteCustomExercise(exerciseId) {
-  store.data.customExercises = store.data.customExercises.filter(
-    exercise => exercise.id !== exerciseId
-  );
-
-  saveData(store.data);
 }
 
 export function addExerciseLog(exerciseLog) {
@@ -174,6 +111,30 @@ export function duplicateExerciseLog(logId) {
   });
 }
 
+export function addCustomExercise(exercise) {
+  const newExercise = {
+    id: `custom-${crypto.randomUUID()}`,
+    name: exercise.name,
+    category: exercise.category || "Custom",
+    pattern: exercise.pattern || "Custom",
+    equipment: exercise.equipment || [],
+    loadType: exercise.loadType || "custom",
+    defaultMethod: exercise.defaultMethod || "standard-sets",
+    cues: exercise.cues || []
+  };
+
+  store.data.customExercises.push(newExercise);
+  saveData(store.data);
+}
+
+export function deleteCustomExercise(exerciseId) {
+  store.data.customExercises = store.data.customExercises.filter(
+    exercise => exercise.id !== exerciseId
+  );
+
+  saveData(store.data);
+}
+
 export function addCustomTemplate(template) {
   const newTemplate = {
     id: `custom-template-${crypto.randomUUID()}`,
@@ -192,6 +153,69 @@ export function addCustomTemplate(template) {
 export function deleteCustomTemplate(templateId) {
   store.data.customTemplates = store.data.customTemplates.filter(
     template => template.id !== templateId
+  );
+
+  saveData(store.data);
+}
+
+export function updateCustomTemplate(templateId, updates) {
+  const template = store.data.customTemplates.find(
+    item => item.id === templateId
+  );
+
+  if (!template) return;
+
+  Object.assign(template, {
+    ...updates,
+    updatedAt: new Date().toISOString()
+  });
+
+  saveData(store.data);
+}
+
+export function addExerciseToTemplate(templateId, exercisePlan) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = template.exercises || [];
+
+  template.exercises.push({
+    id: crypto.randomUUID(),
+    exerciseId: exercisePlan.exerciseId,
+    methodId: exercisePlan.methodId,
+    target: exercisePlan.target || "",
+    notes: exercisePlan.notes || ""
+  });
+
+  saveData(store.data);
+}
+
+export function removeExerciseFromTemplate(templateId, plannedExerciseId) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = (template.exercises || []).filter(
+    item => item.id !== plannedExerciseId
+  );
+
+  saveData(store.data);
+}
+
+export function updateExerciseInTemplate(templateId, plannedExerciseId, updates) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = (template.exercises || []).map(item =>
+    item.id === plannedExerciseId
+      ? {
+          ...item,
+          ...updates,
+          updatedAt: new Date().toISOString()
+        }
+      : item
   );
 
   saveData(store.data);
@@ -222,20 +246,5 @@ export function createTemplateFromSession(sessionId) {
   };
 
   store.data.customTemplates.push(template);
-  saveData(store.data);
-}
-
-export function updateCustomTemplate(templateId, updates) {
-  const template = store.data.customTemplates.find(
-    item => item.id === templateId
-  );
-
-  if (!template) return;
-
-  Object.assign(template, {
-    ...updates,
-    updatedAt: new Date().toISOString()
-  });
-
   saveData(store.data);
 }
