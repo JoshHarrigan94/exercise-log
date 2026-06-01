@@ -302,6 +302,7 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
   });
 
   document.querySelector("#log-method")?.addEventListener("change", async event => {
+  try {
     const { renderMethodFields } = await import("./components/methodFields.js");
 
     const container = document.querySelector("#dynamic-method-fields");
@@ -313,8 +314,12 @@ document.querySelectorAll("[data-log-all-execution-rows]").forEach(button => {
     bindPreviewInputs();
     updateMethodPreview();
     updateMethodMemoryPanel();
-    bindMethodMemoryActions();
-  });
+        bindMethodMemoryActions();
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Failed to update method fields.");
+  }
+});
 
   document.querySelector("#log-exercise")?.addEventListener("change", () => {
     updateMethodMemoryPanel();
@@ -540,4 +545,67 @@ bindCalendarActions();
 
 window.renderApp = renderApp;
 
-renderApp();
+function renderBootError(error) {
+  const root = document.querySelector("#app");
+
+  if (!root) {
+    console.error("Boot failed and #app was not found", error);
+    return;
+  }
+
+  root.innerHTML = `
+    <main style="
+      min-height: 100vh;
+      padding: 24px;
+      background: #f4f1ea;
+      color: #1f2933;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    ">
+      <section style="
+        max-width: 760px;
+        margin: 0 auto;
+        background: #fffdf8;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 20px;
+        padding: 20px;
+      ">
+        <p style="
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          font-size: 12px;
+          font-weight: 800;
+          color: #e85d3f;
+        ">
+          Progression Lab boot error
+        </p>
+
+        <h1 style="margin-top: 8px;">
+          The app failed to load.
+        </h1>
+
+        <p style="margin-top: 8px; color: #5f6670;">
+          Copy this error and send it back into ChatGPT.
+        </p>
+
+        <pre style="
+          margin-top: 16px;
+          padding: 14px;
+          overflow: auto;
+          white-space: pre-wrap;
+          background: #1f2933;
+          color: #f8fafc;
+          border-radius: 14px;
+          font-size: 13px;
+          line-height: 1.5;
+        ">${error?.stack || error?.message || String(error)}</pre>
+      </section>
+    </main>
+  `;
+}
+
+try {
+  renderApp();
+} catch (error) {
+  console.error(error);
+  renderBootError(error);
+}
