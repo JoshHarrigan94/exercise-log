@@ -221,7 +221,7 @@ function renderMovementBuilder(templates, exercises) {
 
   return `
     <details class="block-utility-panel" open>
-      <summary>Add movement to Week 1 / Workout A</summary>
+      <summary>Add movement to workout</summary>
 
       ${
         customTemplates.length === 0
@@ -233,6 +233,28 @@ function renderMovementBuilder(templates, exercises) {
                   <option value="${template.id}">${template.name}</option>
                 `).join("")}
               </select>
+
+                <select id="template-builder-week">
+  ${customTemplates.flatMap(template =>
+    (template.weeks || []).map(week => `
+      <option value="${template.id}::${week.id}">
+        ${template.name} · ${week.name}
+      </option>
+    `)
+  ).join("")}
+</select>
+
+<select id="template-builder-workout">
+  ${customTemplates.flatMap(template =>
+    (template.weeks || []).flatMap(week =>
+      (week.workouts || []).map(workout => `
+        <option value="${template.id}::${workout.id}">
+          ${template.name} · ${week.name} · ${workout.name}
+        </option>
+      `)
+    )
+  ).join("")}
+</select>
 
               <select id="template-builder-exercise">
                 ${exercises.map(exercise => `
