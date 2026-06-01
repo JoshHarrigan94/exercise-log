@@ -1,4 +1,5 @@
 import { getAllTemplates } from "../logic/templateLibrary.js";
+import { analyseBlockDomain } from "../engine/index.js";
 import { getAllExercises, getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 
@@ -128,6 +129,45 @@ function renderWeek(template, week) {
   `;
 }
 
+function renderDomainSummary(template) {
+  const analysis = analyseBlockDomain(template);
+
+  if (!analysis?.classification) {
+    return "";
+  }
+
+  const domains =
+    analysis.classification.dominantDomains?.slice(0, 3) || [];
+
+  const bestMatch = analysis.bestProgrammeMatch;
+
+  return `
+    <div class="block-domain-panel">
+
+      <div class="block-domain-tags">
+        ${domains.map(domain => `
+          <span class="domain-pill">
+            ${domain.percentage}% ${domain.domain}
+          </span>
+        `).join("")}
+      </div>
+
+      ${
+        bestMatch
+          ? `
+            <div class="programme-match">
+              <span>Best match</span>
+              <strong>${bestMatch.name}</strong>
+              <small>${bestMatch.score}% similarity</small>
+            </div>
+          `
+          : ""
+      }
+
+    </div>
+  `;
+}
+
 function renderBlockCard(template) {
   const movementCount = getBlockMovementCount(template);
 
@@ -157,7 +197,9 @@ function renderBlockCard(template) {
         }
       </div>
 
-      <div class="block-structure">
+${renderDomainSummary(template)}
+
+<details class="block-detail-panel">
   ${(template.weeks || []).map(week =>
     renderWeek(template, week)
   ).join("")}
