@@ -24,48 +24,34 @@ function renderSetSummary(item) {
   return `${sets.length} sets · ${first.load || "Load"} × ${first.reps || "Reps"}${first.rest ? ` · ${first.rest}` : ""}`;
 }
 
-function renderPlanRows(template) {
+function renderMovementRows(template) {
   const planned = template.exercises || [];
 
   if (planned.length === 0) {
-    return `<div class="plan-empty-row">No planned movements yet.</div>`;
+    return `<div class="block-empty-row">No movements planned.</div>`;
   }
 
   return `
-    <div class="plan-row-list">
+    <div class="block-movement-list">
       ${planned.map(item => {
         const exercise = getExerciseById(item.exerciseId);
 
         return `
-          <div class="plan-row">
-            <div class="plan-row-main">
+          <div class="block-movement-row">
+            <div>
               <strong>${exercise?.name || "Exercise"}</strong>
               <small>${getMethodName(item.methodId)} · ${renderSetSummary(item)}</small>
             </div>
 
             ${
-              item.notes
-                ? `<p>${item.notes}</p>`
-                : ""
-            }
-
-            ${
               isCustomTemplate(template)
                 ? `
                   <div class="planned-exercise-actions">
-                    <button
-                      class="mini-action-button"
-                      data-template-id="${template.id}"
-                      data-edit-template-exercise="${item.id}"
-                    >
+                    <button class="mini-action-button" data-template-id="${template.id}" data-edit-template-exercise="${item.id}">
                       Edit
                     </button>
 
-                    <button
-                      class="mini-delete-button"
-                      data-template-id="${template.id}"
-                      data-remove-template-exercise="${item.id}"
-                    >
+                    <button class="mini-delete-button" data-template-id="${template.id}" data-remove-template-exercise="${item.id}">
                       ×
                     </button>
                   </div>
@@ -79,34 +65,27 @@ function renderPlanRows(template) {
   `;
 }
 
-function renderPlanCard(template) {
+function renderBlockCard(template) {
+  const movementCount = (template.exercises || []).length;
+
   return `
-    <article class="plan-card">
-      <div class="plan-card-header">
-        <button 
-          class="plan-title-button"
-          data-template-id="${template.id}"
-        >
-          <span>${template.priority || "Training block"}</span>
+    <article class="training-block-card">
+      <div class="training-block-top">
+        <button class="training-block-title" data-template-id="${template.id}">
+          <span>${template.priority || "Block"}</span>
           <strong>${template.name}</strong>
-          <small>${template.goal || "No goal set"}</small>
+          <small>${template.goal || "No goal set"} · ${movementCount} movements</small>
         </button>
 
         ${
           isCustomTemplate(template)
             ? `
               <div class="template-actions">
-                <button
-                  class="mini-action-button"
-                  data-edit-template-id="${template.id}"
-                >
+                <button class="mini-action-button" data-edit-template-id="${template.id}">
                   Edit
                 </button>
 
-                <button 
-                  class="mini-delete-button"
-                  data-delete-custom-template="${template.id}"
-                >
+                <button class="mini-delete-button" data-delete-custom-template="${template.id}">
                   ×
                 </button>
               </div>
@@ -115,21 +94,20 @@ function renderPlanCard(template) {
         }
       </div>
 
-      ${renderPlanRows(template)}
+      <details class="block-detail-panel">
+        <summary>View movements</summary>
+        ${renderMovementRows(template)}
+      </details>
     </article>
   `;
 }
 
 function renderQuickStart() {
   return `
-    <article class="plan-create-card">
-      <div>
-        <p class="eyebrow">Quick start</p>
-        <h2>Ad hoc session</h2>
-        <p>Start logging without a plan.</p>
-      </div>
+    <details class="block-utility-panel">
+      <summary>Start ad hoc session</summary>
 
-      <div class="inline-session-form">
+      <div class="block-utility-body">
         <input id="adhoc-session-name" type="text" placeholder="Session name" />
         <input id="adhoc-session-goal" type="text" placeholder="Goal optional" />
 
@@ -137,20 +115,16 @@ function renderQuickStart() {
           Start
         </button>
       </div>
-    </article>
+    </details>
   `;
 }
 
-function renderCreateTemplatePanel() {
+function renderCreateBlock() {
   return `
-    <article class="plan-create-card">
-      <div>
-        <p class="eyebrow">Create block</p>
-        <h2>Training block / plan</h2>
-        <p>Create the container first, then add planned movements.</p>
-      </div>
+    <details class="block-utility-panel" open>
+      <summary>Create training block</summary>
 
-      <div class="inline-template-form">
+      <div class="block-utility-body">
         <input id="custom-template-name" type="text" placeholder="Block name" />
         <input id="custom-template-goal" type="text" placeholder="Goal" />
         <input id="custom-template-priority" type="text" placeholder="Focus" />
@@ -161,7 +135,7 @@ function renderCreateTemplatePanel() {
           Save
         </button>
       </div>
-    </article>
+    </details>
   `;
 }
 
@@ -169,19 +143,14 @@ function renderMovementBuilder(templates, exercises) {
   const customTemplates = templates.filter(isCustomTemplate);
 
   return `
-    <article class="plan-builder-card">
-      <div class="plan-builder-header">
-        <div>
-          <p class="eyebrow">Add movement</p>
-          <h2>Planned exercise</h2>
-        </div>
-      </div>
+    <details class="block-utility-panel" open>
+      <summary>Add movement to block</summary>
 
       ${
         customTemplates.length === 0
           ? `<p>Create a custom block first.</p>`
           : `
-            <div class="compact-plan-builder-row structured-builder-row">
+            <div class="block-builder-grid">
               <select id="template-builder-template">
                 ${customTemplates.map(template => `
                   <option value="${template.id}">${template.name}</option>
@@ -211,12 +180,12 @@ function renderMovementBuilder(templates, exercises) {
               <input id="editing-planned-exercise-id" type="hidden" value="" />
 
               <button class="primary-button" id="add-exercise-to-template">
-                Save
+                Save movement
               </button>
             </div>
           `
       }
-    </article>
+    </details>
   `;
 }
 
@@ -225,18 +194,20 @@ export function renderSession() {
   const exercises = getAllExercises();
 
   return `
-    <section class="screen active-screen plans-screen">
+    <section class="screen active-screen blocks-screen">
       <div class="section-header">
-        <p class="eyebrow">Blocks</p>
-        <h1>Plan the work. Execute simply.</h1>
+        <p class="eyebrow">Training blocks</p>
+        <h1>Plan the block. Execute the day.</h1>
       </div>
 
-      ${renderQuickStart()}
-      ${renderCreateTemplatePanel()}
-      ${renderMovementBuilder(templates, exercises)}
+      <div class="blocks-primary-list">
+        ${templates.map(renderBlockCard).join("")}
+      </div>
 
-      <div class="plans-list">
-        ${templates.map(renderPlanCard).join("")}
+      <div class="blocks-builder-area">
+        ${renderCreateBlock()}
+        ${renderMovementBuilder(templates, exercises)}
+        ${renderQuickStart()}
       </div>
     </section>
   `;
