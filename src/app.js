@@ -32,7 +32,9 @@ import {
   deleteCustomExercise,
   addCustomTemplate,
   deleteCustomTemplate,
-  createTemplateFromSession
+  createTemplateFromSession,
+  addExerciseToTemplate,
+removeExerciseFromTemplate
 } from "./state/store.js";
 
 import { getTemplateById } from "./logic/templateLibrary.js";
@@ -84,10 +86,11 @@ function bindSessionStart() {
       if (!template) return;
 
       startSession({
-        templateId: template.id,
-        name: template.name,
-        goal: template.goal
-      });
+  templateId: template.id,
+  name: template.name,
+  goal: template.goal,
+  exercises: template.exercises || []
+});
 
       setView("live");
       renderApp();
@@ -310,6 +313,41 @@ function bindPreviewInputs() {
   });
 }
 
+function bindTemplateBuilderActions() {
+  const addButton = document.querySelector("#add-exercise-to-template");
+
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      const templateId = document.querySelector("#template-builder-template")?.value;
+      const exerciseId = document.querySelector("#template-builder-exercise")?.value;
+      const methodId = document.querySelector("#template-builder-method")?.value;
+      const target = document.querySelector("#template-builder-target")?.value?.trim();
+      const notes = document.querySelector("#template-builder-notes")?.value?.trim();
+
+      if (!templateId || !exerciseId || !methodId) return;
+
+      addExerciseToTemplate(templateId, {
+        exerciseId,
+        methodId,
+        target,
+        notes
+      });
+
+      renderApp();
+    });
+  }
+
+  document.querySelectorAll("[data-remove-template-exercise]").forEach(button => {
+    button.addEventListener("click", () => {
+      const templateId = button.dataset.templateId;
+      const plannedExerciseId = button.dataset.removeTemplateExercise;
+
+      removeExerciseFromTemplate(templateId, plannedExerciseId);
+      renderApp();
+    });
+  });
+}
+
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
@@ -345,6 +383,7 @@ export function renderApp() {
   updateMethodPreview();
   updateMethodMemoryPanel();
   bindMethodMemoryActions();
+  bindTemplateBuilderActions();
 }
 
 window.renderApp = renderApp;
