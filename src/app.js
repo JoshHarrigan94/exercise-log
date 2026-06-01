@@ -219,6 +219,34 @@ function bindLiveSessionActions() {
       renderApp();
     });
   });
+  
+  document.querySelectorAll("[data-log-planned-exercise]").forEach(button => {
+  button.addEventListener("click", () => {
+    const exerciseId = button.dataset.logPlannedExercise;
+    const methodId = button.dataset.methodId;
+    const target = button.dataset.target || "";
+
+    const load = document.querySelector(`[data-planned-load="${exerciseId}"]`)?.value || "";
+    const reps = document.querySelector(`[data-planned-reps="${exerciseId}"]`)?.value || "";
+    const rpe = document.querySelector(`[data-planned-rpe="${exerciseId}"]`)?.value || "";
+    const pain = document.querySelector(`[data-planned-pain="${exerciseId}"]`)?.value || "";
+
+    addExerciseLog({
+      exerciseId,
+      methodId,
+      rpe,
+      pain,
+      notes: "",
+      data: {
+        load,
+        reps,
+        target
+      }
+    });
+
+    renderApp();
+  });
+});
 
   document.querySelectorAll("[data-edit-log-id]").forEach(button => {
     button.addEventListener("click", () => {
