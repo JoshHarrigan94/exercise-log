@@ -35,7 +35,8 @@ import {
   createTemplateFromSession,
   addExerciseToTemplate,
 removeExerciseFromTemplate,
-updateCustomTemplate
+updateCustomTemplate,
+updateExerciseInTemplate
 } from "./state/store.js";
 
 import { getTemplateById } from "./logic/templateLibrary.js";
@@ -341,12 +342,23 @@ function bindTemplateBuilderActions() {
 
       if (!templateId || !exerciseId || !methodId) return;
 
-      addExerciseToTemplate(templateId, {
-        exerciseId,
-        methodId,
-        target,
-        notes
-      });
+      const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
+
+if (editingPlannedExerciseId) {
+  updateExerciseInTemplate(templateId, editingPlannedExerciseId, {
+    exerciseId,
+    methodId,
+    target,
+    notes
+  });
+} else {
+  addExerciseToTemplate(templateId, {
+    exerciseId,
+    methodId,
+    target,
+    notes
+  });
+}
 
       renderApp();
     });
@@ -363,6 +375,29 @@ function bindTemplateBuilderActions() {
     document.querySelector("#custom-template-goal").value = template.goal || "";
     document.querySelector("#custom-template-priority").value = template.priority || "";
     document.querySelector("#editing-template-id").value = template.id;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+document.querySelectorAll("[data-edit-template-exercise]").forEach(button => {
+  button.addEventListener("click", () => {
+    const templateId = button.dataset.templateId;
+    const plannedExerciseId = button.dataset.editTemplateExercise;
+
+    const template = getTemplateById(templateId);
+    const plannedExercise = template?.exercises?.find(
+      item => item.id === plannedExerciseId
+    );
+
+    if (!plannedExercise) return;
+
+    document.querySelector("#template-builder-template").value = templateId;
+    document.querySelector("#template-builder-exercise").value = plannedExercise.exerciseId;
+    document.querySelector("#template-builder-method").value = plannedExercise.methodId;
+    document.querySelector("#template-builder-target").value = plannedExercise.target || "";
+    document.querySelector("#template-builder-notes").value = plannedExercise.notes || "";
+    document.querySelector("#editing-planned-exercise-id").value = plannedExercise.id;
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
