@@ -2,6 +2,7 @@ import { store } from "../state/store.js";
 import { renderSetLogger } from "../components/setLogger.js";
 import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
+import { getExecutionRows } from "../logic/executionRows.js";
 
 function getExerciseName(id) {
   return getExerciseById(id)?.name || "Exercise";
@@ -22,87 +23,102 @@ function getLoggedCountForExercise(session, exerciseId) {
   return session.exercises.filter(log => log.exerciseId === exerciseId).length;
 }
 
-function renderExerciseBlock(session, item, index) {
-  const loggedCount = getLoggedCountForExercise(session, item.exerciseId);
+function renderExecutionRow(item, row) {
+  const key = `${item.exerciseId}-${row.id}`;
 
   return `
-    <article class="exercise-block">
-      <div class="exercise-block-header">
-        <div>
-          <span class="quiet-label">Exercise ${index + 1}</span>
-          <h2>${getExerciseName(item.exerciseId)}</h2>
-          <p>${getMethodName(item.methodId)} · ${item.target || "No target set"}</p>
+    <div class="execution-line">
+      <span class="execution-set-label">${row.label}</span>
+
+      <input
+        data-exec-load="${key}"
+        value="${row.load || ""}"
+        placeholder="Load"
+      />
+
+      <input
+        data-exec-result="${key}"
+        value="${row.result || ""}"
+        placeholder="Result"
+      />
+
+      <input
+        data-exec-rest="${key}"
+        value="${row.rest || ""}"
+        placeholder="Rest"
+      />
+
+      <input
+        data-exec-rpe="${key}"
+        value="${row.rpe || ""}"
+        placeholder="RPE"
+      />
+
+      <button
+        class="line-log-button"
+        data-log-execution-row="${item.exerciseId}"
+        data-row-id="${row.id}"
+        data-method-id="${item.methodId}"
+        data-row-label="${row.label}"
+        data-grouped="${row.isGrouped ? "true" : "false"}"
+      >
+        Log
+      </button>
+    </div>
+  `;
+}
+
+function renderExerciseBlock(session, item, index) {
+  const rows = getExecutionRows(item);
+  const loggedCount = getLoggedCountForExercise(session, item.exerciseId);
+  const isComplete = loggedCount >= rows.length;
+
+  return `
+    <article class="execution-item ${isComplete ? "execution-item-complete" : ""}">
+      <div class="execution-item-top">
+        <div class="execution-index">
+          ${isComplete ? "✓" : index + 1}
         </div>
 
-        <span class="exercise-log-count">
-          ${loggedCount} logged
+        <div class="execution-title">
+          <h2>${getExerciseName(item.exerciseId)}</h2>
+          <p>${getMethodName(item.methodId)} · ${item.target || "No target"}</p>
+        </div>
+
+        <span class="execution-status">
+          ${loggedCount}/${rows.length}
         </span>
       </div>
 
       ${
         item.notes
-          ? `<p class="exercise-block-note">${item.notes}</p>`
+          ? `<p class="execution-note">${item.notes}</p>`
           : ""
       }
 
-      <div class="set-table">
-        <div class="set-table-head">
-          <span>Load</span>
-          <span>Reps / result</span>
-          <span>RPE</span>
-          <span></span>
-        </div>
-
-        <div class="set-table-row">
-          <input
-            data-planned-load="${item.exerciseId}"
-            type="text"
-            placeholder="Load"
-          />
-
-          <input
-            data-planned-reps="${item.exerciseId}"
-            type="text"
-            placeholder="Reps"
-          />
-
-          <input
-            data-planned-rpe="${item.exerciseId}"
-            type="number"
-            step="0.5"
-            placeholder="8"
-          />
-
-          <button
-            class="primary-button compact-save-button"
-            data-log-planned-exercise="${item.exerciseId}"
-            data-method-id="${item.methodId}"
-            data-target="${item.target || ""}"
-          >
-            Log
-          </button>
-        </div>
+      <div class="execution-lines">
+        ${rows.map(row => renderExecutionRow(item, row)).join("")}
       </div>
+
+      <button
+        class="log-all-minimal-button"
+        data-log-all-execution-rows="${item.exerciseId}"
+        data-method-id="${item.methodId}"
+      >
+        Log all as planned
+      </button>
     </article>
   `;
 }
 
 function renderLoggedSummary(session) {
-  if (session.exercises.length === 0) {
-    return `
-      <article class="quiet-card">
-        <div>
-          <span class="quiet-label">Session log</span>
-          <h2>No results yet</h2>
-          <p>Log each exercise as you complete it.</p>
-        </div>
-      </article>
-    `;
-  }
+  if (session.exercises.length === 0) return "";
 
   return `
-    <article class="logged-summary-card">
-      <span class="quiet-label">Logged</span>
+    <details class="logged-summary-panel">
+      <summary>
+        Logged results · ${session.exercises.length}
+      </summary>
 
       <div class="logged-summary-list">
         ${session.exercises.map(log => `
@@ -110,8 +126,9 @@ function renderLoggedSummary(session) {
             <div>
               <strong>${getExerciseName(log.exerciseId)}</strong>
               <small>
+                ${log.data?.label || "Set"} ·
                 ${log.data?.load || "No load"} ·
-                ${log.data?.reps || "No reps"} ·
+                ${log.data?.result || log.data?.reps || "No result"} ·
                 RPE ${log.rpe || "-"}
               </small>
             </div>
@@ -125,7 +142,7 @@ function renderLoggedSummary(session) {
           </div>
         `).join("")}
       </div>
-    </article>
+    </details>
   `;
 }
 
@@ -138,9 +155,7 @@ export function renderLiveSession() {
         <article class="hero-card">
           <p class="eyebrow">No active session</p>
           <h1>Start a session</h1>
-          <p class="hero-text">
-            Choose a plan or start an ad hoc session.
-          </p>
+          <p class="hero-text">Choose a plan or start an ad hoc session.</p>
 
           <button class="secondary-button" data-view="session">
             Go to Plans
@@ -154,11 +169,10 @@ export function renderLiveSession() {
 
   return `
     <section class="screen active-screen live-session-screen">
-      <article class="live-session-header">
+      <div class="session-execution-header">
         <div>
-          <p class="eyebrow">Live session</p>
+          <p class="eyebrow">Now training</p>
           <h1>${activeSession.name}</h1>
-
           ${
             activeSession.goal
               ? `<p>${activeSession.goal}</p>`
@@ -166,27 +180,25 @@ export function renderLiveSession() {
           }
         </div>
 
-        <div class="live-session-meta">
+        <div class="session-execution-meta">
           <span>${activeSession.exercises.length} logs</span>
           <span>${formatStartTime(activeSession.startedAt)}</span>
         </div>
-      </article>
+      </div>
 
       ${
         planned.length === 0
           ? `
-            <article class="quiet-card">
-              <div>
-                <span class="quiet-label">Ad hoc session</span>
-                <h2>Add movement</h2>
-                <p>No planned movements. Use the compact logger below.</p>
-              </div>
-            </article>
+            <div class="execution-empty">
+              <p class="eyebrow">Ad hoc session</p>
+              <h2>Add movement</h2>
+              <p>No planned movements. Use the compact logger below.</p>
+            </div>
 
             ${renderSetLogger()}
           `
           : `
-            <div class="exercise-block-list">
+            <div class="execution-list">
               ${planned.map((item, index) =>
                 renderExerciseBlock(activeSession, item, index)
               ).join("")}
