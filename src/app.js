@@ -36,7 +36,9 @@ import {
   addExerciseToTemplate,
   removeExerciseFromTemplate,
   updateCustomTemplate,
-  updateExerciseInTemplate
+  updateExerciseInTemplate,
+  addWeekToTemplate,
+addWorkoutToWeek
 } from "./state/store.js";
 
 import { getTemplateById, getWorkoutById } from "./logic/templateLibrary.js";
@@ -522,6 +524,26 @@ function bindCalendarActions() {
   });
 }
 
+function bindBlockStructureActions() {
+  document.querySelectorAll("[data-add-week-to-template]").forEach(button => {
+    button.addEventListener("click", () => {
+      addWeekToTemplate(button.dataset.addWeekToTemplate);
+      renderApp();
+    });
+  });
+
+  document.querySelectorAll("[data-add-workout-to-week]").forEach(button => {
+    button.addEventListener("click", () => {
+      addWorkoutToWeek(
+        button.dataset.templateId,
+        button.dataset.addWorkoutToWeek
+      );
+
+      renderApp();
+    });
+  });
+}
+
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
@@ -552,6 +574,7 @@ export function renderApp() {
   bindLiveSessionActions();
   bindLibraryActions();
   bindTemplateBuilderActions();
+  bindBlockStructureActions();
   bindSessionDetailActions(renderApp);
   bindQuickChips();
   bindPreviewInputs();
