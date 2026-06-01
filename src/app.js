@@ -39,7 +39,7 @@ import {
   updateExerciseInTemplate
 } from "./state/store.js";
 
-import { getTemplateById } from "./logic/templateLibrary.js";
+import { getTemplateById, getWorkoutById } from "./logic/templateLibrary.js";
 
 const app = document.querySelector("#app");
 
@@ -88,14 +88,37 @@ function bindNavigation() {
 function bindSessionStart() {
   document.querySelectorAll("[data-template-id]").forEach(button => {
     button.addEventListener("click", () => {
-      const template = getTemplateById(button.dataset.templateId);
+      const templateId = button.dataset.templateId;
+      const workoutId = button.dataset.workoutId;
+
+      const template = getTemplateById(templateId);
       if (!template) return;
+
+      if (workoutId) {
+        const workout = getWorkoutById(templateId, workoutId);
+        if (!workout) return;
+
+        startSession({
+          templateId: template.id,
+          workoutId: workout.id,
+          name: `${template.name} · ${workout.name}`,
+          goal: workout.goal || template.goal,
+          exercises: workout.exercises || []
+        });
+
+        setView("dashboard");
+        renderApp();
+        return;
+      }
+
+      const firstWorkout = template.weeks?.[0]?.workouts?.[0];
 
       startSession({
         templateId: template.id,
-        name: template.name,
-        goal: template.goal,
-        exercises: template.exercises || []
+        workoutId: firstWorkout?.id || null,
+        name: firstWorkout ? `${template.name} · ${firstWorkout.name}` : template.name,
+        goal: firstWorkout?.goal || template.goal,
+        exercises: firstWorkout?.exercises || template.exercises || []
       });
 
       setView("dashboard");
