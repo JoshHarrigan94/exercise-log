@@ -12,6 +12,18 @@ import {
   getRecentTrend
 } from "./metrics/progression.js";
 
+import {
+  analyseBlockDomain,
+  analyseBlocksDomain,
+  classifyExerciseDomain,
+  classifyWorkoutDomain,
+  classifyBlockDomain,
+  classifyBlocks,
+  matchProgrammeArchetypes,
+  getBestProgrammeMatch,
+  getProgrammeArchetypes
+} from "./domains/index.js";
+
 export function analyseSession(session = {}) {
   const compliance = calculateSessionCompliance(session);
   const deviations = getSessionDeviations(compliance);
@@ -41,5 +53,14 @@ export {
   getExerciseLogs,
   getBestLoad,
   getBestResult,
-  getRecentTrend
+  getRecentTrend,
+  analyseBlockDomain,
+  analyseBlocksDomain,
+  classifyExerciseDomain,
+  classifyWorkoutDomain,
+  classifyBlockDomain,
+  classifyBlocks,
+  matchProgrammeArchetypes,
+  getBestProgrammeMatch,
+  getProgrammeArchetypes
 };
