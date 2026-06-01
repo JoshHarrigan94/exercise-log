@@ -633,3 +633,25 @@ textarea {
   top: 12px;
   right: 12px;
 }
+
+@media (min-width: 860px) {
+  .screen {
+    gap: 18px;
+  }
+
+  .hero-card {
+    padding: 26px;
+  }
+
+  .grid.two-col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .logger-card {
+    max-width: 720px;
+  }
+
+  .view-container {
+    width: 100%;
+  }
+}
