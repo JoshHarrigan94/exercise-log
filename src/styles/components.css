@@ -725,3 +725,17 @@ textarea {
     display: none;
   }
 }
+
+.planned-session-card > span {
+
+  color: var(--accent);
+
+  text-transform: uppercase;
+
+  font-size: 0.68rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+}
