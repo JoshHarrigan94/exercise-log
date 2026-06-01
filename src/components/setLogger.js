@@ -49,10 +49,7 @@ export function renderSetLogger() {
           <input id="log-rpe" type="number" min="1" max="10" step="0.5" placeholder="8" />
         </label>
 
-        <label class="compact-field compact-field-small">
-          <span>Pain</span>
-          <input id="log-pain" type="number" min="0" max="10" step="1" placeholder="0" />
-        </label>
+        
 
         <button class="primary-button compact-save-button" id="add-exercise-log">
           Save
