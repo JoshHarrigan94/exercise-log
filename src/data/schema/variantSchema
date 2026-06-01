@@ -1,0 +1,79 @@
+export const variantSchema = {
+  id: "string",
+
+  name: "string",
+
+  description: "string",
+
+  baseMovementId: "movement-id",
+
+  modifiers: [
+    "modifier-id"
+  ],
+
+  equipmentOverrides: [
+    "equipment-id"
+  ],
+
+  expressionAdjustments: {
+    "expression-id": "number"
+  },
+
+  measurableOutputOverrides: [
+    "output-id"
+  ],
+
+  progressionRank: "number",
+
+  regressionRank: "number",
+
+  prerequisites: [
+    {
+      type: "strength",
+      value: "string"
+    },
+    {
+      type: "skill",
+      value: "string"
+    },
+    {
+      type: "mobility",
+      value: "string"
+    }
+  ],
+
+  progressions: [
+    "variant-id"
+  ],
+
+  regressions: [
+    "variant-id"
+  ],
+
+  coachingTags: [
+    "bodyweight",
+    "external-load",
+    "tempo",
+    "pause",
+    "isometric",
+    "eccentric",
+    "assisted",
+    "reactive",
+    "single-leg",
+    "bilateral",
+    "unilateral",
+    "skill-intensive",
+    "rehab-friendly"
+  ],
+
+  coachingNotes: [
+    "string"
+  ],
+
+  riskProfile: {
+    technicalComplexity: "0-10",
+    fatigueCost: "0-10",
+    tendonDemand: "0-10",
+    jointStress: "0-10"
+  }
+};
