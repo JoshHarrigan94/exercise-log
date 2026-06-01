@@ -1,47 +1,52 @@
-function parseTarget(target = "") {
-  const value = String(target || "").trim();
-
-  return {
-    raw: value,
-    load: extractLoad(value),
-    reps: extractReps(value),
-    rest: extractRest(value)
-  };
+function asText(value) {
+  return String(value || "").trim();
 }
 
-function extractLoad(value) {
-  const match = value.match(/(?:BW|\+?\d+(?:\.\d+)?\s?kg|\+?\d+(?:\.\d+)?)/i);
+function extractLoad(target) {
+  const text = asText(target);
+  const match = text.match(/(?:BW|\+?\d+(?:\.\d+)?\s?kg)/i);
   return match ? match[0].replace(/\s/g, "") : "";
 }
 
-function extractRest(value) {
-  const match = value.match(/(?:rest\s*)?(\d+)(?:s|sec|seconds|m|min|minutes)/i);
+function extractRest(target) {
+  const text = asText(target);
+  const match = text.match(/(?:rest\s*)?(\d+)\s?(?:s|sec|seconds|m|min|minutes)/i);
   return match ? match[0].replace(/^rest\s*/i, "") : "";
 }
 
-function extractReps(value) {
-  const withoutRest = value.replace(/(?:rest\s*)?\d+(?:s|sec|seconds|m|min|minutes)/gi, "");
-  const withoutLoad = withoutRest.replace(/(?:BW|\+?\d+(?:\.\d+)?\s?kg)/gi, "");
-  const match = withoutLoad.match(/(\d+(?:[-+x×]\d+)*)/);
+function cleanResult(target) {
+  return asText(target)
+    .replace(/(?:BW|\+?\d+(?:\.\d+)?\s?kg)/gi, "")
+    .replace(/(?:rest\s*)?\d+\s?(?:s|sec|seconds|m|min|minutes)/gi, "")
+    .replace(/[·,]/g, " ")
+    .trim();
+}
 
-  return match ? match[1] : "";
+function extractSetsAndReps(target) {
+  const text = asText(target);
+  const match = text.match(/(\d+)\s?[x×]\s?(\d+)/i);
+
+  if (!match) return null;
+
+  return {
+    sets: Number(match[1]),
+    reps: match[2]
+  };
 }
 
 function buildStandardRows(item) {
-  const parsed = parseTarget(item.target);
+  const target = asText(item.target);
+  const load = extractLoad(target);
+  const rest = extractRest(target);
+  const setsAndReps = extractSetsAndReps(target);
 
-  const setMatch = String(item.target || "").match(/(\d+)\s?[x×]\s?(\d+)/i);
-
-  if (setMatch) {
-    const sets = Number(setMatch[1]);
-    const reps = setMatch[2];
-
-    return Array.from({ length: sets }, (_, index) => ({
-      id: `${item.id || item.exerciseId}-${index + 1}`,
+  if (setsAndReps && setsAndReps.sets > 0 && setsAndReps.sets <= 20) {
+    return Array.from({ length: setsAndReps.sets }, (_, index) => ({
+      id: `row-${index + 1}`,
       label: `Set ${index + 1}`,
-      load: parsed.load,
-      result: reps,
-      rest: parsed.rest,
+      load,
+      result: setsAndReps.reps,
+      rest,
       rpe: "",
       isGrouped: false
     }));
@@ -49,11 +54,11 @@ function buildStandardRows(item) {
 
   return [
     {
-      id: `${item.id || item.exerciseId}-1`,
+      id: "row-1",
       label: "Set 1",
-      load: parsed.load,
-      result: parsed.reps,
-      rest: parsed.rest,
+      load,
+      result: cleanResult(target),
+      rest,
       rpe: "",
       isGrouped: false
     }
@@ -61,23 +66,25 @@ function buildStandardRows(item) {
 }
 
 function buildGroupedRow(item, label) {
-  const parsed = parseTarget(item.target);
+  const target = asText(item.target);
 
   return [
     {
-      id: `${item.id || item.exerciseId}-1`,
+      id: "row-1",
       label,
-      load: parsed.load,
-      result: parsed.reps || parsed.raw,
-      rest: parsed.rest,
+      load: extractLoad(target),
+      result: cleanResult(target),
+      rest: extractRest(target),
       rpe: "",
       isGrouped: true
     }
   ];
 }
 
-export function getExecutionRows(item) {
-  switch (item.methodId) {
+export function getExecutionRows(item = {}) {
+  const methodId = item.methodId || "standard-sets";
+
+  switch (methodId) {
     case "ladder":
     case "top-set-ladder":
       return buildGroupedRow(item, "Ladder");
@@ -98,8 +105,6 @@ export function getExecutionRows(item) {
       return buildGroupedRow(item, "Top set");
 
     case "top-set-backoff":
-      return buildStandardRows(item);
-
     case "standard-sets":
     default:
       return buildStandardRows(item);
