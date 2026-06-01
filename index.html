@@ -15,6 +15,39 @@
 <body>
   <div id="app"></div>
 
-  <script type="module" src="./src/app.js"></script>
+  <script>
+  window.addEventListener("error", function (event) {
+    const root = document.querySelector("#app") || document.body;
+
+    root.innerHTML = `
+      <main style="padding:24px;font-family:system-ui;background:#f4f1ea;color:#1f2933;min-height:100vh;">
+        <section style="background:#fff;border-radius:18px;padding:18px;max-width:760px;margin:auto;">
+          <h1>Boot Error</h1>
+          <p>The app failed before JavaScript could start properly.</p>
+          <pre style="background:#111827;color:white;padding:14px;border-radius:12px;white-space:pre-wrap;overflow:auto;">${event.message}
+          
+File: ${event.filename}
+Line: ${event.lineno}
+Column: ${event.colno}</pre>
+        </section>
+      </main>
+    `;
+  });
+
+  window.addEventListener("unhandledrejection", function (event) {
+    const root = document.querySelector("#app") || document.body;
+
+    root.innerHTML = `
+      <main style="padding:24px;font-family:system-ui;background:#f4f1ea;color:#1f2933;min-height:100vh;">
+        <section style="background:#fff;border-radius:18px;padding:18px;max-width:760px;margin:auto;">
+          <h1>Promise Boot Error</h1>
+          <pre style="background:#111827;color:white;padding:14px;border-radius:12px;white-space:pre-wrap;overflow:auto;">${event.reason?.stack || event.reason}</pre>
+        </section>
+      </main>
+    `;
+  });
+</script>
+
+<script type="module" src="./src/app.js"></script>
 </body>
 </html>
