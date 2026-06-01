@@ -13,6 +13,24 @@ export function setView(viewId) {
   store.activeView = viewId;
 }
 
+export function updateExerciseInTemplate(templateId, plannedExerciseId, updates) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+
+  if (!template) return;
+
+  template.exercises = (template.exercises || []).map(item =>
+    item.id === plannedExerciseId
+      ? {
+          ...item,
+          ...updates,
+          updatedAt: new Date().toISOString()
+        }
+      : item
+  );
+
+  saveData(store.data);
+}
+
 export function selectSession(sessionId) {
   store.selectedSessionId = sessionId;
   store.activeView = "session-detail";
