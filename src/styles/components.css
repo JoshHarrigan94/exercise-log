@@ -1730,3 +1730,10 @@ select {
 .workout-panel summary small {
   color: var(--muted);
 }
+
+.block-add-button {
+  align-self: flex-start;
+  margin-top: 6px;
+  background: rgba(35, 35, 35, 0.055);
+  color: var(--text);
+}
