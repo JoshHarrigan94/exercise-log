@@ -77,6 +77,51 @@ function normaliseWeek(week = {}, index = 0) {
   };
 }
 
+export function addWeekToTemplate(templateId) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+  if (!template) return;
+
+  template.weeks = template.weeks || [];
+
+  const weekNumber = template.weeks.length + 1;
+
+  template.weeks.push({
+    id: makeId("week"),
+    name: `Week ${weekNumber}`,
+    workouts: [
+      {
+        id: makeId("workout"),
+        name: "Workout A",
+        goal: "",
+        exercises: []
+      }
+    ]
+  });
+
+  saveData(store.data);
+}
+
+export function addWorkoutToWeek(templateId, weekId) {
+  const template = store.data.customTemplates.find(item => item.id === templateId);
+  if (!template) return;
+
+  const week = template.weeks?.find(item => item.id === weekId);
+  if (!week) return;
+
+  week.workouts = week.workouts || [];
+
+  const nextLetter = String.fromCharCode(65 + week.workouts.length);
+
+  week.workouts.push({
+    id: makeId("workout"),
+    name: `Workout ${nextLetter}`,
+    goal: "",
+    exercises: []
+  });
+
+  saveData(store.data);
+}
+
 function normaliseTemplate(template = {}) {
   const legacyExercises = (template.exercises || []).map(normalisePlannedExercise);
 
