@@ -10,11 +10,22 @@ import {
   getHighEffortLogs
 } from "../logic/analytics.js";
 
-import { analyseSession } from "../engine/index.js";
+import {
+  analyseSessionWithProgramme,
+  analyseBlockDomain
+} from "../engine/index.js";
 
-function getLatestAnalysis(sessions = []) {
+function getLatestAnalysis(sessions = [], blocks = []) {
   const latest = sessions[0];
-  return latest ? analyseSession(latest) : null;
+  if (!latest) return null;
+
+  const block = blocks.find(item => item.id === latest.templateId);
+  const blockAnalysis = block ? analyseBlockDomain(block) : null;
+
+  return analyseSessionWithProgramme(
+    latest,
+    blockAnalysis?.bestProgrammeMatch || null
+  );
 }
 
 function renderEngineFeedback(analysis) {
@@ -60,9 +71,22 @@ function renderEngineFeedback(analysis) {
       </div>
 
       <div class="engine-recommendation">
-        <span>Recommendation</span>
-        <p>${analysis.feedback.recommendation}</p>
+  <span>Recommendation</span>
+  <p>${analysis.feedback.recommendation}</p>
+</div>
+
+${
+  analysis.coachingDecision
+    ? `
+      <div class="engine-recommendation">
+        <span>Programme-aware decision</span>
+        <strong>${analysis.coachingDecision.decision}</strong>
+        <p>${analysis.coachingDecision.reason}</p>
+        <small>${analysis.coachingDecision.programmeName} · ${analysis.coachingDecision.model}</small>
       </div>
+    `
+    : ""
+}
     </article>
   `;
 }
@@ -140,7 +164,10 @@ export function renderHistory() {
   const consistency = getConsistencySummary(sessions);
   const highEffortLogs = getHighEffortLogs(sessions);
   const recentSessions = getRecentSessions(sessions, 8);
-  const latestAnalysis = getLatestAnalysis(sessions);
+  const latestAnalysis = getLatestAnalysis(
+  sessions,
+  store.data.customTemplates || []
+);
 
   return `
     <section class="screen active-screen">
