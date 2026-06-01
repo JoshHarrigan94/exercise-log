@@ -742,3 +742,24 @@ select {
     width: 100%;
   }
 }
+
+.review-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.review-insight-grid {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 860px) {
+  .review-metric-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .review-insight-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
