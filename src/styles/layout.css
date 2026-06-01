@@ -194,3 +194,82 @@
     top: 24px;
   }
 }
+
+.desktop-plan-builder {
+
+  display: flex;
+
+}
+
+.planned-exercise-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 10px;
+
+}
+
+.planned-exercise-row,
+
+.planned-session-row {
+
+  border: var(--border);
+
+  border-radius: var(--radius-sm);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  padding: 10px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+}
+
+.planned-exercise-row div,
+
+.planned-session-row {
+
+  min-width: 0;
+
+}
+
+.planned-exercise-row p {
+
+  margin-top: 4px;
+
+  font-size: 0.8rem;
+
+}
+
+.template-plan-preview {
+
+  padding: 0 2px 12px;
+
+}
+
+.planned-session-card {
+
+  border: var(--border);
+
+  border-radius: var(--radius-md);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  padding: 12px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+  }
