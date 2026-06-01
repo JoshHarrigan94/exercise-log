@@ -1,13 +1,44 @@
-import { exercises } from "../data/exercises.js";
-import { store } from "../state/store.js";
+import { exerciseBases } from "../data/exerciseBases.js";
+import { exerciseVariants } from "../data/exerciseVariants.js";
 
-export function getAllExercises() {
-  return [
-    ...exercises,
-    ...(store.data.customExercises || [])
-  ];
+import {
+  getBaseMovementById,
+  getVariantById,
+  resolveMovementVariant
+} from "../data/movementIndex.js";
+
+export function getAllBaseMovements() {
+  return exerciseBases;
+}
+
+export function getAllVariants() {
+  return exerciseVariants;
 }
 
 export function getExerciseById(id) {
-  return getAllExercises().find(exercise => exercise.id === id);
+  const variant = getVariantById(id);
+
+  if (variant) {
+    return resolveMovementVariant(id);
+  }
+
+  const base = getBaseMovementById(id);
+
+  if (base) {
+    return {
+      id: base.id,
+      name: base.name,
+      base,
+      family: base.family
+    };
+  }
+
+  return null;
+}
+
+export function getAllExercises() {
+  return exerciseVariants.map(variant => ({
+    id: variant.id,
+    name: variant.name
+  }));
 }
