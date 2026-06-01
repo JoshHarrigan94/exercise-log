@@ -1,5 +1,10 @@
 import { getAllTemplates } from "../logic/templateLibrary.js";
-import { analyseBlockDomain } from "../engine/index.js";
+import {
+  analyseBlockDomain,
+  analyseBlockMetrics
+} from "../engine/index.js";
+
+import { store } from "../state/store.js";
 import { getAllExercises, getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 
@@ -168,6 +173,78 @@ function renderDomainSummary(template) {
   `;
 }
 
+function renderBlockMetrics(template) {
+  const metrics = analyseBlockMetrics(
+    template,
+    store.data.sessions || []
+  );
+
+  const domain = metrics.domain?.classification;
+  const bestMatch = metrics.domain?.bestProgrammeMatch;
+  const latestDecision = metrics.latestDecision;
+
+  const dominantDomains = domain?.dominantDomains?.slice(0, 3) || [];
+
+  return `
+    <div class="block-dashboard-panel">
+      <div class="block-dashboard-metrics">
+        <div>
+          <span>Completed</span>
+          <strong>${metrics.completedSessions}/${metrics.plannedWorkouts}</strong>
+        </div>
+
+        <div>
+          <span>Compliance</span>
+          <strong>${metrics.averageCompletion}%</strong>
+        </div>
+
+        <div>
+          <span>Warnings</span>
+          <strong>${metrics.warningCount}</strong>
+        </div>
+      </div>
+
+      <div class="block-domain-tags">
+        ${dominantDomains.map(domain => `
+          <span class="domain-pill">
+            ${domain.percentage}% ${domain.domain}
+          </span>
+        `).join("")}
+      </div>
+
+      ${
+        bestMatch
+          ? `
+            <div class="programme-match">
+              <span>Best match</span>
+              <strong>${bestMatch.name}</strong>
+              <small>${bestMatch.score}% similarity</small>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        latestDecision
+          ? `
+            <div class="programme-match">
+              <span>Current signal</span>
+              <strong>${latestDecision.decision}</strong>
+              <small>${latestDecision.reason}</small>
+            </div>
+          `
+          : `
+            <div class="programme-match">
+              <span>Current signal</span>
+              <strong>Awaiting data</strong>
+              <small>Complete a workout from this block to generate coaching feedback.</small>
+            </div>
+          `
+      }
+    </div>
+  `;
+}
+
 function renderBlockCard(template) {
   const movementCount = getBlockMovementCount(template);
 
@@ -198,6 +275,7 @@ function renderBlockCard(template) {
       </div>
 
 ${renderDomainSummary(template)}
+${renderBlockMetrics(template)}
 
 <details class="block-detail-panel">
   ${(template.weeks || []).map(week =>
