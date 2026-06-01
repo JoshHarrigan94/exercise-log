@@ -425,7 +425,14 @@ function buildTargetFromSets(plannedSets) {
 
 function bindTemplateBuilderActions() {
   document.querySelector("#add-exercise-to-template")?.addEventListener("click", () => {
-    const templateId = document.querySelector("#template-builder-template")?.value;
+    const workoutChoice = document.querySelector("#template-builder-workout")?.value || "";
+const [selectedTemplateId, selectedWorkoutId] = workoutChoice.split("::");
+
+const templateId =
+  selectedTemplateId ||
+  document.querySelector("#template-builder-template")?.value;
+
+const workoutId = selectedWorkoutId || "";
     const exerciseId = document.querySelector("#template-builder-exercise")?.value;
     const methodId = document.querySelector("#template-builder-method")?.value;
     const notes = document.querySelector("#template-builder-notes")?.value?.trim();
@@ -437,12 +444,13 @@ function bindTemplateBuilderActions() {
     const target = buildTargetFromSets(plannedSets);
 
     const payload = {
-      exerciseId,
-      methodId,
-      target,
-      notes,
-      sets: plannedSets
-    };
+  exerciseId,
+  methodId,
+  workoutId,
+  target,
+  notes,
+  sets: plannedSets
+};
 
     if (editingPlannedExerciseId) {
       updateExerciseInTemplate(templateId, editingPlannedExerciseId, payload);
