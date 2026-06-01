@@ -407,26 +407,43 @@ function bindTemplateBuilderActions() {
     const templateId = document.querySelector("#template-builder-template")?.value;
     const exerciseId = document.querySelector("#template-builder-exercise")?.value;
     const methodId = document.querySelector("#template-builder-method")?.value;
-    const target = document.querySelector("#template-builder-target")?.value?.trim();
-    const notes = document.querySelector("#template-builder-notes")?.value?.trim();
-    const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
+    const load = document.querySelector("#template-builder-load")?.value?.trim();
+const sets = Number(document.querySelector("#template-builder-sets")?.value || 1);
+const reps = document.querySelector("#template-builder-reps")?.value?.trim();
+const rest = document.querySelector("#template-builder-rest")?.value?.trim();
+const rpe = document.querySelector("#template-builder-rpe")?.value?.trim();
+const notes = document.querySelector("#template-builder-notes")?.value?.trim();
+const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
+
+const plannedSets = Array.from({ length: Math.max(1, sets) }, (_, index) => ({
+  id: `set-${index + 1}`,
+  label: `Set ${index + 1}`,
+  load,
+  reps,
+  rest,
+  rpe
+}));
+
+const target = `${sets || 1} × ${reps || "?"}${load ? ` @ ${load}` : ""}${rest ? ` · ${rest}` : ""}`;
 
     if (!templateId || !exerciseId || !methodId) return;
 
     if (editingPlannedExerciseId) {
       updateExerciseInTemplate(templateId, editingPlannedExerciseId, {
-        exerciseId,
-        methodId,
-        target,
-        notes
-      });
+  exerciseId,
+  methodId,
+  target,
+  notes,
+  sets: plannedSets
+});
     } else {
       addExerciseToTemplate(templateId, {
-        exerciseId,
-        methodId,
-        target,
-        notes
-      });
+  exerciseId,
+  methodId,
+  target,
+  notes,
+  sets: plannedSets
+});
     }
 
     renderApp();
