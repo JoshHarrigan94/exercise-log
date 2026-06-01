@@ -1,10 +1,15 @@
 .app-shell {
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 18px 16px 94px;
+  padding: 18px 16px 96px;
   position: relative;
+}
+
+.workspace-shell {
+  width: 100%;
+  min-width: 0;
 }
 
 .top-bar {
@@ -12,15 +17,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .top-bar h1 {
-  font-size: 1.8rem;
+  font-size: 1.55rem;
+  letter-spacing: -0.05em;
 }
 
 .view-container {
   display: block;
+  width: 100%;
 }
 
 .screen {
@@ -33,10 +40,16 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 2px 2px 0;
 }
 
 .section-header h1 {
-  font-size: 1.65rem;
+  font-size: 1.8rem;
+  letter-spacing: -0.06em;
+}
+
+.section-header h2 {
+  font-size: 1.1rem;
 }
 
 .grid {
@@ -48,101 +61,89 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+.stack,
 .timeline {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.workspace-shell {
-  width: 100%;
-}
-
 .desktop-sidebar {
   display: none;
 }
 
+/* Desktop workspace */
+
 @media (min-width: 860px) {
   .app-shell {
-    max-width: 1280px;
+    max-width: 1240px;
     display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 24px;
-    padding: 24px;
-  }
-
-  .workspace-shell {
-    min-width: 0;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 28px;
+    padding: 28px;
   }
 
   .desktop-sidebar {
     display: flex;
     position: sticky;
-    top: 24px;
-    height: calc(100vh - 48px);
-    border: var(--border);
-    border-radius: var(--radius-lg);
-    background: rgba(21, 27, 35, 0.88);
-    box-shadow: var(--shadow);
+    top: 28px;
+    height: calc(100vh - 56px);
+    border-radius: 32px;
+    background: var(--surface);
     padding: 18px;
     flex-direction: column;
-    gap: 24px;
+    gap: 26px;
   }
 
   .sidebar-brand {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
+    padding: 4px 6px;
   }
 
   .sidebar-brand span {
     color: var(--accent);
     text-transform: uppercase;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 900;
     letter-spacing: 0.12em;
   }
 
   .sidebar-brand strong {
     color: var(--text);
-    font-size: 1.15rem;
-    letter-spacing: -0.03em;
+    font-size: 1.05rem;
+    letter-spacing: -0.04em;
   }
 
   .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .sidebar-nav-item {
     width: 100%;
     border: 0;
-    border-radius: var(--radius-md);
+    border-radius: 999px;
     background: transparent;
     color: var(--muted);
-    padding: 13px 14px;
+    padding: 12px 13px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
     cursor: pointer;
     text-align: left;
   }
 
   .sidebar-nav-item span {
-    width: 24px;
+    width: 22px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .sidebar-nav-item strong {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .sidebar-nav-item.active {
@@ -151,13 +152,23 @@
   }
 
   .top-bar {
-    margin-bottom: 24px;
+    margin-bottom: 30px;
+  }
+
+  .top-bar h1 {
+    font-size: 1.7rem;
   }
 
   .bottom-nav {
     display: none;
   }
+
+  .screen {
+    gap: 20px;
+  }
 }
+
+/* Legacy desktop dashboard support */
 
 .desktop-dashboard-grid {
   display: flex;
@@ -165,111 +176,56 @@
   gap: 16px;
 }
 
-.desktop-main-column {
+.desktop-main-column,
+.desktop-side-panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.desktop-side-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 @media (min-width: 860px) {
   .desktop-dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 20px;
     align-items: start;
   }
 
-  .desktop-main-column {
-    gap: 18px;
-  }
-
   .desktop-side-panel {
     position: sticky;
-    top: 24px;
+    top: 28px;
   }
 }
 
+/* Planning layout */
+
 .desktop-plan-builder {
-
   display: flex;
-
 }
 
 .planned-exercise-list {
-
   display: flex;
-
   flex-direction: column;
-
   gap: 8px;
-
   margin-top: 10px;
-
 }
 
 .planned-exercise-row,
-
 .planned-session-row {
-
-  border: var(--border);
-
-  border-radius: var(--radius-sm);
-
-  background: rgba(255, 255, 255, 0.03);
-
-  padding: 10px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 12px;
-
-}
-
-.planned-exercise-row div,
-
-.planned-session-row {
-
   min-width: 0;
-
 }
 
 .planned-exercise-row p {
-
   margin-top: 4px;
-
   font-size: 0.8rem;
-
 }
 
 .template-plan-preview {
-
   padding: 0 2px 12px;
-
 }
 
 .planned-session-card {
-
-  border: var(--border);
-
-  border-radius: var(--radius-md);
-
-  background: rgba(255, 255, 255, 0.03);
-
-  padding: 12px;
-
   display: flex;
-
   flex-direction: column;
-
   gap: 8px;
-  }
+}
