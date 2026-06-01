@@ -82,9 +82,11 @@ function renderTemplateBuilder(templates, exercises) {
               ></textarea>
             </label>
 
-            <button class="primary-button" id="add-exercise-to-template">
-              Add to Template
-            </button>
+            <input id="editing-planned-exercise-id" type="hidden" value="" />
+
+<button class="primary-button" id="add-exercise-to-template">
+  Save Planned Exercise
+</button>
           `
       }
     </article>
@@ -114,13 +116,23 @@ function renderTemplateExerciseList(template) {
             ${
               template.id.startsWith("custom-template-")
                 ? `
-                  <button
-                    class="mini-delete-button"
-                    data-template-id="${template.id}"
-                    data-remove-template-exercise="${item.id}"
-                  >
-                    ×
-                  </button>
+                  <div class="planned-exercise-actions">
+  <button
+    class="mini-action-button"
+    data-template-id="${template.id}"
+    data-edit-template-exercise="${item.id}"
+  >
+    Edit
+  </button>
+
+  <button
+    class="mini-delete-button"
+    data-template-id="${template.id}"
+    data-remove-template-exercise="${item.id}"
+  >
+    ×
+  </button>
+</div>
                 `
                 : ""
             }
