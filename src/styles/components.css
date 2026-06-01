@@ -1860,3 +1860,44 @@ select {
 .programme-match small {
   color: var(--muted);
 }
+
+.block-dashboard-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(35, 35, 35, 0.035);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block-dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.block-dashboard-metrics div {
+  border-radius: 14px;
+  background: rgba(35, 35, 35, 0.035);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.block-dashboard-metrics span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.block-dashboard-metrics strong {
+  font-size: 1rem;
+}
+
+@media (max-width: 760px) {
+  .block-dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+}
