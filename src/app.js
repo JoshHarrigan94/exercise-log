@@ -2,7 +2,6 @@ import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
 import { renderLibrary } from "./ui/exerciseLibraryView.js";
-import { renderProgress } from "./ui/progressView.js";
 import { renderHistory } from "./ui/historyView.js";
 import {
   renderSessionDetail,
@@ -34,33 +33,25 @@ import {
   deleteCustomTemplate,
   createTemplateFromSession,
   addExerciseToTemplate,
-removeExerciseFromTemplate,
-updateCustomTemplate,
-updateExerciseInTemplate
+  removeExerciseFromTemplate,
+  updateCustomTemplate,
+  updateExerciseInTemplate
 } from "./state/store.js";
 
 import { getTemplateById } from "./logic/templateLibrary.js";
 
 const app = document.querySelector("#app");
 
-const views = {
-  dashboard: renderDashboard,
-  session: renderSession,
-  live: renderLiveSession,
-  library: renderLibrary,
-  progress: renderProgress,
-  history: renderHistory,
-  "session-detail": renderSessionDetail
-};
-
 function getViewTitle() {
+  if (store.activeView === "dashboard" && store.activeSession) {
+    return "Live Session";
+  }
+
   const titles = {
     dashboard: "Today",
-    session: "Start Session",
-    live: "Live Session",
-    library: "Exercise Library",
-    progress: "Progress",
-    history: "Training History",
+    session: "Plans",
+    library: "Library",
+    history: "Review",
     "session-detail": "Session Detail"
   };
 
@@ -68,6 +59,18 @@ function getViewTitle() {
 }
 
 function renderView() {
+  if (store.activeView === "dashboard" && store.activeSession) {
+    return renderLiveSession();
+  }
+
+  const views = {
+    dashboard: renderDashboard,
+    session: renderSession,
+    library: renderLibrary,
+    history: renderHistory,
+    "session-detail": renderSessionDetail
+  };
+
   const view = views[store.activeView] || renderDashboard;
   return view();
 }
@@ -88,66 +91,51 @@ function bindSessionStart() {
       if (!template) return;
 
       startSession({
-  templateId: template.id,
-  name: template.name,
-  goal: template.goal,
-  exercises: template.exercises || []
-});
-
-      setView("live");
-      renderApp();
-    });
-  });
-
-  const adhocButton = document.querySelector("#start-adhoc-session");
-
-  if (adhocButton) {
-    adhocButton.addEventListener("click", () => {
-      startSession({
-        name: document.querySelector("#adhoc-session-name")?.value?.trim() || "Ad Hoc Session",
-        goal: document.querySelector("#adhoc-session-goal")?.value?.trim() || ""
+        templateId: template.id,
+        name: template.name,
+        goal: template.goal,
+        exercises: template.exercises || []
       });
 
-      setView("live");
+      setView("dashboard");
       renderApp();
     });
-  }
-
-  const customTemplateButton = document.querySelector("#add-custom-template");
-
-  if (customTemplateButton) {
-    customTemplateButton.addEventListener("click", () => {
-      const name = document.querySelector("#custom-template-name")?.value?.trim();
-      const goal = document.querySelector("#custom-template-goal")?.value?.trim();
-      const priority = document.querySelector("#custom-template-priority")?.value?.trim();
-
-      if (!name) {
-        alert("Add a template name first.");
-        return;
-      }
-
-      const editingTemplateId = document.querySelector("#editing-template-id")?.value;
-
-if (editingTemplateId) {
-  updateCustomTemplate(editingTemplateId, {
-    name,
-    goal,
-    priority
   });
-} else {
-  addCustomTemplate({
-    name,
-    goal,
-    priority
-  });
-}
-      renderApp();
+
+  document.querySelector("#start-adhoc-session")?.addEventListener("click", () => {
+    startSession({
+      name: document.querySelector("#adhoc-session-name")?.value?.trim() || "Ad Hoc Session",
+      goal: document.querySelector("#adhoc-session-goal")?.value?.trim() || ""
     });
-  }
+
+    setView("dashboard");
+    renderApp();
+  });
+
+  document.querySelector("#add-custom-template")?.addEventListener("click", () => {
+    const name = document.querySelector("#custom-template-name")?.value?.trim();
+    const goal = document.querySelector("#custom-template-goal")?.value?.trim();
+    const priority = document.querySelector("#custom-template-priority")?.value?.trim();
+    const editingTemplateId = document.querySelector("#editing-template-id")?.value;
+
+    if (!name) {
+      alert("Add a template name first.");
+      return;
+    }
+
+    if (editingTemplateId) {
+      updateCustomTemplate(editingTemplateId, { name, goal, priority });
+    } else {
+      addCustomTemplate({ name, goal, priority });
+    }
+
+    renderApp();
+  });
 
   document.querySelectorAll("[data-delete-custom-template]").forEach(button => {
     button.addEventListener("click", () => {
       if (!confirm("Delete this custom template?")) return;
+
       deleteCustomTemplate(button.dataset.deleteCustomTemplate);
       renderApp();
     });
@@ -164,9 +152,14 @@ function bindHistoryActions() {
 }
 
 function populateLoggerFromLog(log) {
-  document.querySelector("#log-exercise").value = log.exerciseId;
-  document.querySelector("#log-method").value = log.methodId;
-  document.querySelector("#log-method").dispatchEvent(new Event("change", { bubbles: true }));
+  const exerciseInput = document.querySelector("#log-exercise");
+  const methodInput = document.querySelector("#log-method");
+
+  if (!exerciseInput || !methodInput) return;
+
+  exerciseInput.value = log.exerciseId;
+  methodInput.value = log.methodId;
+  methodInput.dispatchEvent(new Event("change", { bubbles: true }));
 
   setTimeout(() => {
     Object.entries(log.data || {}).forEach(([key, value]) => {
@@ -192,6 +185,7 @@ function bindLiveSessionActions() {
 
   document.querySelector("#save-active-as-template")?.addEventListener("click", () => {
     if (!store.activeSession) return;
+
     createTemplateFromSession(store.activeSession.id);
     alert("Saved as template.");
     renderApp();
@@ -199,6 +193,7 @@ function bindLiveSessionActions() {
 
   document.querySelector(".cancel-session-button")?.addEventListener("click", () => {
     if (!confirm("Discard this active session?")) return;
+
     cancelActiveSession();
     setView("dashboard");
     renderApp();
@@ -231,22 +226,20 @@ function bindLiveSessionActions() {
     });
   });
 
-  const methodSelect = document.querySelector("#log-method");
+  document.querySelector("#log-method")?.addEventListener("change", async event => {
+    const { renderMethodFields } = await import("./components/methodFields.js");
 
-  if (methodSelect) {
-    methodSelect.addEventListener("change", async event => {
-      const { renderMethodFields } = await import("./components/methodFields.js");
+    const container = document.querySelector("#dynamic-method-fields");
+    if (!container) return;
 
-      document.querySelector("#dynamic-method-fields").innerHTML =
-        renderMethodFields(event.target.value);
+    container.innerHTML = renderMethodFields(event.target.value);
 
-      bindQuickChips();
-      bindPreviewInputs();
-      updateMethodPreview();
-      updateMethodMemoryPanel();
-      bindMethodMemoryActions();
-    });
-  }
+    bindQuickChips();
+    bindPreviewInputs();
+    updateMethodPreview();
+    updateMethodMemoryPanel();
+    bindMethodMemoryActions();
+  });
 
   document.querySelector("#log-exercise")?.addEventListener("change", () => {
     updateMethodMemoryPanel();
@@ -316,7 +309,87 @@ function bindLibraryActions() {
   document.querySelectorAll("[data-delete-custom-exercise]").forEach(button => {
     button.addEventListener("click", () => {
       if (!confirm("Delete this custom exercise?")) return;
+
       deleteCustomExercise(button.dataset.deleteCustomExercise);
+      renderApp();
+    });
+  });
+}
+
+function bindTemplateBuilderActions() {
+  document.querySelector("#add-exercise-to-template")?.addEventListener("click", () => {
+    const templateId = document.querySelector("#template-builder-template")?.value;
+    const exerciseId = document.querySelector("#template-builder-exercise")?.value;
+    const methodId = document.querySelector("#template-builder-method")?.value;
+    const target = document.querySelector("#template-builder-target")?.value?.trim();
+    const notes = document.querySelector("#template-builder-notes")?.value?.trim();
+    const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
+
+    if (!templateId || !exerciseId || !methodId) return;
+
+    if (editingPlannedExerciseId) {
+      updateExerciseInTemplate(templateId, editingPlannedExerciseId, {
+        exerciseId,
+        methodId,
+        target,
+        notes
+      });
+    } else {
+      addExerciseToTemplate(templateId, {
+        exerciseId,
+        methodId,
+        target,
+        notes
+      });
+    }
+
+    renderApp();
+  });
+
+  document.querySelectorAll("[data-edit-template-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      const template = getTemplateById(button.dataset.editTemplateId);
+      if (!template) return;
+
+      document.querySelector("#custom-template-name").value = template.name || "";
+      document.querySelector("#custom-template-goal").value = template.goal || "";
+      document.querySelector("#custom-template-priority").value = template.priority || "";
+      document.querySelector("#editing-template-id").value = template.id;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  document.querySelectorAll("[data-edit-template-exercise]").forEach(button => {
+    button.addEventListener("click", () => {
+      const templateId = button.dataset.templateId;
+      const plannedExerciseId = button.dataset.editTemplateExercise;
+
+      const template = getTemplateById(templateId);
+      const plannedExercise = template?.exercises?.find(
+        item => item.id === plannedExerciseId
+      );
+
+      if (!plannedExercise) return;
+
+      document.querySelector("#template-builder-template").value = templateId;
+      document.querySelector("#template-builder-exercise").value = plannedExercise.exerciseId;
+      document.querySelector("#template-builder-method").value = plannedExercise.methodId;
+      document.querySelector("#template-builder-target").value = plannedExercise.target || "";
+      document.querySelector("#template-builder-notes").value = plannedExercise.notes || "";
+      document.querySelector("#editing-planned-exercise-id").value = plannedExercise.id;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  document.querySelectorAll("[data-remove-template-exercise]").forEach(button => {
+    button.addEventListener("click", () => {
+      removeExerciseFromTemplate(
+        button.dataset.templateId,
+        button.dataset.removeTemplateExercise
+      );
+
       renderApp();
     });
   });
@@ -326,91 +399,6 @@ function bindPreviewInputs() {
   document.querySelectorAll("[id^='dynamic-']").forEach(field => {
     field.addEventListener("input", updateMethodPreview);
     field.addEventListener("change", updateMethodPreview);
-  });
-}
-
-function bindTemplateBuilderActions() {
-  const addButton = document.querySelector("#add-exercise-to-template");
-
-  if (addButton) {
-    addButton.addEventListener("click", () => {
-      const templateId = document.querySelector("#template-builder-template")?.value;
-      const exerciseId = document.querySelector("#template-builder-exercise")?.value;
-      const methodId = document.querySelector("#template-builder-method")?.value;
-      const target = document.querySelector("#template-builder-target")?.value?.trim();
-      const notes = document.querySelector("#template-builder-notes")?.value?.trim();
-
-      if (!templateId || !exerciseId || !methodId) return;
-
-      const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
-
-if (editingPlannedExerciseId) {
-  updateExerciseInTemplate(templateId, editingPlannedExerciseId, {
-    exerciseId,
-    methodId,
-    target,
-    notes
-  });
-} else {
-  addExerciseToTemplate(templateId, {
-    exerciseId,
-    methodId,
-    target,
-    notes
-  });
-}
-
-      renderApp();
-    });
-  }
-
-    document.querySelectorAll("[data-edit-template-id]").forEach(button => {
-  button.addEventListener("click", () => {
-    const templateId = button.dataset.editTemplateId;
-    const template = getTemplateById(templateId);
-
-    if (!template) return;
-
-    document.querySelector("#custom-template-name").value = template.name || "";
-    document.querySelector("#custom-template-goal").value = template.goal || "";
-    document.querySelector("#custom-template-priority").value = template.priority || "";
-    document.querySelector("#editing-template-id").value = template.id;
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-});
-
-document.querySelectorAll("[data-edit-template-exercise]").forEach(button => {
-  button.addEventListener("click", () => {
-    const templateId = button.dataset.templateId;
-    const plannedExerciseId = button.dataset.editTemplateExercise;
-
-    const template = getTemplateById(templateId);
-    const plannedExercise = template?.exercises?.find(
-      item => item.id === plannedExerciseId
-    );
-
-    if (!plannedExercise) return;
-
-    document.querySelector("#template-builder-template").value = templateId;
-    document.querySelector("#template-builder-exercise").value = plannedExercise.exerciseId;
-    document.querySelector("#template-builder-method").value = plannedExercise.methodId;
-    document.querySelector("#template-builder-target").value = plannedExercise.target || "";
-    document.querySelector("#template-builder-notes").value = plannedExercise.notes || "";
-    document.querySelector("#editing-planned-exercise-id").value = plannedExercise.id;
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-});
-
-  document.querySelectorAll("[data-remove-template-exercise]").forEach(button => {
-    button.addEventListener("click", () => {
-      const templateId = button.dataset.templateId;
-      const plannedExerciseId = button.dataset.removeTemplateExercise;
-
-      removeExerciseFromTemplate(templateId, plannedExerciseId);
-      renderApp();
-    });
   });
 }
 
@@ -443,13 +431,13 @@ export function renderApp() {
   bindHistoryActions();
   bindLiveSessionActions();
   bindLibraryActions();
+  bindTemplateBuilderActions();
   bindSessionDetailActions(renderApp);
   bindQuickChips();
   bindPreviewInputs();
   updateMethodPreview();
   updateMethodMemoryPanel();
   bindMethodMemoryActions();
-  bindTemplateBuilderActions();
 }
 
 window.renderApp = renderApp;
