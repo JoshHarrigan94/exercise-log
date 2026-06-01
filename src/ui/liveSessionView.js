@@ -50,7 +50,6 @@ function renderExerciseBlock(session, item, index) {
           <span>Load</span>
           <span>Reps / result</span>
           <span>RPE</span>
-          <span>Pain</span>
           <span></span>
         </div>
 
@@ -72,13 +71,6 @@ function renderExerciseBlock(session, item, index) {
             type="number"
             step="0.5"
             placeholder="8"
-          />
-
-          <input
-            data-planned-pain="${item.exerciseId}"
-            type="number"
-            step="1"
-            placeholder="0"
           />
 
           <button
