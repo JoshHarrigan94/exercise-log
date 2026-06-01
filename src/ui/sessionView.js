@@ -1,223 +1,273 @@
-import { store } from "../state/store.js";
-import { renderSetLogger } from "../components/setLogger.js";
-import { getExerciseById } from "../logic/exerciseLibrary.js";
+import { getAllTemplates } from "../logic/templateLibrary.js";
+import { getAllExercises, getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
-import { getExecutionRows } from "../logic/executionRows.js";
 
-function getExerciseName(id) {
-  return getExerciseById(id)?.name || "Exercise";
+function isCustomTemplate(template) {
+  return template.id.startsWith("custom-template-");
+}
+
+function formatTemplatePriority(template) {
+  if (!template.priority) return "Custom";
+
+  if (template.priority.startsWith?.("custom-") || template.priority.includes("-")) {
+    return "Saved Session";
+  }
+
+  return template.priority;
 }
 
 function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
 }
 
-function formatStartTime(dateString) {
-  return new Date(dateString).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
+function renderPlanRows(template) {
+  const planned = template.exercises || [];
 
-function getLoggedCountForExercise(session, exerciseId) {
-  return session.exercises.filter(log => log.exerciseId === exerciseId).length;
-}
+  if (planned.length === 0) {
+    return `
+      <div class="plan-empty-row">
+        No planned movements yet.
+      </div>
+    `;
+  }
 
-function renderExecutionRow(item, row) {
   return `
-    <div class="execution-row">
-      <span class="execution-row-label">${row.label}</span>
+    <div class="plan-row-list">
+      ${planned.map(item => {
+        const exercise = getExerciseById(item.exerciseId);
 
-      <input
-        data-exec-load="${item.exerciseId}-${row.id}"
-        value="${row.load || ""}"
-        placeholder="Load"
-      />
+        return `
+          <div class="plan-row">
+            <div class="plan-row-main">
+              <strong>${exercise?.name || "Exercise"}</strong>
+              <small>${getMethodName(item.methodId)} · ${item.target || "No target"}</small>
+            </div>
 
-      <input
-        data-exec-result="${item.exerciseId}-${row.id}"
-        value="${row.result || ""}"
-        placeholder="Result"
-      />
+            ${
+              item.notes
+                ? `<p>${item.notes}</p>`
+                : ""
+            }
 
-      <input
-        data-exec-rest="${item.exerciseId}-${row.id}"
-        value="${row.rest || ""}"
-        placeholder="Rest"
-      />
+            ${
+              isCustomTemplate(template)
+                ? `
+                  <div class="planned-exercise-actions">
+                    <button
+                      class="mini-action-button"
+                      data-template-id="${template.id}"
+                      data-edit-template-exercise="${item.id}"
+                    >
+                      Edit
+                    </button>
 
-      <input
-        data-exec-rpe="${item.exerciseId}-${row.id}"
-        value="${row.rpe || ""}"
-        placeholder="RPE"
-      />
-
-      <button
-        class="secondary-button compact-button"
-        data-log-execution-row="${item.exerciseId}"
-        data-row-id="${row.id}"
-        data-method-id="${item.methodId}"
-        data-row-label="${row.label}"
-        data-grouped="${row.isGrouped ? "true" : "false"}"
-      >
-        Log
-      </button>
+                    <button
+                      class="mini-delete-button"
+                      data-template-id="${template.id}"
+                      data-remove-template-exercise="${item.id}"
+                    >
+                      ×
+                    </button>
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `;
+      }).join("")}
     </div>
   `;
 }
 
-function renderExerciseBlock(session, item, index) {
-  const rows = getExecutionRows(item);
-  const loggedCount = getLoggedCountForExercise(session, item.exerciseId);
-
+function renderPlanCard(template) {
   return `
-    <article class="execution-block">
-      <div class="execution-block-header">
-        <div>
-          <span class="quiet-label">Exercise ${index + 1}</span>
-          <h2>${getExerciseName(item.exerciseId)}</h2>
-          <p>${getMethodName(item.methodId)} · ${item.target || "No target"}</p>
-        </div>
+    <article class="plan-card">
+      <div class="plan-card-header">
+        <button 
+          class="plan-title-button"
+          data-template-id="${template.id}"
+        >
+          <span>${formatTemplatePriority(template)}</span>
+          <strong>${template.name}</strong>
+          <small>${template.goal || "No goal set"}</small>
+        </button>
 
-        <span class="exercise-log-count">${loggedCount}/${rows.length}</span>
-      </div>
+        ${
+          isCustomTemplate(template)
+            ? `
+              <div class="template-actions">
+                <button
+                  class="mini-action-button"
+                  data-edit-template-id="${template.id}"
+                >
+                  Edit
+                </button>
 
-      ${
-        item.notes
-          ? `<p class="exercise-block-note">${item.notes}</p>`
-          : ""
-      }
-
-      <div class="execution-table">
-        <div class="execution-table-head">
-          <span>Set</span>
-          <span>Load</span>
-          <span>Result</span>
-          <span>Rest</span>
-          <span>RPE</span>
-          <span></span>
-        </div>
-
-        ${rows.map(row => renderExecutionRow(item, row)).join("")}
-      </div>
-
-      <button
-        class="primary-button log-all-button"
-        data-log-all-execution-rows="${item.exerciseId}"
-        data-method-id="${item.methodId}"
-      >
-        Log all as planned
-      </button>
-    </article>
-  `;
-}
-
-function renderLoggedSummary(session) {
-  if (session.exercises.length === 0) {
-    return "";
-  }
-
-  return `
-    <article class="logged-summary-card">
-      <span class="quiet-label">Logged</span>
-
-      <div class="logged-summary-list">
-        ${session.exercises.map(log => `
-          <div class="logged-summary-row">
-            <div>
-              <strong>${getExerciseName(log.exerciseId)}</strong>
-              <small>
-                ${log.data?.label || "Set"} ·
-                ${log.data?.load || "No load"} ·
-                ${log.data?.result || log.data?.reps || "No result"} ·
-                RPE ${log.rpe || "-"}
-              </small>
-            </div>
-
-            <button
-              class="mini-delete-button"
-              data-remove-log-id="${log.id}"
-            >
-              ×
-            </button>
-          </div>
-        `).join("")}
-      </div>
-    </article>
-  `;
-}
-
-export function renderLiveSession() {
-  const activeSession = store.activeSession;
-
-  if (!activeSession) {
-    return `
-      <section class="screen active-screen">
-        <article class="hero-card">
-          <p class="eyebrow">No active session</p>
-          <h1>Start a session</h1>
-          <p class="hero-text">Choose a plan or start an ad hoc session.</p>
-
-          <button class="secondary-button" data-view="session">
-            Go to Plans
-          </button>
-        </article>
-      </section>
-    `;
-  }
-
-  const planned = activeSession.plannedExercises || [];
-
-  return `
-    <section class="screen active-screen live-session-screen">
-      <article class="live-session-header">
-        <div>
-          <p class="eyebrow">Live session</p>
-          <h1>${activeSession.name}</h1>
-          ${activeSession.goal ? `<p>${activeSession.goal}</p>` : ""}
-        </div>
-
-        <div class="live-session-meta">
-          <span>${activeSession.exercises.length} logs</span>
-          <span>${formatStartTime(activeSession.startedAt)}</span>
-        </div>
-      </article>
-
-      ${
-        planned.length === 0
-          ? `
-            <article class="quiet-card">
-              <div>
-                <span class="quiet-label">Ad hoc session</span>
-                <h2>Add movement</h2>
-                <p>No planned movements. Use the compact logger below.</p>
+                <button 
+                  class="mini-delete-button"
+                  data-delete-custom-template="${template.id}"
+                >
+                  ×
+                </button>
               </div>
-            </article>
+            `
+            : ""
+        }
+      </div>
 
-            ${renderSetLogger()}
+      ${renderPlanRows(template)}
+    </article>
+  `;
+}
+
+function renderQuickStart() {
+  return `
+    <article class="plan-create-card">
+      <div>
+        <p class="eyebrow">Quick start</p>
+        <h2>Ad hoc session</h2>
+        <p>Start logging without building a plan first.</p>
+      </div>
+
+      <div class="inline-session-form">
+        <input
+          id="adhoc-session-name"
+          type="text"
+          placeholder="Upper Pull / Hotel Session / Conditioning"
+        />
+
+        <input
+          id="adhoc-session-goal"
+          type="text"
+          placeholder="Goal optional"
+        />
+
+        <button class="primary-button" id="start-adhoc-session">
+          Start
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderCreateTemplatePanel() {
+  return `
+    <article class="plan-create-card">
+      <div>
+        <p class="eyebrow">Create</p>
+        <h2>New plan</h2>
+        <p>Save a reusable plan, then add planned movements below.</p>
+      </div>
+
+      <div class="inline-template-form">
+        <input
+          id="custom-template-name"
+          type="text"
+          placeholder="Plan name"
+        />
+
+        <input
+          id="custom-template-goal"
+          type="text"
+          placeholder="Goal"
+        />
+
+        <input
+          id="custom-template-priority"
+          type="text"
+          placeholder="Priority"
+        />
+
+        <input id="editing-template-id" type="hidden" value="" />
+
+        <button class="primary-button" id="add-custom-template">
+          Save Plan
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderMovementBuilder(templates, exercises) {
+  const customTemplates = templates.filter(isCustomTemplate);
+
+  return `
+    <article class="plan-builder-card">
+      <div class="plan-builder-header">
+        <div>
+          <p class="eyebrow">Build</p>
+          <h2>Add planned movement</h2>
+        </div>
+      </div>
+
+      ${
+        customTemplates.length === 0
+          ? `
+            <p>Create a custom plan first, then add movements here.</p>
           `
           : `
-            <div class="exercise-block-list">
-              ${planned.map((item, index) =>
-                renderExerciseBlock(activeSession, item, index)
-              ).join("")}
-            </div>
+            <div class="compact-plan-builder-row">
+              <select id="template-builder-template">
+                ${customTemplates.map(template => `
+                  <option value="${template.id}">${template.name}</option>
+                `).join("")}
+              </select>
 
-            <details class="logger-details">
-              <summary>Add unplanned movement</summary>
-              <div class="logger-details-body">
-                ${renderSetLogger()}
-              </div>
-            </details>
+              <select id="template-builder-exercise">
+                ${exercises.map(exercise => `
+                  <option value="${exercise.id}">${exercise.name}</option>
+                `).join("")}
+              </select>
+
+              <select id="template-builder-method">
+                ${methodTypes.map(method => `
+                  <option value="${method.id}">${method.name}</option>
+                `).join("")}
+              </select>
+
+              <input
+                id="template-builder-target"
+                type="text"
+                placeholder="Target"
+              />
+
+              <input
+                id="template-builder-notes"
+                type="text"
+                placeholder="Notes"
+              />
+
+              <input id="editing-planned-exercise-id" type="hidden" value="" />
+
+              <button class="primary-button" id="add-exercise-to-template">
+                Save
+              </button>
+            </div>
           `
       }
+    </article>
+  `;
+}
 
-      ${renderLoggedSummary(activeSession)}
+export function renderSession() {
+  const templates = getAllTemplates();
+  const exercises = getAllExercises();
 
-      <div class="live-session-actions">
-        <button class="complete-session-button">Complete Session</button>
-        <button class="secondary-button" id="save-active-as-template">Save as Template</button>
-        <button class="danger-button cancel-session-button">Discard</button>
+  return `
+    <section class="screen active-screen plans-screen">
+      <div class="section-header">
+        <p class="eyebrow">Plans</p>
+        <h1>Build simply. Train cleanly.</h1>
+      </div>
+
+      ${renderQuickStart()}
+
+      ${renderCreateTemplatePanel()}
+
+      ${renderMovementBuilder(templates, exercises)}
+
+      <div class="plans-list">
+        ${templates.map(renderPlanCard).join("")}
       </div>
     </section>
   `;
