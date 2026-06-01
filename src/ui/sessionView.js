@@ -6,29 +6,29 @@ function isCustomTemplate(template) {
   return template.id.startsWith("custom-template-");
 }
 
-function formatTemplatePriority(template) {
-  if (!template.priority) return "Custom";
-
-  if (template.priority.startsWith?.("custom-") || template.priority.includes("-")) {
-    return "Saved Session";
-  }
-
-  return template.priority;
-}
-
 function getMethodName(id) {
   return methodTypes.find(method => method.id === id)?.name || "Method";
+}
+
+function renderSetSummary(item) {
+  const sets = item.sets || [];
+
+  if (sets.length === 0) return item.target || "No target";
+
+  if (sets.length === 1) {
+    const set = sets[0];
+    return `${set.load || "Load"} × ${set.reps || "Result"}${set.rest ? ` · ${set.rest}` : ""}${set.rpe ? ` · RPE ${set.rpe}` : ""}`;
+  }
+
+  const first = sets[0];
+  return `${sets.length} sets · ${first.load || "Load"} × ${first.reps || "Reps"}${first.rest ? ` · ${first.rest}` : ""}`;
 }
 
 function renderPlanRows(template) {
   const planned = template.exercises || [];
 
   if (planned.length === 0) {
-    return `
-      <div class="plan-empty-row">
-        No planned movements yet.
-      </div>
-    `;
+    return `<div class="plan-empty-row">No planned movements yet.</div>`;
   }
 
   return `
@@ -40,7 +40,7 @@ function renderPlanRows(template) {
           <div class="plan-row">
             <div class="plan-row-main">
               <strong>${exercise?.name || "Exercise"}</strong>
-              <small>${getMethodName(item.methodId)} · ${item.target || "No target"}</small>
+              <small>${getMethodName(item.methodId)} · ${renderSetSummary(item)}</small>
             </div>
 
             ${
@@ -87,7 +87,7 @@ function renderPlanCard(template) {
           class="plan-title-button"
           data-template-id="${template.id}"
         >
-          <span>${formatTemplatePriority(template)}</span>
+          <span>${template.priority || "Training block"}</span>
           <strong>${template.name}</strong>
           <small>${template.goal || "No goal set"}</small>
         </button>
@@ -126,21 +126,12 @@ function renderQuickStart() {
       <div>
         <p class="eyebrow">Quick start</p>
         <h2>Ad hoc session</h2>
-        <p>Start logging without building a plan first.</p>
+        <p>Start logging without a plan.</p>
       </div>
 
       <div class="inline-session-form">
-        <input
-          id="adhoc-session-name"
-          type="text"
-          placeholder="Upper Pull / Hotel Session / Conditioning"
-        />
-
-        <input
-          id="adhoc-session-goal"
-          type="text"
-          placeholder="Goal optional"
-        />
+        <input id="adhoc-session-name" type="text" placeholder="Session name" />
+        <input id="adhoc-session-goal" type="text" placeholder="Goal optional" />
 
         <button class="primary-button" id="start-adhoc-session">
           Start
@@ -154,34 +145,20 @@ function renderCreateTemplatePanel() {
   return `
     <article class="plan-create-card">
       <div>
-        <p class="eyebrow">Create</p>
-        <h2>New plan</h2>
-        <p>Save a reusable plan, then add planned movements below.</p>
+        <p class="eyebrow">Create block</p>
+        <h2>Training block / plan</h2>
+        <p>Create the container first, then add planned movements.</p>
       </div>
 
       <div class="inline-template-form">
-        <input
-          id="custom-template-name"
-          type="text"
-          placeholder="Plan name"
-        />
-
-        <input
-          id="custom-template-goal"
-          type="text"
-          placeholder="Goal"
-        />
-
-        <input
-          id="custom-template-priority"
-          type="text"
-          placeholder="Priority"
-        />
+        <input id="custom-template-name" type="text" placeholder="Block name" />
+        <input id="custom-template-goal" type="text" placeholder="Goal" />
+        <input id="custom-template-priority" type="text" placeholder="Focus" />
 
         <input id="editing-template-id" type="hidden" value="" />
 
         <button class="primary-button" id="add-custom-template">
-          Save Plan
+          Save
         </button>
       </div>
     </article>
@@ -195,18 +172,16 @@ function renderMovementBuilder(templates, exercises) {
     <article class="plan-builder-card">
       <div class="plan-builder-header">
         <div>
-          <p class="eyebrow">Build</p>
-          <h2>Add planned movement</h2>
+          <p class="eyebrow">Add movement</p>
+          <h2>Planned exercise</h2>
         </div>
       </div>
 
       ${
         customTemplates.length === 0
-          ? `
-            <p>Create a custom plan first, then add movements here.</p>
-          `
+          ? `<p>Create a custom block first.</p>`
           : `
-            <div class="compact-plan-builder-row">
+            <div class="compact-plan-builder-row structured-builder-row">
               <select id="template-builder-template">
                 ${customTemplates.map(template => `
                   <option value="${template.id}">${template.name}</option>
@@ -225,18 +200,14 @@ function renderMovementBuilder(templates, exercises) {
                 `).join("")}
               </select>
 
-              <input
-                id="template-builder-target"
-                type="text"
-                placeholder="Target"
-              />
+              <input id="template-builder-load" type="text" placeholder="Load" />
+              <input id="template-builder-sets" type="number" min="1" placeholder="Sets" />
+              <input id="template-builder-reps" type="text" placeholder="Reps / pattern" />
+              <input id="template-builder-rest" type="text" placeholder="Rest" />
+              <input id="template-builder-rpe" type="text" placeholder="RPE" />
+              <input id="template-builder-notes" type="text" placeholder="Notes" />
 
-              <input
-                id="template-builder-notes"
-                type="text"
-                placeholder="Notes"
-              />
-
+              <input id="template-builder-target" type="hidden" value="" />
               <input id="editing-planned-exercise-id" type="hidden" value="" />
 
               <button class="primary-button" id="add-exercise-to-template">
@@ -256,14 +227,12 @@ export function renderSession() {
   return `
     <section class="screen active-screen plans-screen">
       <div class="section-header">
-        <p class="eyebrow">Plans</p>
-        <h1>Build simply. Train cleanly.</h1>
+        <p class="eyebrow">Blocks</p>
+        <h1>Plan the work. Execute simply.</h1>
       </div>
 
       ${renderQuickStart()}
-
       ${renderCreateTemplatePanel()}
-
       ${renderMovementBuilder(templates, exercises)}
 
       <div class="plans-list">
