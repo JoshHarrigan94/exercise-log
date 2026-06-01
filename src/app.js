@@ -19,6 +19,7 @@ import {
 import {
   store,
   setView,
+  selectCalendarDate,
   startSession,
   saveSession,
   addExerciseLog,
@@ -402,6 +403,15 @@ function bindPreviewInputs() {
   });
 }
 
+function bindCalendarActions() {
+  document.querySelectorAll("[data-calendar-day]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectCalendarDate(button.dataset.calendarDay);
+      renderApp();
+    });
+  });
+}
+
 export function renderApp() {
   app.innerHTML = `
     <main class="app-shell">
@@ -438,6 +448,7 @@ export function renderApp() {
   updateMethodPreview();
   updateMethodMemoryPanel();
   bindMethodMemoryActions();
+  bindCalendarActions();
 }
 
 window.renderApp = renderApp;
