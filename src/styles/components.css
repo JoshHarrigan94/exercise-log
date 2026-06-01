@@ -727,15 +727,18 @@ textarea {
 }
 
 .planned-session-card > span {
-
   color: var(--accent);
-
   text-transform: uppercase;
-
   font-size: 0.68rem;
-
   font-weight: 900;
-
   letter-spacing: 0.1em;
+}
 
+.template-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
