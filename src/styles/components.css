@@ -1686,3 +1686,47 @@ select {
     flex-direction: column;
   }
 }
+
+.block-structure {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.block-week-panel,
+.workout-panel {
+  border-top: 1px solid rgba(35, 35, 35, 0.07);
+  padding-top: 10px;
+}
+
+.block-week-panel summary,
+.workout-panel summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 850;
+  color: var(--text);
+}
+
+.block-week-panel summary::-webkit-details-marker,
+.workout-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.block-week-body,
+.workout-panel-body {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.workout-panel summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workout-panel summary small {
+  color: var(--muted);
+}
