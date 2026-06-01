@@ -24,6 +24,16 @@ import {
   getProgrammeArchetypes
 } from "./domains/index.js";
 
+import {
+  getProgrammeDNA,
+  getAllProgrammeDNA,
+  getProgrammeProgressionModel,
+  getRuleSetForProgramme,
+  getRuleSetForProgrammeMatch,
+  getAllProgressionRuleModels,
+  makeCoachingDecision
+} from "./programming/index.js";
+
 export function analyseSession(session = {}) {
   const compliance = calculateSessionCompliance(session);
   const deviations = getSessionDeviations(compliance);
@@ -44,6 +54,19 @@ export function analyseSession(session = {}) {
   };
 }
 
+export function analyseSessionWithProgramme(session = {}, programmeMatch = null) {
+  const sessionAnalysis = analyseSession(session);
+  const coachingDecision = makeCoachingDecision({
+    sessionAnalysis,
+    programmeMatch
+  });
+
+  return {
+    ...sessionAnalysis,
+    coachingDecision
+  };
+}
+
 export function analyseSessions(sessions = []) {
   return sessions.map(analyseSession);
 }
@@ -54,6 +77,7 @@ export {
   getBestLoad,
   getBestResult,
   getRecentTrend,
+
   analyseBlockDomain,
   analyseBlocksDomain,
   classifyExerciseDomain,
@@ -62,5 +86,13 @@ export {
   classifyBlocks,
   matchProgrammeArchetypes,
   getBestProgrammeMatch,
-  getProgrammeArchetypes
+  getProgrammeArchetypes,
+
+  getProgrammeDNA,
+  getAllProgrammeDNA,
+  getProgrammeProgressionModel,
+  getRuleSetForProgramme,
+  getRuleSetForProgrammeMatch,
+  getAllProgressionRuleModels,
+  makeCoachingDecision
 };
