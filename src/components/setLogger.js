@@ -76,12 +76,6 @@ export function renderSetLogger() {
               <input id="log-rpe-detail" type="number" min="1" max="10" step="0.5" placeholder="8" />
               ${renderQuickChips("log-rpe-detail", ["6", "7", "8", "8.5", "9", "9.5", "10"])}
             </label>
-
-            <label class="form-field">
-              <span>Pain</span>
-              <input id="log-pain-detail" type="number" min="0" max="10" step="1" placeholder="0" />
-              ${renderQuickChips("log-pain-detail", ["0", "1", "2", "3", "4"])}
-            </label>
           </div>
 
           <label class="form-field">
