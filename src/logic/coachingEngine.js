@@ -70,28 +70,25 @@ export function generateCoachingReport(
   const atlasCoaching = generateAtlasCoachingObservations(session);
 
   return {
-    dominantDomain,
-    primaryExpression,
+  dominantDomain,
+  primaryExpression,
 
-    domains,
-    expressions,
+  domains,
+  expressions,
 
-    observations,
+  observations,
+  recommendations: dedupe(recommendations),
 
-    recommendations: dedupe(
-      recommendations,
-      
-      atlasCoaching,
-atlasObservations: atlasCoaching.observations,
-atlasExposure: atlasCoaching.analysis,
-    ),
+  requiredMetrics:
+    gapAnalysis.requiredMetrics,
 
-    requiredMetrics:
-      gapAnalysis.requiredMetrics,
+  triggeredRules:
+    triggeredRules.map(rule => rule.id),
 
-    triggeredRules:
-      triggeredRules.map(rule => rule.id)
-  };
+  atlasCoaching,
+  atlasObservations: atlasCoaching.observations,
+  atlasExposure: atlasCoaching.analysis
+};
 }
 
 function emptyReport() {
