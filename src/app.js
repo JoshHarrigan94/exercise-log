@@ -246,7 +246,77 @@ function populateLoggerFromLog(log) {
   }, 0);
 }
 
+function renderLoggerMethodOptions(exerciseId) {
+  const compatibility = getCompatibleMethodsForVariant(exerciseId);
+
+  const methods = [
+    ...(compatibility.recommended || []),
+    ...(compatibility.possible || [])
+  ];
+
+  if (!methods.length) {
+    return methodTypes.map(method => `
+      <option value="${method.id}">
+        ${method.name}
+      </option>
+    `).join("");
+  }
+
+  return methods.map(item => `
+    <option value="${item.method.id}">
+      ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+    </option>
+  `).join("");
+}
+
+function refreshLoggerMethods() {
+  const exerciseInput = document.querySelector("#log-exercise");
+  const methodInput = document.querySelector("#log-method");
+
+  if (!exerciseInput || !methodInput) return;
+
+  methodInput.innerHTML = renderLoggerMethodOptions(exerciseInput.value);
+  methodInput.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function refreshLoggerMovementsForFamily(familyId) {
+  const exerciseInput = document.querySelector("#log-exercise");
+  if (!exerciseInput) return;
+
+  const atlas = getMovementAtlas();
+  const family = atlas.find(item => item.id === familyId);
+
+  if (!family) return;
+
+  exerciseInput.innerHTML = family.bases.flatMap(base =>
+    (base.variants || []).map(variant => `
+      <option 
+        value="${variant.id}"
+        data-base="${base.id}"
+        data-family="${family.id}"
+      >
+        ${variant.name}
+      </option>
+    `)
+  ).join("");
+
+  refreshLoggerMethods();
+}
+
 function bindLiveSessionActions() {
+  document.querySelector("#log-family")?.addEventListener("change", event => {
+  refreshLoggerMovementsForFamily(event.target.value);
+});
+
+document.querySelector("#log-exercise")?.addEventListener("change", () => {
+  refreshLoggerMethods();
+
+  if (document.querySelector("#method-memory-panel")) {
+    updateMethodMemoryPanel();
+    bindMethodMemoryActions();
+  }
+});
+  
   document.querySelector(".complete-session-button")?.addEventListener("click", () => {
     saveSession();
     setView("history");
@@ -340,13 +410,6 @@ function bindLiveSessionActions() {
     } catch (error) {
       console.error(error);
       alert(error.message || "Failed to update method fields.");
-    }
-  });
-
-  document.querySelector("#log-exercise")?.addEventListener("change", () => {
-    if (document.querySelector("#method-memory-panel")) {
-      updateMethodMemoryPanel();
-      bindMethodMemoryActions();
     }
   });
 
