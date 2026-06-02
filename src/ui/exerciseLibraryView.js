@@ -393,7 +393,7 @@ function renderMovementDetail(baseMovementId) {
           </div>
 
           <div class="coaching-summary-item">
-            <span>Tracked Outputs</span>
+            <span>Tracked outputs *</span>
             <strong>${(base.measurableOutputs || []).join(", ") || "Reps"}</strong>
           </div>
         </div>
@@ -664,7 +664,7 @@ function renderCustomMovementBuilder() {
         </div>
 
         <label class="form-field">
-          <span>Name</span>
+          <span>Name *</span>
           <input 
             id="custom-exercise-name" 
             type="text" 
@@ -674,7 +674,7 @@ function renderCustomMovementBuilder() {
 
         <div class="form-grid">
           <label class="form-field">
-            <span>Closest family</span>
+            <span>Closest family *</span>
             <select id="custom-exercise-family">
               <option value="">Select family</option>
               ${atlas.map(family => renderOption(family.id, family.name)).join("")}
@@ -725,7 +725,7 @@ function renderCustomMovementBuilder() {
 
         <div class="form-grid">
           <label class="form-field">
-            <span>Primary expression</span>
+            <span>Primary expression *</span>
             <select id="custom-exercise-expression">
               <option value="">Select expression</option>
               ${expressionOptions.map(expression => renderOption(expression, expression)).join("")}
@@ -733,7 +733,7 @@ function renderCustomMovementBuilder() {
           </label>
 
           <label class="form-field">
-            <span>Default method</span>
+            <span>Default method *</span>
             <select id="custom-exercise-method">
               ${methodTypes.map(method => renderOption(method.id, method.name)).join("")}
             </select>
@@ -756,6 +756,9 @@ function renderCustomMovementBuilder() {
             type="text" 
             placeholder="reps, load, distance, hold duration, pain score"
           />
+          <small class="field-hint">
+  Required. Examples: reps, load, duration, distance, pain score, quality.
+</small>
         </label>
 
         <label class="form-field">
