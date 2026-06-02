@@ -4,7 +4,12 @@ import { renderLiveSession } from "./ui/liveSessionView.js";
 import {
   renderLibrary,
   selectLibraryBaseMovement,
-  clearLibraryBaseMovement
+  clearLibraryBaseMovement,
+  setLibrarySearch,
+  setLibraryFamilyFilter,
+  setLibraryExpressionFilter,
+  setLibraryOutputFilter,
+  clearLibraryFilters
 } from "./ui/exerciseLibraryView.js";
 import { renderHistory } from "./ui/historyView.js";
 import {
@@ -381,6 +386,31 @@ function bindLibraryActions() {
       renderApp();
     });
   });
+
+  document.querySelector("#library-search")?.addEventListener("input", event => {
+  setLibrarySearch(event.target.value);
+  renderApp();
+});
+
+document.querySelector("#library-family-filter")?.addEventListener("change", event => {
+  setLibraryFamilyFilter(event.target.value);
+  renderApp();
+});
+
+document.querySelector("#library-expression-filter")?.addEventListener("change", event => {
+  setLibraryExpressionFilter(event.target.value);
+  renderApp();
+});
+
+document.querySelector("#library-output-filter")?.addEventListener("change", event => {
+  setLibraryOutputFilter(event.target.value);
+  renderApp();
+});
+
+document.querySelector("[data-clear-library-filters]")?.addEventListener("click", () => {
+  clearLibraryFilters();
+  renderApp();
+});
 
   document.querySelectorAll("[data-close-base-movement]").forEach(button => {
     button.addEventListener("click", () => {
