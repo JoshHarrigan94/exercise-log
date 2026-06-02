@@ -5,7 +5,8 @@ import {
   getAllExercises,
   getResolvedBaseMovement,
   getVariantsForBaseMovement,
-  getCompatibleMethodsForBaseMovement
+  getCompatibleMethodsForBaseMovement,
+getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
 
 let selectedBaseMovementId = null;
@@ -87,21 +88,71 @@ function renderVariantCard(variant) {
     .map(expression => expression.name)
     .filter(Boolean);
 
-  return `
-    <article class="exercise-card">
-      <div>
-        <h2>${variant.name}</h2>
-        <p>
-          ${variant.family?.name || "Movement"} · ${variant.base?.name || "Base movement"}
-        </p>
+  const outputs = [
+    ...(variant.base?.measurableOutputs || []),
+    ...(variant.modifiers || []).flatMap(modifier =>
+      modifier.effects?.outputAdjustments || []
+    )
+  ];
 
-        <div class="quick-chip-row">
-          ${modifierNames.slice(0, 3).map(renderTag).join("")}
-          ${expressionNames.slice(0, 2).map(renderTag).join("")}
+  const compatibility = getCompatibleMethodsForVariant(variant.id);
+  const bestMethods = compatibility.recommended.slice(0, 3);
+
+  return `
+    <article class="workspace-card">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Generated variant</p>
+          <h2>${variant.name}</h2>
+        </div>
+
+        <strong>${variant.family?.name || "Movement"}</strong>
+      </div>
+
+      <p class="card-copy">
+        ${variant.base?.name || "Base movement"} variation built from:
+        ${modifierNames.length ? modifierNames.join(", ") : "standard execution"}.
+      </p>
+
+      <div class="coaching-summary-grid">
+        <div class="coaching-summary-item">
+          <span>Base</span>
+          <strong>${variant.base?.name || "Unknown"}</strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Modifiers</span>
+          <strong>${modifierNames.join(", ") || "None"}</strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Expression Bias</span>
+          <strong>${expressionNames.slice(0, 2).join(", ") || "General"}</strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Best Methods</span>
+          <strong>
+            ${
+              bestMethods.length
+                ? bestMethods.map(item => item.method.name).join(", ")
+                : "Standard Sets"
+            }
+          </strong>
         </div>
       </div>
 
-      <span>Variant</span>
+      <div class="section-header">
+        <p class="eyebrow">Tracked outputs</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          Array.from(new Set(outputs)).length
+            ? Array.from(new Set(outputs)).slice(0, 6).map(renderTag).join("")
+            : renderTag("reps")
+        }
+      </div>
     </article>
   `;
 }
