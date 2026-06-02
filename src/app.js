@@ -847,4 +847,4 @@ try {
 } catch (error) {
   console.error(error);
   renderBootError(error);
-}
+} 
