@@ -38,10 +38,12 @@ export function renderSessionDetail() {
   const session = store.data.sessions.find(
     item => item.id === store.selectedSessionId
   );
-
+  const coachingCard =
+  renderCoachingInsightCard(session);
   if (!session) {
     return `
       <section class="screen active-screen">
+        ${coachingCard}
         <article class="insight-card">
           <h2>Session not found</h2>
           <p>This session could not be loaded.</p>
