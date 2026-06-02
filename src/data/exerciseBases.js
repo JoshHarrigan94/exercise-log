@@ -2883,5 +2883,793 @@ export const exerciseBases = [
   secondaryExpressions: ["running-economy"],
   measurableOutputs: ["distance", "quality"]
 }
+,
 
+// Hypertrophy & Machine Ecosystem
+
+{
+  id: "leg-press",
+  name: "Leg Press",
+  domain: "hypertrophy",
+  family: "squat",
+  aliases: ["45 degree leg press", "sled press"],
+  equipment: ["leg press"],
+  bodyRegions: ["quads", "glutes"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps", "rpe"]
+},
+
+{
+  id: "hack-squat",
+  name: "Hack Squat",
+  domain: "hypertrophy",
+  family: "squat",
+  aliases: ["machine hack squat"],
+  equipment: ["hack squat"],
+  bodyRegions: ["quads", "glutes"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["max-strength"],
+  measurableOutputs: ["load", "reps", "rpe"]
+},
+
+{
+  id: "pendulum-squat",
+  name: "Pendulum Squat",
+  domain: "hypertrophy",
+  family: "squat",
+  aliases: ["pendulum"],
+  equipment: ["pendulum squat"],
+  bodyRegions: ["quads", "glutes"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "belt-squat",
+  name: "Belt Squat",
+  domain: "hypertrophy",
+  family: "squat",
+  aliases: ["loading belt squat"],
+  equipment: ["belt squat"],
+  bodyRegions: ["quads", "glutes"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "leg-extension",
+  name: "Leg Extension",
+  domain: "hypertrophy",
+  family: "knee-extension",
+  aliases: ["quad extension"],
+  equipment: ["leg extension"],
+  bodyRegions: ["quads"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "tempo"]
+},
+
+{
+  id: "leg-curl",
+  name: "Leg Curl",
+  domain: "hypertrophy",
+  family: "knee-flexion",
+  aliases: ["hamstring curl"],
+  equipment: ["leg curl"],
+  bodyRegions: ["hamstrings"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "tempo"]
+},
+
+{
+  id: "seated-leg-curl",
+  name: "Seated Leg Curl",
+  domain: "hypertrophy",
+  family: "knee-flexion",
+  aliases: ["seated hamstring curl"],
+  equipment: ["leg curl"],
+  bodyRegions: ["hamstrings"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "machine-chest-press",
+  name: "Machine Chest Press",
+  domain: "hypertrophy",
+  family: "horizontal-push",
+  aliases: ["chest press"],
+  equipment: ["chest press"],
+  bodyRegions: ["chest", "triceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "machine-shoulder-press",
+  name: "Machine Shoulder Press",
+  domain: "hypertrophy",
+  family: "vertical-push",
+  aliases: ["shoulder press machine"],
+  equipment: ["shoulder press"],
+  bodyRegions: ["shoulders", "triceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "machine-row",
+  name: "Machine Row",
+  domain: "hypertrophy",
+  family: "horizontal-pull",
+  aliases: ["plate loaded row"],
+  equipment: ["row machine"],
+  bodyRegions: ["back", "lats"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "chest-supported-row",
+  name: "Chest Supported Row",
+  domain: "hypertrophy",
+  family: "horizontal-pull",
+  aliases: ["supported row"],
+  equipment: ["machine", "bench"],
+  bodyRegions: ["back", "rear delts"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "pec-deck",
+  name: "Pec Deck",
+  domain: "hypertrophy",
+  family: "chest-isolation",
+  aliases: ["machine fly"],
+  equipment: ["pec deck"],
+  bodyRegions: ["chest"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["mind-muscle-connection"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "cable-fly",
+  name: "Cable Fly",
+  domain: "hypertrophy",
+  family: "chest-isolation",
+  aliases: ["cable crossover"],
+  equipment: ["cable"],
+  bodyRegions: ["chest"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["mind-muscle-connection"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "lateral-raise",
+  name: "Lateral Raise",
+  domain: "hypertrophy",
+  family: "shoulder-isolation",
+  aliases: ["side raise"],
+  equipment: ["dumbbell", "cable", "machine"],
+  bodyRegions: ["lateral delts"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "rear-delt-fly",
+  name: "Rear Delt Fly",
+  domain: "hypertrophy",
+  family: "shoulder-isolation",
+  aliases: ["reverse fly"],
+  equipment: ["dumbbell", "cable", "pec deck"],
+  bodyRegions: ["rear delts", "upper back"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["posture"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "preacher-curl",
+  name: "Preacher Curl",
+  domain: "hypertrophy",
+  family: "elbow-flexion",
+  aliases: ["preacher"],
+  equipment: ["ez bar", "machine", "dumbbell"],
+  bodyRegions: ["biceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["mind-muscle-connection"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "cable-curl",
+  name: "Cable Curl",
+  domain: "hypertrophy",
+  family: "elbow-flexion",
+  aliases: ["standing cable curl"],
+  equipment: ["cable"],
+  bodyRegions: ["biceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "tricep-pushdown",
+  name: "Tricep Pushdown",
+  domain: "hypertrophy",
+  family: "elbow-extension",
+  aliases: ["pushdown"],
+  equipment: ["cable"],
+  bodyRegions: ["triceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "overhead-tricep-extension",
+  name: "Overhead Tricep Extension",
+  domain: "hypertrophy",
+  family: "elbow-extension",
+  aliases: ["cable overhead extension"],
+  equipment: ["cable", "dumbbell"],
+  bodyRegions: ["triceps"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["mind-muscle-connection"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "smith-squat",
+  name: "Smith Squat",
+  domain: "hypertrophy",
+  family: "squat",
+  aliases: ["smith machine squat"],
+  equipment: ["smith machine"],
+  bodyRegions: ["quads", "glutes"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["stability"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "smith-incline-press",
+  name: "Smith Incline Press",
+  domain: "hypertrophy",
+  family: "horizontal-push",
+  aliases: ["smith incline bench"],
+  equipment: ["smith machine"],
+  bodyRegions: ["upper chest", "shoulders"],
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["load", "reps"]
+}
+
+,
+
+// Rotation, Core, Shoulder Health, Neck, Foot & Ankle
+
+{
+  id: "pallof-press",
+  name: "Pallof Press",
+  domain: "core",
+  family: "anti-rotation",
+  aliases: ["anti rotation press"],
+  equipment: ["cable", "band"],
+  bodyRegions: ["core", "obliques"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "hold-duration"]
+},
+
+{
+  id: "pallof-hold",
+  name: "Pallof Hold",
+  domain: "core",
+  family: "anti-rotation",
+  aliases: ["anti rotation hold"],
+  equipment: ["cable", "band"],
+  bodyRegions: ["core", "obliques"],
+  primaryExpressions: ["isometric-strength"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "duration", "side"]
+},
+
+{
+  id: "cable-chop",
+  name: "Cable Chop",
+  domain: "core",
+  family: "rotation",
+  aliases: ["high to low chop"],
+  equipment: ["cable", "band"],
+  bodyRegions: ["obliques", "core", "hips"],
+  primaryExpressions: ["rotational-control"],
+  secondaryExpressions: ["hypertrophy"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "cable-lift",
+  name: "Cable Lift",
+  domain: "core",
+  family: "rotation",
+  aliases: ["low to high lift"],
+  equipment: ["cable", "band"],
+  bodyRegions: ["obliques", "core", "hips"],
+  primaryExpressions: ["rotational-control"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "landmine-rotation",
+  name: "Landmine Rotation",
+  domain: "athletic-development",
+  family: "rotation",
+  aliases: ["landmine twist"],
+  equipment: ["landmine", "barbell"],
+  bodyRegions: ["core", "obliques", "hips", "shoulders"],
+  primaryExpressions: ["rotational-power"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "medicine-ball-chest-throw",
+  name: "Medicine Ball Chest Throw",
+  domain: "athletic-development",
+  family: "throw",
+  aliases: ["med ball chest pass"],
+  equipment: ["medicine ball"],
+  bodyRegions: ["chest", "triceps", "core"],
+  primaryExpressions: ["upper-body-power"],
+  secondaryExpressions: ["coordination"],
+  measurableOutputs: ["load", "distance", "reps"]
+},
+
+{
+  id: "medicine-ball-overhead-throw",
+  name: "Medicine Ball Overhead Throw",
+  domain: "athletic-development",
+  family: "throw",
+  aliases: ["overhead med ball throw"],
+  equipment: ["medicine ball"],
+  bodyRegions: ["shoulders", "lats", "core", "hips"],
+  primaryExpressions: ["power"],
+  secondaryExpressions: ["coordination"],
+  measurableOutputs: ["load", "distance", "reps"]
+},
+
+{
+  id: "medicine-ball-rotational-throw",
+  name: "Medicine Ball Rotational Throw",
+  domain: "athletic-development",
+  family: "throw",
+  aliases: ["side throw", "rotational med ball throw"],
+  equipment: ["medicine ball", "wall"],
+  bodyRegions: ["obliques", "hips", "shoulders"],
+  primaryExpressions: ["rotational-power"],
+  secondaryExpressions: ["coordination"],
+  measurableOutputs: ["load", "distance", "side", "reps"]
+},
+
+{
+  id: "medicine-ball-scoop-toss",
+  name: "Medicine Ball Scoop Toss",
+  domain: "athletic-development",
+  family: "throw",
+  aliases: ["scoop throw", "underhand med ball throw"],
+  equipment: ["medicine ball"],
+  bodyRegions: ["glutes", "hips", "core", "shoulders"],
+  primaryExpressions: ["power"],
+  secondaryExpressions: ["coordination"],
+  measurableOutputs: ["load", "distance", "reps"]
+},
+
+{
+  id: "external-rotation",
+  name: "External Rotation",
+  domain: "shoulder-health",
+  family: "shoulder-rotation",
+  aliases: ["band external rotation", "cable external rotation"],
+  equipment: ["band", "cable", "dumbbell"],
+  bodyRegions: ["rotator cuff", "shoulders"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "internal-rotation",
+  name: "Internal Rotation",
+  domain: "shoulder-health",
+  family: "shoulder-rotation",
+  aliases: ["band internal rotation", "cable internal rotation"],
+  equipment: ["band", "cable"],
+  bodyRegions: ["rotator cuff", "shoulders"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "scaption-raise",
+  name: "Scaption Raise",
+  domain: "shoulder-health",
+  family: "shoulder-raise",
+  aliases: ["scaption"],
+  equipment: ["dumbbell", "band"],
+  bodyRegions: ["shoulders", "rotator cuff"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "prone-y-raise",
+  name: "Prone Y Raise",
+  domain: "shoulder-health",
+  family: "scapular-control",
+  aliases: ["y raise", "lower trap raise"],
+  equipment: ["bodyweight", "dumbbell", "bench"],
+  bodyRegions: ["lower traps", "shoulders", "upper back"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "quality"]
+},
+
+{
+  id: "prone-t-raise",
+  name: "Prone T Raise",
+  domain: "shoulder-health",
+  family: "scapular-control",
+  aliases: ["t raise"],
+  equipment: ["bodyweight", "dumbbell", "bench"],
+  bodyRegions: ["rear delts", "upper back"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "quality"]
+},
+
+{
+  id: "serratus-wall-slide",
+  name: "Serratus Wall Slide",
+  domain: "shoulder-health",
+  family: "scapular-control",
+  aliases: ["wall slide"],
+  equipment: ["wall", "band"],
+  bodyRegions: ["serratus", "shoulders", "upper back"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["mobility"],
+  measurableOutputs: ["reps", "quality"]
+},
+
+{
+  id: "scapular-push-up",
+  name: "Scapular Push Up",
+  domain: "shoulder-health",
+  family: "scapular-control",
+  aliases: ["push up plus"],
+  equipment: ["bodyweight"],
+  bodyRegions: ["serratus", "shoulders", "core"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["reps", "quality"]
+},
+
+{
+  id: "neck-flexion",
+  name: "Neck Flexion",
+  domain: "neck-training",
+  family: "neck",
+  aliases: ["weighted neck flexion"],
+  equipment: ["bodyweight", "plate", "harness"],
+  bodyRegions: ["neck"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["hypertrophy"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "neck-extension",
+  name: "Neck Extension",
+  domain: "neck-training",
+  family: "neck",
+  aliases: ["weighted neck extension"],
+  equipment: ["bodyweight", "plate", "harness"],
+  bodyRegions: ["neck", "upper traps"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["hypertrophy"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "neck-lateral-flexion",
+  name: "Neck Lateral Flexion",
+  domain: "neck-training",
+  family: "neck",
+  aliases: ["side neck raise"],
+  equipment: ["bodyweight", "plate", "harness"],
+  bodyRegions: ["neck"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["hypertrophy"],
+  measurableOutputs: ["load", "reps", "side"]
+},
+
+{
+  id: "short-foot",
+  name: "Short Foot",
+  domain: "foot-ankle",
+  family: "foot-intrinsic",
+  aliases: ["foot doming", "arch raise"],
+  equipment: ["bodyweight"],
+  bodyRegions: ["feet", "arches"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "reps", "quality"]
+},
+
+{
+  id: "toe-yoga",
+  name: "Toe Yoga",
+  domain: "foot-ankle",
+  family: "foot-intrinsic",
+  aliases: ["toe control", "big toe control"],
+  equipment: ["bodyweight"],
+  bodyRegions: ["feet", "toes"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["reps", "quality"]
+},
+
+{
+  id: "big-toe-raise",
+  name: "Big Toe Raise",
+  domain: "foot-ankle",
+  family: "foot-intrinsic",
+  aliases: ["hallux raise"],
+  equipment: ["bodyweight"],
+  bodyRegions: ["big toe", "feet"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["reps", "quality"]
+},
+
+{
+  id: "toe-splay",
+  name: "Toe Splay",
+  domain: "foot-ankle",
+  family: "foot-intrinsic",
+  aliases: ["toe spread"],
+  equipment: ["bodyweight"],
+  bodyRegions: ["toes", "feet"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["reps", "quality"]
+},
+
+{
+  id: "soleus-raise",
+  name: "Soleus Raise",
+  domain: "foot-ankle",
+  family: "calf",
+  aliases: ["bent knee calf raise", "seated calf raise"],
+  equipment: ["bodyweight", "dumbbell", "machine"],
+  bodyRegions: ["soleus", "calves", "achilles"],
+  primaryExpressions: ["tendon-capacity"],
+  secondaryExpressions: ["hypertrophy", "tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "tempo", "pain-response"]
+}
+
+,
+
+// Isometrics
+
+{
+  id: "mid-thigh-pull",
+  name: "Mid-Thigh Pull",
+  domain: "isometric",
+  family: "hinge",
+  aliases: ["isometric mid thigh pull", "imtp"],
+  equipment: ["barbell", "rack", "force plate"],
+  bodyRegions: ["glutes", "hamstrings", "back", "traps"],
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["rate-of-force-development"],
+  measurableOutputs: ["force", "duration", "peak-force"]
+},
+
+{
+  id: "overcoming-isometric-squat",
+  name: "Overcoming Isometric Squat",
+  domain: "isometric",
+  family: "squat",
+  aliases: ["isometric squat against pins"],
+  equipment: ["barbell", "rack", "pins"],
+  bodyRegions: ["quads", "glutes", "trunk"],
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["rate-of-force-development"],
+  measurableOutputs: ["force", "duration", "joint-angle"]
+},
+
+{
+  id: "overcoming-isometric-bench-press",
+  name: "Overcoming Isometric Bench Press",
+  domain: "isometric",
+  family: "horizontal-push",
+  aliases: ["isometric bench against pins"],
+  equipment: ["barbell", "bench", "rack", "pins"],
+  bodyRegions: ["chest", "triceps", "shoulders"],
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["rate-of-force-development"],
+  measurableOutputs: ["force", "duration", "joint-angle"]
+},
+
+{
+  id: "overcoming-isometric-deadlift",
+  name: "Overcoming Isometric Deadlift",
+  domain: "isometric",
+  family: "hinge",
+  aliases: ["isometric deadlift against pins"],
+  equipment: ["barbell", "rack", "pins"],
+  bodyRegions: ["glutes", "hamstrings", "back", "grip"],
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["rate-of-force-development"],
+  measurableOutputs: ["force", "duration", "joint-angle"]
+},
+
+{
+  id: "overcoming-isometric-press",
+  name: "Overcoming Isometric Press",
+  domain: "isometric",
+  family: "vertical-push",
+  aliases: ["isometric overhead press against pins"],
+  equipment: ["barbell", "rack", "pins"],
+  bodyRegions: ["shoulders", "triceps", "upper back"],
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["rate-of-force-development"],
+  measurableOutputs: ["force", "duration", "joint-angle"]
+},
+
+{
+  id: "split-squat-hold",
+  name: "Split Squat Hold",
+  domain: "isometric",
+  family: "lunge",
+  aliases: ["isometric split squat", "lunge hold"],
+  equipment: ["bodyweight", "dumbbell", "kettlebell"],
+  bodyRegions: ["quads", "glutes", "adductors", "hips"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["duration", "load", "side", "joint-angle"]
+},
+
+{
+  id: "spanish-squat-hold",
+  name: "Spanish Squat Hold",
+  domain: "isometric",
+  family: "squat",
+  aliases: ["spanish squat iso"],
+  equipment: ["band", "strap"],
+  bodyRegions: ["quads", "knees"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["duration", "pain-response", "joint-angle"]
+},
+
+{
+  id: "wall-sit-hold",
+  name: "Wall Sit Hold",
+  domain: "isometric",
+  family: "squat",
+  aliases: ["wall sit iso"],
+  equipment: ["bodyweight", "wall"],
+  bodyRegions: ["quads", "knees"],
+  primaryExpressions: ["strength-endurance"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "load"]
+},
+
+{
+  id: "calf-raise-hold",
+  name: "Calf Raise Hold",
+  domain: "isometric",
+  family: "calf",
+  aliases: ["calf iso", "achilles iso"],
+  equipment: ["bodyweight", "dumbbell", "machine"],
+  bodyRegions: ["calves", "achilles", "feet"],
+  primaryExpressions: ["tendon-capacity"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "load", "pain-response", "joint-angle"]
+},
+
+{
+  id: "soleus-hold",
+  name: "Soleus Hold",
+  domain: "isometric",
+  family: "calf",
+  aliases: ["bent knee calf iso", "soleus iso"],
+  equipment: ["bodyweight", "dumbbell", "machine"],
+  bodyRegions: ["soleus", "calves", "achilles"],
+  primaryExpressions: ["tendon-capacity"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "load", "pain-response", "joint-angle"]
+},
+
+{
+  id: "tibialis-hold",
+  name: "Tibialis Hold",
+  domain: "isometric",
+  family: "tibialis",
+  aliases: ["tibialis iso", "shin iso"],
+  equipment: ["bodyweight", "band"],
+  bodyRegions: ["shins", "ankles", "feet"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["duration", "load", "joint-angle"]
+},
+
+{
+  id: "pull-up-hold",
+  name: "Pull Up Hold",
+  domain: "isometric",
+  family: "vertical-pull",
+  aliases: ["isometric pull up hold", "top hold"],
+  equipment: ["bodyweight", "pull-up bar", "rings"],
+  bodyRegions: ["back", "lats", "arms", "grip"],
+  primaryExpressions: ["relative-strength"],
+  secondaryExpressions: ["isometric-strength"],
+  measurableOutputs: ["duration", "external-load", "joint-angle"]
+},
+
+{
+  id: "chin-over-bar-hold",
+  name: "Chin Over Bar Hold",
+  domain: "isometric",
+  family: "vertical-pull",
+  aliases: ["top chin hold", "top pull up hold"],
+  equipment: ["bodyweight", "pull-up bar"],
+  bodyRegions: ["back", "arms", "grip"],
+  primaryExpressions: ["relative-strength"],
+  secondaryExpressions: ["strength-endurance"],
+  measurableOutputs: ["duration", "external-load"]
+},
+
+{
+  id: "scapular-hang",
+  name: "Scapular Hang",
+  domain: "isometric",
+  family: "vertical-pull",
+  aliases: ["active hang", "scap hang"],
+  equipment: ["bodyweight", "pull-up bar", "rings"],
+  bodyRegions: ["lats", "shoulders", "grip"],
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "quality"]
+},
+
+{
+  id: "dead-hang",
+  name: "Dead Hang",
+  domain: "isometric",
+  family: "vertical-pull",
+  aliases: ["passive hang", "bar hang"],
+  equipment: ["bodyweight", "pull-up bar", "rings"],
+  bodyRegions: ["grip", "shoulders", "lats"],
+  primaryExpressions: ["tissue-tolerance"],
+  secondary
 ];
