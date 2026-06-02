@@ -1,7 +1,8 @@
 import { methodTypes } from "../data/methodTypes.js";
 
 const UNIVERSAL_METHODS = [
-  "standard-sets"
+  "standard-sets",
+  "straight-sets"
 ];
 
 const FAMILY_METHOD_RULES = {
@@ -225,12 +226,16 @@ function scoreMethod(methodId, base, variant = null) {
 
 export function getMethodCompatibility(base, variant = null) {
   if (!base) {
-    return {
-      recommended: [],
-      possible: methodTypes,
-      limited: []
-    };
-  }
+  return {
+    recommended: methodTypes.filter(method =>
+      UNIVERSAL_METHODS.includes(method.id)
+    ),
+    possible: methodTypes.filter(method =>
+      !UNIVERSAL_METHODS.includes(method.id)
+    ),
+    limited: []
+  };
+}
 
   const scored = methodTypes
     .map(method => scoreMethod(method.id, base, variant))
