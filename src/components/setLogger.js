@@ -58,8 +58,21 @@ function renderMethodOptionsForExercise(exerciseId) {
 
 export function renderSetLogger() {
   const atlas = getMovementAtlas();
-  const firstFamily = atlas[0];
-  const firstExerciseId = firstFamily?.bases?.[0]?.variants?.[0]?.id || "";
+const firstFamily = atlas[0];
+const firstExerciseId =
+  firstFamily?.bases?.[0]?.variants?.[0]?.id ||
+  "";
+  if (!atlas.length) {
+  return `
+    <article class="logger-card compact-logger">
+      <p class="eyebrow">Log</p>
+      <h2>No atlas movements found</h2>
+      <p class="card-copy">
+        Add movement data before logging sessions.
+      </p>
+    </article>
+  `;
+}
 
   return `
     <article class="logger-card compact-logger">
