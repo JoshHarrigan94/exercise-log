@@ -1,3 +1,5 @@
+import { generateAtlasCoachingObservations } from "./atlasCoachingAnalysis.js";
+
 import {
   classifySession
 } from "./domainClassifiers.js";
@@ -65,6 +67,8 @@ export function generateCoachingReport(
     recommendations.push(rule.recommendation);
   });
 
+  const atlasCoaching = generateAtlasCoachingObservations(session);
+
   return {
     dominantDomain,
     primaryExpression,
@@ -75,7 +79,11 @@ export function generateCoachingReport(
     observations,
 
     recommendations: dedupe(
-      recommendations
+      recommendations,
+      
+      atlasCoaching,
+atlasObservations: atlasCoaching.observations,
+atlasExposure: atlasCoaching.analysis,
     ),
 
     requiredMetrics:
