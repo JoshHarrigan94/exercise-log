@@ -252,6 +252,78 @@ function renderMethodCompatibilityCard(baseMovementId) {
   `;
 }
 
+function renderMovementRelationshipCard(base) {
+  const relationships = base.relationships || {
+    regressions: [],
+    progressions: [],
+    alternatives: []
+  };
+
+  return `
+    <article class="workspace-card">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Movement pathway</p>
+          <h2>Regressions, progressions and alternatives</h2>
+        </div>
+      </div>
+
+      <div class="coaching-summary-grid">
+        <div class="coaching-summary-item">
+          <span>Regressions</span>
+          <strong>${relationships.regressions.length}</strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Progressions</span>
+          <strong>${relationships.progressions.length}</strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Alternatives</span>
+          <strong>${relationships.alternatives.length}</strong>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Regression options</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          relationships.regressions.length
+            ? relationships.regressions.map(renderTag).join("")
+            : renderTag("None mapped yet")
+        }
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Progression options</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          relationships.progressions.length
+            ? relationships.progressions.map(renderTag).join("")
+            : renderTag("None mapped yet")
+        }
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Alternatives</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          relationships.alternatives.length
+            ? relationships.alternatives.map(renderTag).join("")
+            : renderTag("None mapped yet")
+        }
+      </div>
+    </article>
+  `;
+}
+
 function renderMovementDetail(baseMovementId) {
   const base = getResolvedBaseMovement(baseMovementId);
   const variants = getVariantsForBaseMovement(baseMovementId);
@@ -301,7 +373,7 @@ function renderMovementDetail(baseMovementId) {
             <h2>What this movement captures</h2>
           </div>
         </div>
-
+          ${renderMovementRelationshipCard(base)}
         <div class="coaching-summary-grid">
           <div class="coaching-summary-item">
             <span>Family</span>
