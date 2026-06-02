@@ -242,4 +242,118 @@ export const exerciseVariants = [
     baseMovementId: "zone2-run",
     modifiers: ["continuous"]
   }
+  
+,
+
+{
+  id: "chest-supported-row",
+  name: "Chest Supported Row",
+  baseMovementId: "row",
+  modifiers: ["assisted"]
+},
+
+{
+  id: "single-arm-row",
+  name: "Single Arm Row",
+  baseMovementId: "row",
+  modifiers: ["single-arm"]
+},
+
+{
+  id: "tempo-row",
+  name: "Tempo Row",
+  baseMovementId: "row",
+  modifiers: ["tempo"]
+},
+
+{
+  id: "pause-overhead-press",
+  name: "Pause Overhead Press",
+  baseMovementId: "overhead-press",
+  modifiers: ["pause"]
+},
+
+{
+  id: "tempo-overhead-press",
+  name: "Tempo Overhead Press",
+  baseMovementId: "overhead-press",
+  modifiers: ["tempo"]
+},
+
+{
+  id: "weighted-step-up",
+  name: "Weighted Step Up",
+  baseMovementId: "step-up",
+  modifiers: ["weighted"]
+},
+
+{
+  id: "tempo-step-up",
+  name: "Tempo Step Up",
+  baseMovementId: "step-up",
+  modifiers: ["tempo"]
+},
+
+{
+  id: "single-leg-calf-raise",
+  name: "Single Leg Calf Raise",
+  baseMovementId: "calf-raise",
+  modifiers: ["single-leg"]
+},
+
+{
+  id: "isometric-calf-raise",
+  name: "Isometric Calf Raise",
+  baseMovementId: "calf-raise",
+  modifiers: ["isometric"]
+},
+
+{
+  id: "tempo-calf-raise",
+  name: "Tempo Calf Raise",
+  baseMovementId: "calf-raise",
+  modifiers: ["tempo"]
+},
+
+{
+  id: "banded-tibialis-raise",
+  name: "Banded Tibialis Raise",
+  baseMovementId: "tibialis-raise",
+  modifiers: ["band-resisted"]
+},
+
+{
+  id: "heavy-kettlebell-swing",
+  name: "Heavy Kettlebell Swing",
+  baseMovementId: "kettlebell-swing",
+  modifiers: ["weighted"]
+},
+
+{
+  id: "interval-kettlebell-swing",
+  name: "Interval Kettlebell Swing",
+  baseMovementId: "kettlebell-swing",
+  modifiers: ["continuous"]
+},
+
+{
+  id: "farmer-carry",
+  name: "Farmer Carry",
+  baseMovementId: "loaded-carry",
+  modifiers: ["weighted"]
+},
+
+{
+  id: "suitcase-carry",
+  name: "Suitcase Carry",
+  baseMovementId: "loaded-carry",
+  modifiers: ["single-arm"]
+},
+
+{
+  id: "weighted-plank",
+  name: "Weighted Plank",
+  baseMovementId: "plank",
+  modifiers: ["weighted", "isometric"]
+}
 ];
