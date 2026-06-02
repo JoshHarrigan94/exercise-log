@@ -1,7 +1,7 @@
 import { generateCoachingReport } from "../../logic/coachingEngine.js";
 
 function formatLabel(value = "") {
-  return value
+  return String(value || "")
     .split("-")
     .map(word =>
       word.charAt(0).toUpperCase() +
@@ -12,7 +12,16 @@ function formatLabel(value = "") {
 
 export function renderCoachingInsightCard(session) {
   const report =
-    generateCoachingReport(session);
+    generateCoachingReport(session) || {};
+
+  const observations =
+    report.observations || [];
+
+  const recommendations =
+    report.recommendations || [];
+
+  const requiredMetrics =
+    report.requiredMetrics || [];
 
   return `
     <article class="workspace-card coaching-card">
@@ -55,10 +64,10 @@ export function renderCoachingInsightCard(session) {
         <h3>Observations</h3>
 
         ${
-          report.observations.length
+          observations.length
             ? `
               <ul class="coach-list">
-                ${report.observations.map(item => `
+                ${observations.map(item => `
                   <li>${item}</li>
                 `).join("")}
               </ul>
@@ -73,10 +82,10 @@ export function renderCoachingInsightCard(session) {
         <h3>Recommendations</h3>
 
         ${
-          report.recommendations.length
+          recommendations.length
             ? `
               <ul class="coach-list">
-                ${report.recommendations.map(item => `
+                ${recommendations.map(item => `
                   <li>${item}</li>
                 `).join("")}
               </ul>
@@ -91,10 +100,10 @@ export function renderCoachingInsightCard(session) {
         <h3>Required Metrics</h3>
 
         ${
-          report.requiredMetrics.length
+          requiredMetrics.length
             ? `
               <div class="metric-chip-row">
-                ${report.requiredMetrics.map(metric => `
+                ${requiredMetrics.map(metric => `
                   <span class="metric-chip">
                     ${formatLabel(metric)}
                   </span>
