@@ -1,12 +1,65 @@
-import { getAllExercises } from "../logic/exerciseLibrary.js";
+import {
+  getMovementAtlas,
+  getCompatibleMethodsForVariant
+} from "../logic/exerciseLibrary.js";
+
 import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
 import { renderMethodPreview } from "./methodPreview.js";
 import { renderMethodMemoryPanel } from "./methodMemoryPanel.js";
 
+function renderFamilyOptions(atlas) {
+  return atlas.map(family => `
+    <option value="${family.id}">
+      ${family.name}
+    </option>
+  `).join("");
+}
+
+function renderExerciseOptionsForFamily(family) {
+  if (!family) return "";
+
+  return family.bases.flatMap(base =>
+    (base.variants || []).map(variant => `
+      <option 
+        value="${variant.id}"
+        data-base="${base.id}"
+        data-family="${family.id}"
+      >
+        ${variant.name}
+      </option>
+    `)
+  ).join("");
+}
+
+function renderMethodOptionsForExercise(exerciseId) {
+  const compatibility = getCompatibleMethodsForVariant(exerciseId);
+
+  const methods = [
+    ...(compatibility.recommended || []),
+    ...(compatibility.possible || [])
+  ];
+
+  if (!methods.length) {
+    return methodTypes.map(method => `
+      <option value="${method.id}">
+        ${method.name}
+      </option>
+    `).join("");
+  }
+
+  return methods.map(item => `
+    <option value="${item.method.id}">
+      ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+    </option>
+  `).join("");
+}
+
 export function renderSetLogger() {
-  const allExercises = getAllExercises();
+  const atlas = getMovementAtlas();
+  const firstFamily = atlas[0];
+  const firstExerciseId = firstFamily?.bases?.[0]?.variants?.[0]?.id || "";
 
   return `
     <article class="logger-card compact-logger">
@@ -23,24 +76,23 @@ export function renderSetLogger() {
 
       <div class="compact-log-row">
         <label class="compact-field compact-field-wide">
-          <span>Exercise</span>
+          <span>Family</span>
+          <select id="log-family">
+            ${renderFamilyOptions(atlas)}
+          </select>
+        </label>
+
+        <label class="compact-field compact-field-wide">
+          <span>Movement</span>
           <select id="log-exercise">
-            ${allExercises.map(exercise => `
-              <option value="${exercise.id}">
-                ${exercise.name}
-              </option>
-            `).join("")}
+            ${renderExerciseOptionsForFamily(firstFamily)}
           </select>
         </label>
 
         <label class="compact-field compact-field-wide">
           <span>Method</span>
           <select id="log-method">
-            ${methodTypes.map(method => `
-              <option value="${method.id}">
-                ${method.name}
-              </option>
-            `).join("")}
+            ${renderMethodOptionsForExercise(firstExerciseId)}
           </select>
         </label>
 
@@ -48,8 +100,6 @@ export function renderSetLogger() {
           <span>RPE</span>
           <input id="log-rpe" type="number" min="1" max="10" step="0.5" placeholder="8" />
         </label>
-
-        
 
         <button class="primary-button compact-save-button" id="add-exercise-log">
           Save
