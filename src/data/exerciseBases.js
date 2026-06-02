@@ -339,5 +339,85 @@ export const exerciseBases = [
       "pace"
     ]
   }
+,
 
+{
+  id: "row",
+  name: "Row",
+  domain: "strength",
+  family: "horizontal-pull",
+  primaryExpressions: ["hypertrophy"],
+  secondaryExpressions: ["strength-endurance", "motor-control"],
+  measurableOutputs: ["load", "reps", "range"]
+},
+
+{
+  id: "overhead-press",
+  name: "Overhead Press",
+  domain: "strength",
+  family: "vertical-push",
+  primaryExpressions: ["max-strength"],
+  secondaryExpressions: ["hypertrophy", "motor-control"],
+  measurableOutputs: ["load", "reps"]
+},
+
+{
+  id: "step-up",
+  name: "Step Up",
+  domain: "strength",
+  family: "step",
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["hypertrophy", "motor-control"],
+  measurableOutputs: ["load", "reps", "height", "side"]
+},
+
+{
+  id: "calf-raise",
+  name: "Calf Raise",
+  domain: "rehab",
+  family: "calf",
+  primaryExpressions: ["tendon-capacity"],
+  secondaryExpressions: ["hypertrophy", "tissue-tolerance"],
+  measurableOutputs: ["load", "reps", "tempo", "pain-response"]
+},
+
+{
+  id: "tibialis-raise",
+  name: "Tibialis Raise",
+  domain: "rehab",
+  family: "tibialis",
+  primaryExpressions: ["tissue-tolerance"],
+  secondaryExpressions: ["motor-control"],
+  measurableOutputs: ["reps", "load", "range"]
+},
+
+{
+  id: "kettlebell-swing",
+  name: "Kettlebell Swing",
+  domain: "power",
+  family: "hinge",
+  primaryExpressions: ["power"],
+  secondaryExpressions: ["work-capacity", "tendon-capacity"],
+  measurableOutputs: ["load", "reps", "duration", "density"]
+},
+
+{
+  id: "loaded-carry",
+  name: "Loaded Carry",
+  domain: "conditioning",
+  family: "carry",
+  primaryExpressions: ["work-capacity"],
+  secondaryExpressions: ["tissue-tolerance", "motor-control"],
+  measurableOutputs: ["load", "distance", "duration"]
+},
+
+{
+  id: "plank",
+  name: "Plank",
+  domain: "core",
+  family: "anti-extension",
+  primaryExpressions: ["motor-control"],
+  secondaryExpressions: ["tissue-tolerance"],
+  measurableOutputs: ["duration", "load", "quality"]
+}
 ];
