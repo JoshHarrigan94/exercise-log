@@ -97,25 +97,27 @@ function renderFamilyCard(family) {
 function renderBaseMovementCard(base) {
   return `
     <button 
-      class="exercise-card"
+      class="exercise-card atlas-base-card"
       type="button"
       data-open-base-movement="${base.id}"
     >
       <div>
+        <p class="eyebrow">${base.familyName}</p>
         <h2>${base.name}</h2>
+
         <p>
-          ${base.familyName} · ${base.domain} · ${base.variantCount} variants
+          ${base.domain || "General"} · ${base.variantCount} generated variants
         </p>
 
         <div class="quick-chip-row">
           ${base.primaryExpressionNames.slice(0, 2).map(renderTag).join("")}
           ${(base.measurableOutputs || []).slice(0, 3).map(renderTag).join("")}
           ${base.progressionCount ? renderTag(`${base.progressionCount} progressions`) : ""}
-${base.regressionCount ? renderTag(`${base.regressionCount} regressions`) : ""}
+          ${base.regressionCount ? renderTag(`${base.regressionCount} regressions`) : ""}
         </div>
       </div>
 
-      <span>Open</span>
+      <span>Explore</span>
     </button>
   `;
 }
@@ -778,6 +780,57 @@ function renderCustomMovementBuilder() {
   `;
 }
 
+function renderAtlasStats(atlas, baseMovements, customExercises) {
+  const variantCount = atlas.reduce(
+    (total, family) => total + family.variantCount,
+    0
+  );
+
+  return `
+    <div class="coaching-summary-grid">
+      <div class="coaching-summary-item">
+        <span>Families</span>
+        <strong>${atlas.length}</strong>
+      </div>
+
+      <div class="coaching-summary-item">
+        <span>Base Movements</span>
+        <strong>${baseMovements.length}</strong>
+      </div>
+
+      <div class="coaching-summary-item">
+        <span>Generated Variants</span>
+        <strong>${variantCount}</strong>
+      </div>
+
+      <div class="coaching-summary-item">
+        <span>Custom</span>
+        <strong>${customExercises.length}</strong>
+      </div>
+    </div>
+  `;
+}
+
+function renderAtlasEmptyState() {
+  return `
+    <article class="workspace-card">
+      <p class="eyebrow">No matches</p>
+      <h2>No movements match these filters</h2>
+      <p class="card-copy">
+        Try clearing one filter or searching by family, movement, expression or output.
+      </p>
+
+      <button 
+        class="secondary-button"
+        type="button"
+        data-clear-library-filters
+      >
+        Clear filters
+      </button>
+    </article>
+  `;
+}
+
 export function renderLibrary() {
   if (customMovementBuilderOpen) {
   return renderCustomMovementBuilder();
@@ -804,13 +857,15 @@ const filteredBaseMovements = baseMovements.filter(baseMatchesFilters);
       </div>
 
       <article class="hero-card">
-        <p class="eyebrow">Library direction</p>
-        <h1>Movement first. Variants second. Custom last.</h1>
-        <p class="hero-text">
-          This library is a structured atlas of movement families, base movements,
-          expressions, outputs and generated variants — not just a place to add exercises.
-        </p>
-      </article>
+  <p class="eyebrow">Movement Atlas</p>
+  <h1>Your training library now behaves like a movement system.</h1>
+  <p class="hero-text">
+    Explore movement families, base patterns, generated variants, expression bias,
+    method compatibility and progression pathways before adding anything custom.
+  </p>
+
+  ${renderAtlasStats(atlas, baseMovements, customExercises)}
+</article>
 
       ${renderLibraryFilters(atlas, baseMovements)}
       ${renderCustomMovementCard(customExercises)}
@@ -834,11 +889,7 @@ const filteredBaseMovements = baseMovements.filter(baseMatchesFilters);
   filteredBaseMovements.length
     ? filteredBaseMovements.map(renderBaseMovementCard).join("")
     : `
-      <article class="workspace-card">
-        <p class="card-copy">
-          No base movements match these filters yet.
-        </p>
-      </article>
+      ${renderAtlasEmptyState()}
     `
 }
       </div>
