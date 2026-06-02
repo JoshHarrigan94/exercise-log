@@ -114,6 +114,8 @@ export function renderCoachingInsightCard(session) {
         }
 
       </div>
+      
+      ${renderAtlasCoachingSection(report)}
 
     </article>
   `;
