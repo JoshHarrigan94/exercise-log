@@ -18,7 +18,12 @@ import {
   renderSessionDetail,
   bindSessionDetailActions
 } from "./ui/sessionDetailView.js";
+import {
+  getMovementAtlas,
+  getCompatibleMethodsForVariant
+} from "./logic/exerciseLibrary.js";
 
+import { methodTypes } from "./data/methodTypes.js";
 import { renderNav, renderSidebar } from "./components/nav.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
@@ -478,7 +483,62 @@ function buildTargetFromSets(plannedSets) {
   return `${setCount} × ${first.reps || "?"}${first.load ? ` @ ${first.load}` : ""}${first.rest ? ` · ${first.rest}` : ""}`;
 }
 
+function refreshTemplateBuilderMethods() {
+  const exerciseInput = document.querySelector("#template-builder-exercise");
+  const methodInput = document.querySelector("#template-builder-method");
+
+  if (!exerciseInput || !methodInput) return;
+
+  const compatibility = getCompatibleMethodsForVariant(exerciseInput.value);
+
+  const methods = [
+    ...(compatibility.recommended || []),
+    ...(compatibility.possible || [])
+  ];
+
+  methodInput.innerHTML = methods.length
+    ? methods.map(item => `
+        <option value="${item.method.id}">
+          ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+        </option>
+      `).join("")
+    : methodTypes.map(method => `
+        <option value="${method.id}">
+          ${method.name}
+        </option>
+      `).join("");
+}
+
 function bindTemplateBuilderActions() {
+  document.querySelector("#template-builder-exercise")?.addEventListener("change", () => {
+  refreshTemplateBuilderMethods();
+});
+
+document.querySelector("#template-builder-family")?.addEventListener("change", event => {
+  const familyId = event.target.value;
+  const exerciseInput = document.querySelector("#template-builder-exercise");
+
+  if (!exerciseInput) return;
+
+  const atlas = getMovementAtlas();
+  const family = atlas.find(item => item.id === familyId);
+
+  if (!family) return;
+
+  exerciseInput.innerHTML = family.bases.flatMap(base =>
+    (base.variants || []).map(variant => `
+      <option 
+        value="${variant.id}"
+        data-family="${family.id}"
+        data-base="${base.id}"
+      >
+        ${variant.name}
+      </option>
+    `)
+  ).join("");
+
+  refreshTemplateBuilderMethods();
+});
   document.querySelector("#add-exercise-to-template")?.addEventListener("click", () => {
     const workoutChoice = document.querySelector("#template-builder-workout")?.value || "";
 const [selectedTemplateId, selectedWorkoutId] = workoutChoice.split("::");
