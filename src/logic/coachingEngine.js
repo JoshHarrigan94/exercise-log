@@ -1,6 +1,6 @@
 import {
   classifySession
-} from "./domainClassifiersjs";
+} from "./domainClassifiers.js";
 
 import {
   classifySessionExpressions,
@@ -8,18 +8,7 @@ import {
   getTopExpressions
 } from "./expressionClassifiers.js";
 
-import {
-  analyseExpressionGaps
-} from "./expressionGapAnalysis.js";
-
-import {
-  getTriggeredCoachingRules
-} from "./coachingRules.js";
-
-export function generateCoachingReport(
-  session,
-  athleteProfile = {}
-) {
+export function generateCoachingReport(session) {
   if (!session) {
     return emptyReport();
   }
@@ -51,38 +40,13 @@ export function generateCoachingReport(
     recommendations
   );
 
-  const gapAnalysis =
-    analyseExpressionGaps(expressions);
-
-  gapAnalysis.recommendations.forEach(item => {
-    recommendations.push(item);
-  });
-
-  const triggeredRules =
-    getTriggeredCoachingRules(expressions);
-
-  triggeredRules.forEach(rule => {
-    recommendations.push(rule.recommendation);
-  });
-
   return {
     dominantDomain,
     primaryExpression,
-
     domains,
     expressions,
-
     observations,
-
-    recommendations: dedupe(
-      recommendations
-    ),
-
-    requiredMetrics:
-      gapAnalysis.requiredMetrics,
-
-    triggeredRules:
-      triggeredRules.map(rule => rule.id)
+    recommendations
   };
 }
 
@@ -90,25 +54,16 @@ function emptyReport() {
   return {
     dominantDomain: null,
     primaryExpression: null,
-
     domains: {},
     expressions: {},
-
     observations: [],
-    recommendations: [],
-
-    requiredMetrics: [],
-    triggeredRules: []
+    recommendations: []
   };
 }
 
 function getHighest(scores = {}) {
   return Object.entries(scores)
     .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-}
-
-function dedupe(items = []) {
-  return [...new Set(items)];
 }
 
 function buildDomainObservations(
@@ -124,7 +79,7 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Track total reps and external load progression."
+        "Track total reps and external load progression closely."
       );
       break;
 
@@ -134,17 +89,17 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Monitor fatigue accumulation and recovery."
+        "Monitor fatigue accumulation and recovery capacity."
       );
       break;
 
     case "plyometric":
       observations.push(
-        "Current training places large demands on elastic and reactive qualities."
+        "Current training places a large demand on elastic and reactive qualities."
       );
 
       recommendations.push(
-        "Monitor landing quality and tendon response."
+        "Track tendon soreness and landing quality."
       );
       break;
 
@@ -154,7 +109,7 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Monitor weekly running volume progression."
+        "Monitor weekly volume progression carefully."
       );
       break;
   }
@@ -174,17 +129,19 @@ function buildExpressionObservations(
       observations.push(
         `${score}% of training targets relative strength.`
       );
+
+      recommendations.push(
+        "Track bodyweight alongside performance trends."
+      );
     }
 
     if (expression === "hypertrophy") {
       observations.push(
         `${score}% of training targets hypertrophy.`
       );
-    }
 
-    if (expression === "max-strength") {
-      observations.push(
-        `${score}% of training targets maximal strength.`
+      recommendations.push(
+        "Monitor weekly volume and recovery capacity."
       );
     }
 
@@ -192,11 +149,29 @@ function buildExpressionObservations(
       observations.push(
         `${score}% of training targets reactive strength.`
       );
+
+      recommendations.push(
+        "Monitor landing quality and tendon readiness."
+      );
     }
 
     if (expression === "aerobic-capacity") {
       observations.push(
-        `${score}% of training targets aerobic capacity.`
+        `${score}% of training targets aerobic development.`
+      );
+
+      recommendations.push(
+        "Monitor pace, heart rate and weekly duration."
+      );
+    }
+
+    if (expression === "max-strength") {
+      observations.push(
+        `${score}% of training targets maximal strength.`
+      );
+
+      recommendations.push(
+        "Track estimated 1RM trends over time."
       );
     }
   });
