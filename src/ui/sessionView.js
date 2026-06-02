@@ -5,7 +5,12 @@ import {
 } from "../engine/index.js";
 
 import { store } from "../state/store.js";
-import { getAllExercises, getExerciseById } from "../logic/exerciseLibrary.js";
+import {
+  getAllExercises,
+  getExerciseById,
+  getMovementAtlas,
+  getCompatibleMethodsForVariant
+} from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 
 function isCustomTemplate(template) {
@@ -336,12 +341,69 @@ function renderCreateBlock() {
   `;
 }
 
+function renderAtlasFamilyOptions(atlas) {
+  return atlas.map(family => `
+    <option value="${family.id}">
+      ${family.name}
+    </option>
+  `).join("");
+}
+
+function renderAtlasExerciseOptions(atlas) {
+  return atlas.map(family => `
+    <optgroup label="${family.name}">
+      ${family.bases.flatMap(base =>
+        (base.variants || []).map(variant => `
+          <option 
+            value="${variant.id}"
+            data-family="${family.id}"
+            data-base="${base.id}"
+          >
+            ${variant.name}
+          </option>
+        `)
+      ).join("")}
+    </optgroup>
+  `).join("");
+}
+
+function renderMethodOptionsForExercise(exerciseId) {
+  const compatibility = getCompatibleMethodsForVariant(exerciseId);
+
+  const recommended = compatibility.recommended || [];
+  const possible = compatibility.possible || [];
+
+  const methods = [
+    ...recommended,
+    ...possible
+  ];
+
+  if (methods.length === 0) {
+    return methodTypes.map(method => `
+      <option value="${method.id}">
+        ${method.name}
+      </option>
+    `).join("");
+  }
+
+  return methods.map(item => `
+    <option value="${item.method.id}">
+      ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+    </option>
+  `).join("");
+}
+
 function renderMovementBuilder(templates, exercises) {
   const customTemplates = templates.filter(isCustomTemplate);
+  const atlas = getMovementAtlas();
+  const firstExerciseId =
+    atlas[0]?.bases?.[0]?.variants?.[0]?.id ||
+    exercises[0]?.id ||
+    "";
 
   return `
     <details class="block-utility-panel" open>
-      <summary>Add movement to workout</summary>
+      <summary>Add atlas movement to workout</summary>
 
       ${
         customTemplates.length === 0
@@ -354,38 +416,38 @@ function renderMovementBuilder(templates, exercises) {
                 `).join("")}
               </select>
 
-                <select id="template-builder-week">
-  ${customTemplates.flatMap(template =>
-    (template.weeks || []).map(week => `
-      <option value="${template.id}::${week.id}">
-        ${template.name} · ${week.name}
-      </option>
-    `)
-  ).join("")}
-</select>
+              <select id="template-builder-week">
+                ${customTemplates.flatMap(template =>
+                  (template.weeks || []).map(week => `
+                    <option value="${template.id}::${week.id}">
+                      ${template.name} · ${week.name}
+                    </option>
+                  `)
+                ).join("")}
+              </select>
 
-<select id="template-builder-workout">
-  ${customTemplates.flatMap(template =>
-    (template.weeks || []).flatMap(week =>
-      (week.workouts || []).map(workout => `
-        <option value="${template.id}::${workout.id}">
-          ${template.name} · ${week.name} · ${workout.name}
-        </option>
-      `)
-    )
-  ).join("")}
-</select>
+              <select id="template-builder-workout">
+                ${customTemplates.flatMap(template =>
+                  (template.weeks || []).flatMap(week =>
+                    (week.workouts || []).map(workout => `
+                      <option value="${template.id}::${workout.id}">
+                        ${template.name} · ${week.name} · ${workout.name}
+                      </option>
+                    `)
+                  )
+                ).join("")}
+              </select>
+
+              <select id="template-builder-family">
+                ${renderAtlasFamilyOptions(atlas)}
+              </select>
 
               <select id="template-builder-exercise">
-                ${exercises.map(exercise => `
-                  <option value="${exercise.id}">${exercise.name}</option>
-                `).join("")}
+                ${renderAtlasExerciseOptions(atlas)}
               </select>
 
               <select id="template-builder-method">
-                ${methodTypes.map(method => `
-                  <option value="${method.id}">${method.name}</option>
-                `).join("")}
+                ${renderMethodOptionsForExercise(firstExerciseId)}
               </select>
 
               <input id="template-builder-load" type="text" placeholder="Load" />
