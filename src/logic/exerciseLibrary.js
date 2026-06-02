@@ -68,17 +68,30 @@ export function getCompatibleMethodsForBaseMovement(baseMovementId) {
 }
 
 export function getCompatibleMethodsForVariant(variantId) {
+  const fallback = {
+    recommended: [],
+    possible: [],
+    limited: []
+  };
+
+  if (!variantId) return fallback;
+
   const variant = getVariantById(variantId);
 
   if (!variant) {
-    return {
-      recommended: [],
-      possible: [],
-      limited: []
-    };
+    return fallback;
   }
 
-  const base = getBaseMovementById(variant.baseMovementId);
+  const baseMovementId =
+    variant.baseMovementId ||
+    variant.baseId ||
+    variant.base;
+
+  const base = getBaseMovementById(baseMovementId);
+
+  if (!base) {
+    return fallback;
+  }
 
   return getMethodCompatibility(base, variant);
 }
@@ -142,18 +155,32 @@ export function getVariantsForBaseMovement(baseMovementId) {
 }
 
 export function getExerciseById(id) {
+  if (!id) return null;
+
   const customExercise = store.data.customExercises.find(
     exercise => exercise.id === id
   );
 
   if (customExercise) {
-    return customExercise;
+    return {
+      ...customExercise,
+      source: "custom"
+    };
   }
 
   const variant = getVariantById(id);
 
   if (variant) {
-    return resolveMovementVariant(id);
+    const resolved = resolveMovementVariant(id);
+
+    return {
+      ...resolved,
+      id,
+      name: resolved?.name || variant.name || "Unknown Movement",
+      pattern: resolved?.family?.name || "Generated Movement",
+      defaultMethod: variant.defaultMethod || "standard-sets",
+      source: "atlas"
+    };
   }
 
   const base = getBaseMovementById(id);
@@ -165,11 +192,18 @@ export function getExerciseById(id) {
       base,
       family: base.family,
       pattern: formatFamilyName(base.family),
-      defaultMethod: "standard-sets"
+      defaultMethod: "standard-sets",
+      source: "base"
     };
   }
 
-  return null;
+  return {
+    id,
+    name: "Unknown Movement",
+    pattern: "Legacy / Missing",
+    defaultMethod: "standard-sets",
+    source: "legacy"
+  };
 }
 
 export function getAllExercises() {
@@ -178,16 +212,18 @@ export function getAllExercises() {
 
     return {
       id: variant.id,
-      name: variant.name,
+      name: resolved?.name || variant.name || "Unknown Movement",
       pattern: resolved?.family?.name || "Generated Movement",
-      defaultMethod: "standard-sets",
+      defaultMethod: variant.defaultMethod || "standard-sets",
       source: "atlas"
     };
   });
 
   const customExercises = store.data.customExercises.map(exercise => ({
     ...exercise,
-    source: "custom"
+    source: "custom",
+    pattern: exercise.pattern || exercise.category || "Custom",
+    defaultMethod: exercise.defaultMethod || "standard-sets"
   }));
 
   return [
