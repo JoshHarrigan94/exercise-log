@@ -375,6 +375,20 @@ function bindLiveSessionActions() {
 }
 
 function bindLibraryActions() {
+  document.querySelectorAll("[data-open-base-movement]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectLibraryBaseMovement(button.dataset.openBaseMovement);
+      renderApp();
+    });
+  });
+
+  document.querySelectorAll("[data-close-base-movement]").forEach(button => {
+    button.addEventListener("click", () => {
+      clearLibraryBaseMovement();
+      renderApp();
+    });
+  });
+
   document.querySelector("#add-custom-exercise")?.addEventListener("click", () => {
     const name = document.querySelector("#custom-exercise-name")?.value?.trim();
 
