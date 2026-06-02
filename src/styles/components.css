@@ -1901,3 +1901,31 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+.atlas-base-card {
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.atlas-base-card:hover {
+  transform: translateY(-2px);
+}
+
+.atlas-base-card .eyebrow {
+  margin-bottom: 0.25rem;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.coaching-card .coaching-summary-grid {
+  margin-top: 1rem;
+}
