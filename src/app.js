@@ -2,6 +2,12 @@ import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
 import {
+  getMovementAtlas,
+  getCompatibleMethodsForVariant
+} from "./logic/exerciseLibrary.js";
+
+import { methodTypes } from "./data/methodTypes.js";
+import {
   renderLibrary,
   selectLibraryBaseMovement,
   clearLibraryBaseMovement,
