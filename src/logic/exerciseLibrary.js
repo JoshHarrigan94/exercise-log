@@ -13,6 +13,12 @@ import {
   resolveMovementVariant
 } from "../data/movementIndex.js";
 
+function resolveMovementName(id) {
+  const exercise = getExerciseById(id);
+
+  return exercise?.name || id;
+}
+
 function formatFamilyName(familyId) {
   return (
     getMovementFamilyById(familyId)?.name ||
@@ -39,10 +45,21 @@ function resolveBaseMovement(base) {
     secondaryExpressionNames: (base.secondaryExpressions || []).map(formatExpressionName),
     variantCount: variants.length,
     variants,
-    relationships: movementRelationships[base.id] || {
-  regressions: [],
-  progressions: [],
-  alternatives: []
+    relationships: {
+  regressions: (movementRelationships[base.id]?.regressions || []).map(id => ({
+    id,
+    name: resolveMovementName(id)
+  })),
+
+  progressions: (movementRelationships[base.id]?.progressions || []).map(id => ({
+    id,
+    name: resolveMovementName(id)
+  })),
+
+  alternatives: (movementRelationships[base.id]?.alternatives || []).map(id => ({
+    id,
+    name: resolveMovementName(id)
+  }))
 },
 
 regressionCount: movementRelationships[base.id]?.regressions?.length || 0,
