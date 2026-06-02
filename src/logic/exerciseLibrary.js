@@ -45,6 +45,14 @@ export function getAllBaseMovements() {
   return exerciseBases.map(resolveBaseMovement);
 }
 
+export function getResolvedVariant(variantId) {
+  const variant = getVariantById(variantId);
+
+  if (!variant) return null;
+
+  return resolveMovementVariant(variantId);
+}
+
 export function getCompatibleMethodsForBaseMovement(baseMovementId) {
   const base = getBaseMovementById(baseMovementId);
 
