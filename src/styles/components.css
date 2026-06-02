@@ -1929,3 +1929,42 @@ select {
 .coaching-card .coaching-summary-grid {
   margin-top: 1rem;
 }
+
+.movement-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.9rem 0;
+
+  background: none;
+  border: none;
+
+  border-bottom:
+    1px solid var(--border-color);
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.movement-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.movement-row-main span {
+  opacity: 0.65;
+  font-size: 0.82rem;
+}
+
+.movement-row-meta {
+  opacity: 0.6;
+  font-size: 0.82rem;
+}
+
+.library-action-bar {
+  margin-top: 1rem;
+}
