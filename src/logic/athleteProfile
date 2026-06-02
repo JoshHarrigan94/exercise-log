@@ -1,0 +1,82 @@
+export function createDefaultAthleteProfile() {
+  return {
+    id: "default-athlete",
+
+    goals: [],
+
+    priorityDomains: [],
+
+    priorityExpressions: [],
+
+    movementPriorities: [],
+
+    injuries: [],
+
+    riskFlags: [],
+
+    constraints: {
+      availableDaysPerWeek: null,
+      preferredSessionLengthMinutes: null,
+      trainingLocation: [],
+      timeLimitations: []
+    },
+
+    availableEquipment: [],
+
+    preferredMethods: [],
+
+    avoidedMethods: [],
+
+    trainingAge: null,
+
+    recoveryProfile: {
+      sleepQuality: null,
+      stressLevel: null,
+      sorenessTrend: null,
+      motivation: null
+    }
+  };
+}
+
+export function buildAthleteProfile(overrides = {}) {
+  return {
+    ...createDefaultAthleteProfile(),
+    ...overrides,
+    constraints: {
+      ...createDefaultAthleteProfile().constraints,
+      ...(overrides.constraints || {})
+    },
+    recoveryProfile: {
+      ...createDefaultAthleteProfile().recoveryProfile,
+      ...(overrides.recoveryProfile || {})
+    }
+  };
+}
+
+export function getPriorityExpressionIds(profile = {}) {
+  return profile.priorityExpressions || [];
+}
+
+export function getPriorityDomainIds(profile = {}) {
+  return profile.priorityDomains || [];
+}
+
+export function hasInjuryFlag(profile = {}, flag) {
+  return (profile.injuries || []).some(injury =>
+    injury.id === flag ||
+    injury.area === flag ||
+    injury.type === flag
+  );
+}
+
+export function hasAvailableEquipment(profile = {}, equipmentId) {
+  return (profile.availableEquipment || []).includes(equipmentId);
+}
+
+export function prefersMethod(profile = {}, methodId) {
+  return (profile.preferredMethods || []).includes(methodId);
+}
+
+export function avoidsMethod(profile = {}, methodId) {
+  return (profile.avoidedMethods || []).includes(methodId);
+}
