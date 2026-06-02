@@ -3,7 +3,7 @@ import { exerciseVariants } from "../data/exerciseVariants.js";
 import { movementFamilies } from "../data/movementFamilies.js";
 import { expressionTypes } from "../data/expressionTypes.js";
 import { store } from "../state/store.js";
-
+import { getMethodCompatibility } from "./methodCompatibility.js";
 import {
   getBaseMovementById,
   getVariantById,
@@ -43,6 +43,36 @@ function resolveBaseMovement(base) {
 
 export function getAllBaseMovements() {
   return exerciseBases.map(resolveBaseMovement);
+}
+
+export function getCompatibleMethodsForBaseMovement(baseMovementId) {
+  const base = getBaseMovementById(baseMovementId);
+
+  if (!base) {
+    return {
+      recommended: [],
+      possible: [],
+      limited: []
+    };
+  }
+
+  return getMethodCompatibility(base);
+}
+
+export function getCompatibleMethodsForVariant(variantId) {
+  const variant = getVariantById(variantId);
+
+  if (!variant) {
+    return {
+      recommended: [],
+      possible: [],
+      limited: []
+    };
+  }
+
+  const base = getBaseMovementById(variant.baseMovementId);
+
+  return getMethodCompatibility(base, variant);
 }
 
 export function getAllVariants() {
