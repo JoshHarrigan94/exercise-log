@@ -58,10 +58,12 @@ export function renderSessionDetail() {
   return `
     <section class="screen active-screen">
   <button class="secondary-button" id="back-to-history">
-        ← Back to History
-      </button>
-        ${coachingCard}
-      <article class="hero-card">
+    ← Back to History
+  </button>
+
+  ${coachingCard}
+
+  <article class="hero-card">
         <p class="eyebrow">
           ${formatDate(session.startedAt, { weekday: "short" })}
         </p>
