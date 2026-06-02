@@ -1,12 +1,12 @@
 import {
   classifySession
-} from "./domainClassifier.js";
+} from "./domainClassifiersjs";
 
 import {
   classifySessionExpressions,
   getPrimaryExpression,
   getTopExpressions
-} from "./expressionClassifier.js";
+} from "./expressionClassifiers.js";
 
 import {
   analyseExpressionGaps
