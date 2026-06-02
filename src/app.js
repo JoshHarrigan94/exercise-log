@@ -27,10 +27,6 @@ import {
   renderSessionDetail,
   bindSessionDetailActions
 } from "./ui/sessionDetailView.js";
-import {
-  getMovementAtlas,
-  getCompatibleMethodsForVariant
-} from "./logic/exerciseLibrary.js";
 
 import { methodTypes } from "./data/methodTypes.js";
 import { renderNav, renderSidebar } from "./components/nav.js";
