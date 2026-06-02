@@ -1,7 +1,11 @@
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
-import { renderLibrary } from "./ui/exerciseLibraryView.js";
+import {
+  renderLibrary,
+  selectLibraryBaseMovement,
+  clearLibraryBaseMovement
+} from "./ui/exerciseLibraryView.js";
 import { renderHistory } from "./ui/historyView.js";
 import {
   renderSessionDetail,
