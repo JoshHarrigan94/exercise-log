@@ -5,7 +5,10 @@ import {
   getMovementAtlas,
   getCompatibleMethodsForVariant
 } from "./logic/exerciseLibrary.js";
-
+import {
+  validateCustomMovement,
+  normaliseCustomMovement
+} from "./logic/customMovementValidation.js";
 import { methodTypes } from "./data/methodTypes.js";
 import {
   renderLibrary,
@@ -485,38 +488,40 @@ function bindLibraryActions() {
   });
 
   document.querySelector("#add-custom-exercise")?.addEventListener("click", () => {
-    const name = document.querySelector("#custom-exercise-name")?.value?.trim();
+  const rawMovement = {
+    name: document.querySelector("#custom-exercise-name")?.value?.trim(),
+    category: document.querySelector("#custom-exercise-family")?.value || "",
+    pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim() || "",
+    closestBaseMovementId: document.querySelector("#custom-exercise-base")?.value || "",
+    primaryExpression: document.querySelector("#custom-exercise-expression")?.value || "",
+    equipment: document.querySelector("#custom-exercise-equipment")?.value
+      ?.split(",")
+      .map(item => item.trim())
+      .filter(Boolean) || [],
+    measurableOutputs: document.querySelector("#custom-exercise-outputs")?.value
+      ?.split(",")
+      .map(item => item.trim())
+      .filter(Boolean) || [],
+    movementType: document.querySelector("#custom-exercise-type")?.value || "",
+    defaultMethod: document.querySelector("#custom-exercise-method")?.value || "",
+    cues: document.querySelector("#custom-exercise-cues")?.value
+      ?.split(",")
+      .map(item => item.trim())
+      .filter(Boolean) || []
+  };
 
-    if (!name) {
-      alert("Add a movement name first.");
-      return;
-    }
+  const validation = validateCustomMovement(rawMovement);
 
-    addCustomExercise({
-      name,
-      category: document.querySelector("#custom-exercise-family")?.value || "custom",
-      pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim() || "Custom",
-      closestBaseMovementId: document.querySelector("#custom-exercise-base")?.value || "",
-      primaryExpression: document.querySelector("#custom-exercise-expression")?.value || "",
-      equipment: document.querySelector("#custom-exercise-equipment")?.value
-        ?.split(",")
-        .map(item => item.trim())
-        .filter(Boolean) || [],
-      measurableOutputs: document.querySelector("#custom-exercise-outputs")?.value
-        ?.split(",")
-        .map(item => item.trim())
-        .filter(Boolean) || [],
-      movementType: document.querySelector("#custom-exercise-type")?.value || "custom",
-      defaultMethod: document.querySelector("#custom-exercise-method")?.value,
-      cues: document.querySelector("#custom-exercise-cues")?.value
-        ?.split(",")
-        .map(item => item.trim())
-        .filter(Boolean) || []
-    });
+  if (!validation.isValid) {
+    alert(validation.errors.join("\n"));
+    return;
+  }
 
-    closeCustomMovementBuilder();
-    renderApp();
-  });
+  addCustomExercise(normaliseCustomMovement(rawMovement));
+
+  closeCustomMovementBuilder();
+  renderApp();
+});
 
   document.querySelectorAll("[data-delete-custom-exercise]").forEach(button => {
     button.addEventListener("click", () => {
