@@ -1,82 +1,129 @@
-import { methodTypes } from "../data/methodTypes.js";
-import { renderExerciseCard } from "../components/exerciseCard.js";
-import { store } from "../state/store.js";
-import { getAllExercises } from "../logic/exerciseLibrary.js";
+import {
+  getMovementAtlas,
+  getAllExercises
+} from "../logic/exerciseLibrary.js";
 
-function getMethodName(methodId) {
-  return methodTypes.find(method => method.id === methodId)?.name || "Custom";
+function renderTag(label) {
+  return `
+    <span class="quick-chip">${label}</span>
+  `;
+}
+
+function renderFamilyCard(family) {
+  return `
+    <article class="workspace-card">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Movement family</p>
+          <h2>${family.name}</h2>
+        </div>
+
+        <strong>${family.baseCount} bases</strong>
+      </div>
+
+      <p class="card-copy">${family.description}</p>
+
+      <div class="quick-chip-row">
+        ${renderTag(`${family.variantCount} generated variants`)}
+        ${family.expressionNames.slice(0, 3).map(renderTag).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderBaseMovementCard(base) {
+  return `
+    <article class="exercise-card">
+      <div>
+        <h2>${base.name}</h2>
+        <p>
+          ${base.familyName} · ${base.domain} · ${base.variantCount} variants
+        </p>
+
+        <div class="quick-chip-row">
+          ${base.primaryExpressionNames.slice(0, 2).map(renderTag).join("")}
+          ${(base.measurableOutputs || []).slice(0, 3).map(renderTag).join("")}
+        </div>
+      </div>
+
+      <span>Base</span>
+    </article>
+  `;
+}
+
+function renderCustomMovementCard(customExercises) {
+  return `
+    <article class="ad-hoc-card">
+      <div class="section-header">
+        <p class="eyebrow">Custom movement</p>
+        <h2>Create niche / complex movement</h2>
+      </div>
+
+      <p class="card-copy">
+        Use this only for movements the atlas cannot already generate:
+        complexes, unusual machines, sport drills, rehab drills, or personal variations.
+      </p>
+
+      <button class="secondary-button" type="button">
+        Custom Movement page coming next
+      </button>
+
+      ${
+        customExercises.length
+          ? `
+            <div class="quick-chip-row">
+              ${customExercises.map(exercise => renderTag(exercise.name)).join("")}
+            </div>
+          `
+          : ""
+      }
+    </article>
+  `;
 }
 
 export function renderLibrary() {
+  const atlas = getMovementAtlas();
   const allExercises = getAllExercises();
+  const customExercises = allExercises.filter(
+    exercise => exercise.source === "custom"
+  );
+
+  const baseMovements = atlas.flatMap(family => family.bases);
 
   return `
     <section class="screen active-screen">
       <div class="section-header">
-        <p class="eyebrow">Exercise library</p>
-        <h1>Your movements</h1>
+        <p class="eyebrow">Movement Atlas</p>
+        <h1>Explore the movement system</h1>
       </div>
 
-      <article class="ad-hoc-card">
-        <div class="section-header">
-          <p class="eyebrow">Custom exercise</p>
-          <h2>Add movement</h2>
-        </div>
-
-        <label class="form-field">
-          <span>Name</span>
-          <input id="custom-exercise-name" type="text" placeholder="Ring Row / Cable Row / Seated Jump" />
-        </label>
-
-        <div class="form-grid">
-          <label class="form-field">
-            <span>Category</span>
-            <input id="custom-exercise-category" type="text" placeholder="Pull / Push / Rehab" />
-          </label>
-
-          <label class="form-field">
-            <span>Pattern</span>
-            <input id="custom-exercise-pattern" type="text" placeholder="Horizontal Pull" />
-          </label>
-        </div>
-
-        <label class="form-field">
-          <span>Default Method</span>
-          <select id="custom-exercise-method">
-            ${methodTypes.map(method => `
-              <option value="${method.id}">${method.name}</option>
-            `).join("")}
-          </select>
-        </label>
-
-        <button class="primary-button" id="add-custom-exercise">
-          Add Exercise
-        </button>
+      <article class="hero-card">
+        <p class="eyebrow">Library direction</p>
+        <h1>Movement first. Variants second. Custom last.</h1>
+        <p class="hero-text">
+          This library is now a structured atlas of movement families, base movements,
+          expressions, outputs and generated variants — not just a place to add exercises.
+        </p>
       </article>
 
-      <div class="stack">
-        ${allExercises.map(exercise => `
-          <div class="exercise-row-wrap">
-            ${renderExerciseCard(
-              exercise.name,
-              exercise.pattern,
-              getMethodName(exercise.defaultMethod)
-            )}
+      ${renderCustomMovementCard(customExercises)}
 
-            ${
-              exercise.id.startsWith("custom-")
-                ? `
-                  <button 
-                    class="mini-delete-button custom-exercise-delete"
-                    data-delete-custom-exercise="${exercise.id}"
-                  >
-                    ×
-                  </button>
-                `
-                : ""
-            }
-          </div>
-        `).join("")}
+      <div class="section-header">
+        <p class="eyebrow">Explore</p>
+        <h2>Movement families</h2>
+      </div>
+
+      <div class="stack">
+        ${atlas.map(renderFamilyCard).join("")}
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Base movements</p>
+        <h2>Generated from the atlas</h2>
+      </div>
+
+      <div class="stack">
+        ${baseMovements.map(renderBaseMovementCard).join("")}
       </div>
     </section>
   `;
