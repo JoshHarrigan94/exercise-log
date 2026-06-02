@@ -12,7 +12,9 @@ import { getProgressionRecommendation } from "../logic/progressionEngine.js";
 import { renderRecommendationBadge } from "../components/recommendationBadge.js";
 import { formatDate, formatMethodData } from "../utils/format.js";
 import { calculateMethodExposure } from "../logic/methodCalculations.js";
-
+import {
+  renderCoachingInsightCard
+} from "./components/coachingInsightCard.js";
 function getExerciseName(id) {
   return getExerciseById(id)?.name || "Exercise";
 }
