@@ -9,7 +9,9 @@ import {
   setLibraryFamilyFilter,
   setLibraryExpressionFilter,
   setLibraryOutputFilter,
-  clearLibraryFilters
+  clearLibraryFilters,
+  openCustomMovementBuilder,
+  closeCustomMovementBuilder
 } from "./ui/exerciseLibraryView.js";
 import { renderHistory } from "./ui/historyView.js";
 import {
@@ -387,34 +389,23 @@ function bindLibraryActions() {
     });
   });
 
-  document.querySelector("#library-search")?.addEventListener("input", event => {
-  setLibrarySearch(event.target.value);
-  renderApp();
-});
-
-document.querySelector("#library-family-filter")?.addEventListener("change", event => {
-  setLibraryFamilyFilter(event.target.value);
-  renderApp();
-});
-
-document.querySelector("#library-expression-filter")?.addEventListener("change", event => {
-  setLibraryExpressionFilter(event.target.value);
-  renderApp();
-});
-
-document.querySelector("#library-output-filter")?.addEventListener("change", event => {
-  setLibraryOutputFilter(event.target.value);
-  renderApp();
-});
-
-document.querySelector("[data-clear-library-filters]")?.addEventListener("click", () => {
-  clearLibraryFilters();
-  renderApp();
-});
-
   document.querySelectorAll("[data-close-base-movement]").forEach(button => {
     button.addEventListener("click", () => {
       clearLibraryBaseMovement();
+      renderApp();
+    });
+  });
+
+  document.querySelectorAll("[data-open-custom-movement-builder]").forEach(button => {
+    button.addEventListener("click", () => {
+      openCustomMovementBuilder();
+      renderApp();
+    });
+  });
+
+  document.querySelectorAll("[data-close-custom-movement-builder]").forEach(button => {
+    button.addEventListener("click", () => {
+      closeCustomMovementBuilder();
       renderApp();
     });
   });
@@ -423,23 +414,39 @@ document.querySelector("[data-clear-library-filters]")?.addEventListener("click"
     const name = document.querySelector("#custom-exercise-name")?.value?.trim();
 
     if (!name) {
-      alert("Add an exercise name first.");
+      alert("Add a movement name first.");
       return;
     }
 
     addCustomExercise({
       name,
-      category: document.querySelector("#custom-exercise-category")?.value?.trim(),
-      pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim(),
-      defaultMethod: document.querySelector("#custom-exercise-method")?.value
+      category: document.querySelector("#custom-exercise-family")?.value || "custom",
+      pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim() || "Custom",
+      closestBaseMovementId: document.querySelector("#custom-exercise-base")?.value || "",
+      primaryExpression: document.querySelector("#custom-exercise-expression")?.value || "",
+      equipment: document.querySelector("#custom-exercise-equipment")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || [],
+      measurableOutputs: document.querySelector("#custom-exercise-outputs")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || [],
+      movementType: document.querySelector("#custom-exercise-type")?.value || "custom",
+      defaultMethod: document.querySelector("#custom-exercise-method")?.value,
+      cues: document.querySelector("#custom-exercise-cues")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || []
     });
 
+    closeCustomMovementBuilder();
     renderApp();
   });
 
   document.querySelectorAll("[data-delete-custom-exercise]").forEach(button => {
     button.addEventListener("click", () => {
-      if (!confirm("Delete this custom exercise?")) return;
+      if (!confirm("Delete this custom movement?")) return;
 
       deleteCustomExercise(button.dataset.deleteCustomExercise);
       renderApp();
