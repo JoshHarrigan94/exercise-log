@@ -1,21 +1,33 @@
 import { renderDashboard } from "./ui/dashboardView.js";
 import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
+
+import {
+  normaliseLoggedMovement
+} from "./logic/logNormalization.js";
+
+import {
+  normalisePlannedMovement
+} from "./logic/templateMovementNormalization.js";
+
 import {
   getMovementAtlas,
-  getCompatibleMethodsForVariant,
-  selectGeneratedMovement,
-clearGeneratedMovement
+  getCompatibleMethodsForVariant
 } from "./logic/exerciseLibrary.js";
+
 import {
   validateCustomMovement,
   normaliseCustomMovement
 } from "./logic/customMovementValidation.js";
+
 import { methodTypes } from "./data/methodTypes.js";
+
 import {
   renderLibrary,
   selectLibraryBaseMovement,
   clearLibraryBaseMovement,
+  selectGeneratedMovement,
+  clearGeneratedMovement,
   setLibrarySearch,
   setLibraryFamilyFilter,
   setLibraryExpressionFilter,
@@ -24,7 +36,9 @@ import {
   openCustomMovementBuilder,
   closeCustomMovementBuilder
 } from "./ui/exerciseLibraryView.js";
+
 import { renderHistory } from "./ui/historyView.js";
+
 import {
   renderSessionDetail,
   bindSessionDetailActions
@@ -33,6 +47,7 @@ import {
 import { renderNav, renderSidebar } from "./components/nav.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
+
 import {
   updateMethodMemoryPanel,
   bindMethodMemoryActions
@@ -60,10 +75,13 @@ import {
   updateCustomTemplate,
   updateExerciseInTemplate,
   addWeekToTemplate,
-addWorkoutToWeek
+  addWorkoutToWeek
 } from "./state/store.js";
 
-import { getTemplateById, getWorkoutById } from "./logic/templateLibrary.js";
+import {
+  getTemplateById,
+  getWorkoutById
+} from "./logic/templateLibrary.js";
 
 const app = document.querySelector("#app");
 
@@ -97,6 +115,7 @@ function renderView() {
   };
 
   const view = views[store.activeView] || renderDashboard;
+
   return view();
 }
 
@@ -140,7 +159,9 @@ function bindSessionStart() {
       startSession({
         templateId: template.id,
         workoutId: firstWorkout?.id || null,
-        name: firstWorkout ? `${template.name} · ${firstWorkout.name}` : template.name,
+        name: firstWorkout
+          ? `${template.name} · ${firstWorkout.name}`
+          : template.name,
         goal: firstWorkout?.goal || template.goal,
         exercises: firstWorkout?.exercises || template.exercises || []
       });
@@ -152,8 +173,12 @@ function bindSessionStart() {
 
   document.querySelector("#start-adhoc-session")?.addEventListener("click", () => {
     startSession({
-      name: document.querySelector("#adhoc-session-name")?.value?.trim() || "Ad Hoc Session",
-      goal: document.querySelector("#adhoc-session-goal")?.value?.trim() || ""
+      name:
+        document.querySelector("#adhoc-session-name")?.value?.trim() ||
+        "Ad Hoc Session",
+      goal:
+        document.querySelector("#adhoc-session-goal")?.value?.trim() ||
+        ""
     });
 
     setView("dashboard");
@@ -172,9 +197,17 @@ function bindSessionStart() {
     }
 
     if (editingTemplateId) {
-      updateCustomTemplate(editingTemplateId, { name, goal, priority });
+      updateCustomTemplate(editingTemplateId, {
+        name,
+        goal,
+        priority
+      });
     } else {
-      addCustomTemplate({ name, goal, priority });
+      addCustomTemplate({
+        name,
+        goal,
+        priority
+      });
     }
 
     renderApp();
@@ -206,7 +239,8 @@ function readExecutionRow(button) {
   const rowLabel = button.dataset.rowLabel;
   const key = `${exerciseId}-${rowId}`;
 
-  return {
+  const rawLog = {
+    movementCatalogueId: exerciseId,
     exerciseId,
     methodId,
     rpe: document.querySelector(`[data-exec-rpe="${key}"]`)?.value || "",
@@ -218,6 +252,8 @@ function readExecutionRow(button) {
       rest: document.querySelector(`[data-exec-rest="${key}"]`)?.value || ""
     }
   };
+
+  return normaliseLoggedMovement(rawLog);
 }
 
 function populateLoggerFromLog(log) {
@@ -226,18 +262,35 @@ function populateLoggerFromLog(log) {
 
   if (!exerciseInput || !methodInput) return;
 
-  exerciseInput.value = log.exerciseId;
-  methodInput.value = log.methodId;
+  exerciseInput.value =
+    log.movementCatalogueId ||
+    log.exerciseId ||
+    log.movementExpression?.id ||
+    "";
+
+  methodInput.value =
+    log.methodId ||
+    log.movementExpression?.methodId ||
+    "";
+
   methodInput.dispatchEvent(new Event("change", { bubbles: true }));
 
   setTimeout(() => {
-    Object.entries(log.data || {}).forEach(([key, value]) => {
+    Object.entries(log.data || log.outputs || {}).forEach(([key, value]) => {
       const field = document.querySelector(`#dynamic-${key}`);
       if (field) field.value = value;
     });
 
-    document.querySelector("#log-rpe").value = log.rpe || "";
-    document.querySelector("#log-notes").value = log.notes || "";
+    document.querySelector("#log-rpe").value =
+      log.rpe ||
+      log.outputs?.rpe ||
+      "";
+
+    document.querySelector("#log-notes").value =
+      log.notes ||
+      log.outputs?.notes ||
+      "";
+
     document.querySelector("#editing-log-id").value = log.id;
 
     if (document.querySelector("#method-preview")) {
@@ -305,18 +358,18 @@ function refreshLoggerMovementsForFamily(familyId) {
 
 function bindLiveSessionActions() {
   document.querySelector("#log-family")?.addEventListener("change", event => {
-  refreshLoggerMovementsForFamily(event.target.value);
-});
+    refreshLoggerMovementsForFamily(event.target.value);
+  });
 
-document.querySelector("#log-exercise")?.addEventListener("change", () => {
-  refreshLoggerMethods();
+  document.querySelector("#log-exercise")?.addEventListener("change", () => {
+    refreshLoggerMethods();
 
-  if (document.querySelector("#method-memory-panel")) {
-    updateMethodMemoryPanel();
-    bindMethodMemoryActions();
-  }
-});
-  
+    if (document.querySelector("#method-memory-panel")) {
+      updateMethodMemoryPanel();
+      bindMethodMemoryActions();
+    }
+  });
+
   document.querySelector(".complete-session-button")?.addEventListener("click", () => {
     saveSession();
     setView("history");
@@ -424,10 +477,10 @@ document.querySelector("#log-exercise")?.addEventListener("change", () => {
   });
 
   document.querySelector("#add-exercise-log")?.addEventListener("click", () => {
-    const exerciseId = document.querySelector("#log-exercise")?.value;
-    const methodId = document.querySelector("#log-method")?.value;
+    const movementCatalogueId = document.querySelector("#log-exercise")?.value || "";
+    const methodId = document.querySelector("#log-method")?.value || "";
 
-    if (!exerciseId || !methodId) return;
+    if (!movementCatalogueId || !methodId) return;
 
     const dynamicData = {};
 
@@ -435,13 +488,19 @@ document.querySelector("#log-exercise")?.addEventListener("change", () => {
       dynamicData[field.id.replace("dynamic-", "")] = field.value;
     });
 
-    const payload = {
-      exerciseId,
+    const rawLog = {
+      movementCatalogueId,
       methodId,
-      rpe: document.querySelector("#log-rpe")?.value || "",
+      rpe:
+        document.querySelector("#log-rpe-detail")?.value ||
+        document.querySelector("#log-rpe")?.value ||
+        "",
       notes: document.querySelector("#log-notes")?.value || "",
-      data: dynamicData
+      data: dynamicData,
+      outputs: dynamicData
     };
+
+    const payload = normaliseLoggedMovement(rawLog);
 
     const editingLogId = document.querySelector("#editing-log-id")?.value;
 
@@ -462,20 +521,20 @@ function bindLibraryActions() {
       renderApp();
     });
   });
-  
-  document.querySelectorAll("[data-open-generated-movement]").forEach(button => {
-  button.addEventListener("click", () => {
-    selectGeneratedMovement(button.dataset.openGeneratedMovement);
-    renderApp();
-  });
-});
 
-document.querySelectorAll("[data-close-generated-movement]").forEach(button => {
-  button.addEventListener("click", () => {
-    clearGeneratedMovement();
-    renderApp();
+  document.querySelectorAll("[data-open-generated-movement]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectGeneratedMovement(button.dataset.openGeneratedMovement);
+      renderApp();
+    });
   });
-});
+
+  document.querySelectorAll("[data-close-generated-movement]").forEach(button => {
+    button.addEventListener("click", () => {
+      clearGeneratedMovement();
+      renderApp();
+    });
+  });
 
   document.querySelectorAll("[data-close-base-movement]").forEach(button => {
     button.addEventListener("click", () => {
@@ -499,40 +558,40 @@ document.querySelectorAll("[data-close-generated-movement]").forEach(button => {
   });
 
   document.querySelector("#add-custom-exercise")?.addEventListener("click", () => {
-  const rawMovement = {
-    name: document.querySelector("#custom-exercise-name")?.value?.trim(),
-    category: document.querySelector("#custom-exercise-family")?.value || "",
-    pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim() || "",
-    closestBaseMovementId: document.querySelector("#custom-exercise-base")?.value || "",
-    primaryExpression: document.querySelector("#custom-exercise-expression")?.value || "",
-    equipment: document.querySelector("#custom-exercise-equipment")?.value
-      ?.split(",")
-      .map(item => item.trim())
-      .filter(Boolean) || [],
-    measurableOutputs: document.querySelector("#custom-exercise-outputs")?.value
-      ?.split(",")
-      .map(item => item.trim())
-      .filter(Boolean) || [],
-    movementType: document.querySelector("#custom-exercise-type")?.value || "",
-    defaultMethod: document.querySelector("#custom-exercise-method")?.value || "",
-    cues: document.querySelector("#custom-exercise-cues")?.value
-      ?.split(",")
-      .map(item => item.trim())
-      .filter(Boolean) || []
-  };
+    const rawMovement = {
+      name: document.querySelector("#custom-exercise-name")?.value?.trim(),
+      category: document.querySelector("#custom-exercise-family")?.value || "",
+      pattern: document.querySelector("#custom-exercise-pattern")?.value?.trim() || "",
+      closestBaseMovementId: document.querySelector("#custom-exercise-base")?.value || "",
+      primaryExpression: document.querySelector("#custom-exercise-expression")?.value || "",
+      equipment: document.querySelector("#custom-exercise-equipment")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || [],
+      measurableOutputs: document.querySelector("#custom-exercise-outputs")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || [],
+      movementType: document.querySelector("#custom-exercise-type")?.value || "",
+      defaultMethod: document.querySelector("#custom-exercise-method")?.value || "",
+      cues: document.querySelector("#custom-exercise-cues")?.value
+        ?.split(",")
+        .map(item => item.trim())
+        .filter(Boolean) || []
+    };
 
-  const validation = validateCustomMovement(rawMovement);
+    const validation = validateCustomMovement(rawMovement);
 
-  if (!validation.isValid) {
-    alert(validation.errors.join("\n"));
-    return;
-  }
+    if (!validation.isValid) {
+      alert(validation.errors.join("\n"));
+      return;
+    }
 
-  addCustomExercise(normaliseCustomMovement(rawMovement));
+    addCustomExercise(normaliseCustomMovement(rawMovement));
 
-  closeCustomMovementBuilder();
-  renderApp();
-});
+    closeCustomMovementBuilder();
+    renderApp();
+  });
 
   document.querySelectorAll("[data-delete-custom-exercise]").forEach(button => {
     button.addEventListener("click", () => {
@@ -541,6 +600,31 @@ document.querySelectorAll("[data-close-generated-movement]").forEach(button => {
       deleteCustomExercise(button.dataset.deleteCustomExercise);
       renderApp();
     });
+  });
+
+  document.querySelector("#library-search")?.addEventListener("input", event => {
+    setLibrarySearch(event.target.value);
+    renderApp();
+  });
+
+  document.querySelector("#library-family-filter")?.addEventListener("change", event => {
+    setLibraryFamilyFilter(event.target.value);
+    renderApp();
+  });
+
+  document.querySelector("#library-expression-filter")?.addEventListener("change", event => {
+    setLibraryExpressionFilter(event.target.value);
+    renderApp();
+  });
+
+  document.querySelector("#library-output-filter")?.addEventListener("change", event => {
+    setLibraryOutputFilter(event.target.value);
+    renderApp();
+  });
+
+  document.querySelector("[data-clear-library-filters]")?.addEventListener("click", () => {
+    clearLibraryFilters();
+    renderApp();
   });
 }
 
@@ -569,88 +653,66 @@ function buildTargetFromSets(plannedSets) {
 }
 
 function refreshTemplateBuilderMethods() {
-  const exerciseInput = document.querySelector("#template-builder-exercise");
   const methodInput = document.querySelector("#template-builder-method");
 
-  if (!exerciseInput || !methodInput) return;
+  if (!methodInput) return;
 
-  const compatibility = getCompatibleMethodsForVariant(exerciseInput.value);
-
-  const methods = [
-    ...(compatibility.recommended || []),
-    ...(compatibility.possible || [])
-  ];
-
-  methodInput.innerHTML = methods.length
-    ? methods.map(item => `
-        <option value="${item.method.id}">
-          ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
-        </option>
-      `).join("")
-    : methodTypes.map(method => `
-        <option value="${method.id}">
-          ${method.name}
-        </option>
-      `).join("");
+  methodInput.innerHTML = methodTypes.map(method => `
+    <option value="${method.id}">
+      ${method.name}
+    </option>
+  `).join("");
 }
 
 function bindTemplateBuilderActions() {
   document.querySelector("#template-builder-exercise")?.addEventListener("change", () => {
-  refreshTemplateBuilderMethods();
-});
+    refreshTemplateBuilderMethods();
+  });
 
-document.querySelector("#template-builder-family")?.addEventListener("change", event => {
-  const familyId = event.target.value;
-  const exerciseInput = document.querySelector("#template-builder-exercise");
+  document.querySelector("#template-builder-family")?.addEventListener("change", () => {
+    refreshTemplateBuilderMethods();
+  });
 
-  if (!exerciseInput) return;
-
-  const atlas = getMovementAtlas();
-  const family = atlas.find(item => item.id === familyId);
-
-  if (!family) return;
-
-  exerciseInput.innerHTML = family.bases.flatMap(base =>
-    (base.variants || []).map(variant => `
-      <option 
-        value="${variant.id}"
-        data-family="${family.id}"
-        data-base="${base.id}"
-      >
-        ${variant.name}
-      </option>
-    `)
-  ).join("");
-
-  refreshTemplateBuilderMethods();
-});
   document.querySelector("#add-exercise-to-template")?.addEventListener("click", () => {
-    const workoutChoice = document.querySelector("#template-builder-workout")?.value || "";
-const [selectedTemplateId, selectedWorkoutId] = workoutChoice.split("::");
+    const workoutChoice =
+      document.querySelector("#template-builder-workout")?.value || "";
 
-const templateId =
-  selectedTemplateId ||
-  document.querySelector("#template-builder-template")?.value;
+    const [selectedTemplateId, selectedWorkoutId] =
+      workoutChoice.split("::");
 
-const workoutId = selectedWorkoutId || "";
-    const exerciseId = document.querySelector("#template-builder-exercise")?.value;
-    const methodId = document.querySelector("#template-builder-method")?.value;
-    const notes = document.querySelector("#template-builder-notes")?.value?.trim();
-    const editingPlannedExerciseId = document.querySelector("#editing-planned-exercise-id")?.value;
+    const templateId =
+      selectedTemplateId ||
+      document.querySelector("#template-builder-template")?.value;
 
-    if (!templateId || !exerciseId || !methodId) return;
+    const workoutId = selectedWorkoutId || "";
+
+    const movementCatalogueId =
+      document.querySelector("#template-builder-exercise")?.value || "";
+
+    const methodId =
+      document.querySelector("#template-builder-method")?.value || "";
+
+    const notes =
+      document.querySelector("#template-builder-notes")?.value?.trim();
+
+    const editingPlannedExerciseId =
+      document.querySelector("#editing-planned-exercise-id")?.value;
+
+    if (!templateId || !movementCatalogueId || !methodId) return;
 
     const plannedSets = getPlannedSetsFromBuilder();
     const target = buildTargetFromSets(plannedSets);
 
-    const payload = {
-  exerciseId,
-  methodId,
-  workoutId,
-  target,
-  notes,
-  sets: plannedSets
-};
+    const rawMovement = {
+      movementCatalogueId,
+      methodId,
+      workoutId,
+      target,
+      notes,
+      sets: plannedSets
+    };
+
+    const payload = normalisePlannedMovement(rawMovement);
 
     if (editingPlannedExerciseId) {
       updateExerciseInTemplate(templateId, editingPlannedExerciseId, payload);
@@ -690,8 +752,17 @@ const workoutId = selectedWorkoutId || "";
       const firstSet = plannedExercise.sets?.[0] || {};
 
       document.querySelector("#template-builder-template").value = templateId;
-      document.querySelector("#template-builder-exercise").value = plannedExercise.exerciseId;
-      document.querySelector("#template-builder-method").value = plannedExercise.methodId;
+      document.querySelector("#template-builder-exercise").value =
+        plannedExercise.movementCatalogueId ||
+        plannedExercise.exerciseId ||
+        plannedExercise.movementExpression?.id ||
+        "";
+
+      document.querySelector("#template-builder-method").value =
+        plannedExercise.methodId ||
+        plannedExercise.movementExpression?.methodId ||
+        "";
+
       document.querySelector("#template-builder-load").value = firstSet.load || "";
       document.querySelector("#template-builder-sets").value = plannedExercise.sets?.length || 1;
       document.querySelector("#template-builder-reps").value = firstSet.reps || "";
@@ -862,4 +933,4 @@ try {
 } catch (error) {
   console.error(error);
   renderBootError(error);
-} 
+}
