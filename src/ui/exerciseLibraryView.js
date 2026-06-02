@@ -10,6 +10,16 @@ getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
 
 let selectedBaseMovementId = null;
+let customMovementBuilderOpen = false;
+
+export function openCustomMovementBuilder() {
+  selectedBaseMovementId = null;
+  customMovementBuilderOpen = true;
+}
+
+export function closeCustomMovementBuilder() {
+  customMovementBuilderOpen = false;
+}
 const libraryFilters = {
   search: "",
   family: "",
@@ -352,15 +362,45 @@ function renderCustomMovementCard(customExercises) {
         complexes, unusual machines, sport drills, rehab drills, or personal variations.
       </p>
 
-      <button class="secondary-button" type="button">
-        Custom Movement page coming next
+      <button 
+        class="secondary-button" 
+        type="button"
+        data-open-custom-movement-builder
+      >
+        Open Custom Movement Builder
       </button>
 
       ${
         customExercises.length
           ? `
-            <div class="quick-chip-row">
-              ${customExercises.map(exercise => renderTag(exercise.name)).join("")}
+            <div class="section-header">
+              <p class="eyebrow">Saved custom movements</p>
+            </div>
+
+            <div class="stack">
+              ${customExercises.map(exercise => `
+                <article class="exercise-card">
+                  <div>
+                    <h2>${exercise.name}</h2>
+                    <p>
+                      ${exercise.pattern || exercise.category || "Custom"} · ${exercise.movementType || "custom"}
+                    </p>
+
+                    <div class="quick-chip-row">
+                      ${renderTag(exercise.primaryExpression || "Custom")}
+                      ${renderTag(exercise.defaultMethod || "standard-sets")}
+                    </div>
+                  </div>
+
+                  <button 
+                    class="mini-delete-button custom-exercise-delete"
+                    type="button"
+                    data-delete-custom-exercise="${exercise.id}"
+                  >
+                    ×
+                  </button>
+                </article>
+              `).join("")}
             </div>
           `
           : ""
@@ -368,7 +408,6 @@ function renderCustomMovementCard(customExercises) {
     </article>
   `;
 }
-
 function getUniqueValues(values) {
   return Array.from(new Set(values.filter(Boolean))).sort();
 }
@@ -499,7 +538,174 @@ function renderLibraryFilters(atlas, baseMovements) {
   `;
 }
 
+function renderOption(value, label, selectedValue = "") {
+  return `
+    <option 
+      value="${value}"
+      ${selectedValue === value ? "selected" : ""}
+    >
+      ${label}
+    </option>
+  `;
+}
+
+function renderCustomMovementBuilder() {
+  const atlas = getMovementAtlas();
+  const baseMovements = atlas.flatMap(family => family.bases);
+
+  const expressionOptions = Array.from(
+    new Set(
+      baseMovements.flatMap(base => [
+        ...(base.primaryExpressions || []),
+        ...(base.secondaryExpressions || [])
+      ])
+    )
+  ).sort();
+
+  return `
+    <section class="screen active-screen">
+      <button 
+        class="secondary-button"
+        type="button"
+        data-close-custom-movement-builder
+      >
+        ← Back to Movement Atlas
+      </button>
+
+      <article class="hero-card">
+        <p class="eyebrow">Custom Movement Builder</p>
+        <h1>Create a structured exception</h1>
+        <p class="hero-text">
+          Use this for complexes, niche machines, rehab drills, sport-specific work,
+          or personal variations the atlas cannot already generate.
+        </p>
+      </article>
+
+      <article class="workspace-card">
+        <div class="workspace-card-header">
+          <div>
+            <p class="eyebrow">Movement identity</p>
+            <h2>What are you adding?</h2>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span>Name</span>
+          <input 
+            id="custom-exercise-name" 
+            type="text" 
+            placeholder="Trap bar jump / Landmine complex / Achilles wall push"
+          />
+        </label>
+
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Closest family</span>
+            <select id="custom-exercise-family">
+              <option value="">Select family</option>
+              ${atlas.map(family => renderOption(family.id, family.name)).join("")}
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Closest base movement</span>
+            <select id="custom-exercise-base">
+              <option value="">No close match</option>
+              ${baseMovements.map(base => renderOption(base.id, base.name)).join("")}
+            </select>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Pattern</span>
+            <input 
+              id="custom-exercise-pattern" 
+              type="text" 
+              placeholder="Vertical pull / hinge power / calf rehab"
+            />
+          </label>
+
+          <label class="form-field">
+            <span>Movement type</span>
+            <select id="custom-exercise-type">
+              ${renderOption("complex", "Complex")}
+              ${renderOption("drill", "Drill")}
+              ${renderOption("machine", "Machine")}
+              ${renderOption("rehab", "Rehab")}
+              ${renderOption("sport-specific", "Sport-specific")}
+              ${renderOption("personal-variation", "Personal variation")}
+              ${renderOption("custom", "Other custom")}
+            </select>
+          </label>
+        </div>
+      </article>
+
+      <article class="workspace-card">
+        <div class="workspace-card-header">
+          <div>
+            <p class="eyebrow">Training metadata</p>
+            <h2>How should the app understand it?</h2>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Primary expression</span>
+            <select id="custom-exercise-expression">
+              <option value="">Select expression</option>
+              ${expressionOptions.map(expression => renderOption(expression, expression)).join("")}
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Default method</span>
+            <select id="custom-exercise-method">
+              ${methodTypes.map(method => renderOption(method.id, method.name)).join("")}
+            </select>
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>Equipment</span>
+          <input 
+            id="custom-exercise-equipment" 
+            type="text" 
+            placeholder="barbell, landmine, band, wall"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Tracked outputs</span>
+          <input 
+            id="custom-exercise-outputs" 
+            type="text" 
+            placeholder="reps, load, distance, hold duration, pain score"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Cues</span>
+          <input 
+            id="custom-exercise-cues" 
+            type="text" 
+            placeholder="quiet landing, full lockout, slow eccentric"
+          />
+        </label>
+
+        <button class="primary-button" id="add-custom-exercise">
+          Save Custom Movement
+        </button>
+      </article>
+    </section>
+  `;
+}
+
 export function renderLibrary() {
+  if (customMovementBuilderOpen) {
+  return renderCustomMovementBuilder();
+}
+  
   if (selectedBaseMovementId) {
     return renderMovementDetail(selectedBaseMovementId);
   }
