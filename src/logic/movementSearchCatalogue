@@ -1,0 +1,147 @@
+import {
+  getAllMovementPatterns,
+  getCompatibleModifiersForPattern,
+  resolveMovementExpression
+} from "./movementExpressionResolver.js";
+
+function unique(values) {
+  return Array.from(
+    new Set(
+      values.filter(Boolean)
+    )
+  );
+}
+
+function includesSearch(value, search) {
+  if (!search) return true;
+
+  return String(value || "")
+    .toLowerCase()
+    .includes(search);
+}
+
+function buildSearchText(expression) {
+  return unique([
+    expression.displayName,
+    expression.pattern?.name,
+    expression.pattern?.category,
+    ...(expression.pattern?.aliases || []),
+    ...(expression.pattern?.bodyRegions || []),
+    ...(expression.pattern?.diagnosticRoles || []),
+    ...expression.modifiers.map(modifier => modifier.name),
+    ...expression.modifiers.map(modifier => modifier.category),
+    ...expression.diagnosticSignals,
+    ...expression.expressionBias,
+    ...expression.outputIds,
+    ...expression.searchTerms
+  ]).join(" ").toLowerCase();
+}
+
+function getModifierCombinations(modifiers = []) {
+  const byCategory = {};
+
+  modifiers.forEach(modifier => {
+    if (!byCategory[modifier.category]) {
+      byCategory[modifier.category] = [];
+    }
+
+    byCategory[modifier.category].push(modifier);
+  });
+
+  const singleModifiers =
+    modifiers.map(modifier => [modifier.id]);
+
+  const usefulPairs = [];
+
+  Object.entries(byCategory).forEach(([category, categoryModifiers]) => {
+    if (category === "equipment") return;
+
+    const equipmentModifiers = byCategory.equipment || [];
+
+    categoryModifiers.forEach(modifier => {
+      equipmentModifiers.forEach(equipment => {
+        usefulPairs.push([
+          equipment.id,
+          modifier.id
+        ]);
+      });
+    });
+  });
+
+  return [
+    [],
+    ...singleModifiers,
+    ...usefulPairs
+  ];
+}
+
+export function generateMovementSearchCatalogue() {
+  return getAllMovementPatterns().flatMap(pattern => {
+    const compatibleModifiers =
+      getCompatibleModifiersForPattern(pattern.id);
+
+    const combinations =
+      getModifierCombinations(compatibleModifiers);
+
+    return combinations.map(modifierIds => {
+      const expression = resolveMovementExpression({
+        patternId: pattern.id,
+        modifierIds
+      });
+
+      return {
+        id: expression.id,
+        label: expression.displayName,
+
+        patternId: expression.patternId,
+        modifierIds: expression.modifierIds,
+
+        pattern: expression.pattern,
+        modifiers: expression.modifiers,
+
+        outputIds: expression.outputIds,
+        outputs: expression.outputs,
+
+        diagnosticSignals: expression.diagnosticSignals,
+        expressionBias: expression.expressionBias,
+
+        searchText: buildSearchText(expression),
+        expression
+      };
+    });
+  });
+}
+
+export function searchMovementCatalogue({
+  query = "",
+  patternId = "",
+  category = "",
+  expressionBias = "",
+  outputId = ""
+} = {}) {
+  const search = query.toLowerCase().trim();
+
+  return generateMovementSearchCatalogue()
+    .filter(item =>
+      includesSearch(item.searchText, search)
+    )
+    .filter(item =>
+      !patternId || item.patternId === patternId
+    )
+    .filter(item =>
+      !category || item.pattern?.category === category
+    )
+    .filter(item =>
+      !expressionBias ||
+      item.expressionBias.includes(expressionBias)
+    )
+    .filter(item =>
+      !outputId ||
+      item.outputIds.includes(outputId)
+    );
+}
+
+export function getMovementCatalogueItemById(itemId) {
+  return generateMovementSearchCatalogue()
+    .find(item => item.id === itemId);
+}
