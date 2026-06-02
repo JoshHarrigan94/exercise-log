@@ -5,10 +5,13 @@ import {
   getCompatibleMethodsForBaseMovement,
   getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
-
+import {
+  searchMovementCatalogue
+} from "../logic/movementSearchCatalogue.js";
 import { methodTypes } from "../data/methodTypes.js";
 
 let selectedBaseMovementId = null;
+let selectedGeneratedMovement = null;
 let customMovementBuilderOpen = false;
 
 const libraryFilters = {
@@ -17,6 +20,15 @@ const libraryFilters = {
   expression: "",
   output: ""
 };
+
+export function selectGeneratedMovement(itemId) {
+  selectedBaseMovementId = null;
+  selectedGeneratedMovement = itemId;
+}
+
+export function clearGeneratedMovement() {
+  selectedGeneratedMovement = null;
+}
 
 export function openCustomMovementBuilder() {
   selectedBaseMovementId = null;
@@ -87,26 +99,26 @@ function getUniqueValues(values) {
   return Array.from(new Set(values.filter(Boolean))).sort();
 }
 
-function renderBaseMovementRow(base) {
+function renderMovementCatalogueRow(item) {
   const meta = [
-    base.familyName,
-    ...(base.equipment || []).slice(0, 2),
-    ...(base.bodyRegions || []).slice(0, 2)
+    item.pattern?.name,
+    ...(item.expressionBias || []).slice(0, 2),
+    ...(item.outputIds || []).slice(0, 2)
   ].filter(Boolean);
 
   return `
     <button
       class="movement-row"
-      data-open-base-movement="${base.id}"
+      data-open-generated-movement="${item.id}"
       type="button"
     >
       <div class="movement-row-main">
-        <strong>${base.name}</strong>
+        <strong>${item.label}</strong>
         <span>${meta.join(" · ")}</span>
       </div>
 
       <div class="movement-row-meta">
-        <span>${base.variantCount} variants</span>
+        <span>${item.modifierIds.length || 0} modifiers</span>
       </div>
     </button>
   `;
@@ -707,18 +719,139 @@ function renderAtlasEmptyState() {
   `;
 }
 
+function renderGeneratedMovementDetail(itemId) {
+  const item = searchMovementCatalogue()
+    .find(result => result.id === itemId);
+
+  if (!item) {
+    return `
+      <section class="screen active-screen">
+        <button 
+          class="secondary-button"
+          type="button"
+          data-close-generated-movement
+        >
+          ← Back to Library
+        </button>
+
+        <article class="workspace-card">
+          <p class="card-copy">Movement expression could not be found.</p>
+        </article>
+      </section>
+    `;
+  }
+
+  const expression = item.expression;
+
+  return `
+    <section class="screen active-screen">
+      <button 
+        class="secondary-button"
+        type="button"
+        data-close-generated-movement
+      >
+        ← Back to Library
+      </button>
+
+      <article class="hero-card">
+        <p class="eyebrow">Movement expression</p>
+        <h1>${expression.displayName}</h1>
+        <p class="hero-text">
+          ${expression.pattern?.name || "Movement"} expression generated from pattern and modifiers.
+        </p>
+      </article>
+
+      <article class="workspace-card">
+        <div class="workspace-card-header">
+          <div>
+            <p class="eyebrow">Expression model</p>
+            <h2>What the engine sees</h2>
+          </div>
+        </div>
+
+        <div class="coaching-summary-grid">
+          <div class="coaching-summary-item">
+            <span>Pattern</span>
+            <strong>${expression.pattern?.name || "Unknown"}</strong>
+          </div>
+
+          <div class="coaching-summary-item">
+            <span>Modifiers</span>
+            <strong>
+              ${
+                expression.modifiers.length
+                  ? expression.modifiers.map(modifier => modifier.name).join(", ")
+                  : "None"
+              }
+            </strong>
+          </div>
+
+          <div class="coaching-summary-item">
+            <span>Expression Bias</span>
+            <strong>
+              ${
+                expression.expressionBias.length
+                  ? expression.expressionBias.join(", ")
+                  : "General"
+              }
+            </strong>
+          </div>
+
+          <div class="coaching-summary-item">
+            <span>Outputs</span>
+            <strong>
+              ${
+                expression.outputIds.length
+                  ? expression.outputIds.join(", ")
+                  : "None"
+              }
+            </strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="workspace-card">
+        <div class="workspace-card-header">
+          <div>
+            <p class="eyebrow">Diagnostic signals</p>
+            <h2>What this can reveal</h2>
+          </div>
+        </div>
+
+        <div class="quick-chip-row">
+          ${
+            expression.diagnosticSignals.length
+              ? expression.diagnosticSignals.map(renderTag).join("")
+              : renderTag("No diagnostic signals yet")
+          }
+        </div>
+      </article>
+    </section>
+  `;
+}
+
 export function renderLibrary() {
   if (customMovementBuilderOpen) {
     return renderCustomMovementBuilder();
   }
+  
+  if (selectedGeneratedMovement) {
+  return renderGeneratedMovementDetail(selectedGeneratedMovement);
+}
 
   if (selectedBaseMovementId) {
     return renderMovementDetail(selectedBaseMovementId);
   }
 
   const atlas = getMovementAtlas();
-  const baseMovements = atlas.flatMap(family => family.bases);
-  const filteredBaseMovements = baseMovements.filter(baseMatchesFilters);
+const baseMovements = atlas.flatMap(family => family.bases);
+
+const generatedResults = searchMovementCatalogue({
+  query: libraryFilters.search,
+  patternId: libraryFilters.family,
+  expressionBias: libraryFilters.expression,
+  outputId: libraryFilters.output
+});
 
   return `
     <section class="screen active-screen">
@@ -733,15 +866,15 @@ export function renderLibrary() {
 
       <div class="section-header">
         <p class="eyebrow">Results</p>
-        <h2>${filteredBaseMovements.length} movements found</h2>
+        <h2>${generatedResults.length} movements found</h2>
       </div>
 
       <div class="movement-list">
         ${
-          filteredBaseMovements.length
-            ? filteredBaseMovements.map(renderBaseMovementRow).join("")
-            : renderAtlasEmptyState()
-        }
+  generatedResults.length
+    ? generatedResults.map(renderMovementCatalogueRow).join("")
+    : renderAtlasEmptyState()
+}
       </div>
 
       ${renderCustomMovementButton()}
