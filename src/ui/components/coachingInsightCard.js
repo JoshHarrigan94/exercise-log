@@ -10,6 +10,78 @@ function formatLabel(value = "") {
     .join(" ");
 }
 
+function renderAtlasCoachingSection(report = {}) {
+  const atlasObservations =
+    report.atlasObservations || [];
+
+  const exposure =
+    report.atlasExposure || {};
+
+  return `
+    <div class="coaching-section">
+
+      <h3>Atlas Intelligence</h3>
+
+      ${
+        atlasObservations.length
+          ? `
+            <ul class="coach-list">
+              ${atlasObservations.map(item => `
+                <li>${item}</li>
+              `).join("")}
+            </ul>
+          `
+          : `
+            <p>
+              Log atlas movements to unlock movement-family,
+              expression and exposure-gap insights.
+            </p>
+          `
+      }
+
+      <div class="coaching-summary-grid">
+
+        <div class="coaching-summary-item">
+          <span>Dominant Family</span>
+          <strong>
+            ${
+              exposure.dominantFamily?.name
+                ? formatLabel(exposure.dominantFamily.name)
+                : "Not Enough Data"
+            }
+          </strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Dominant Expression</span>
+          <strong>
+            ${
+              exposure.dominantExpression?.name
+                ? formatLabel(exposure.dominantExpression.name)
+                : "Not Enough Data"
+            }
+          </strong>
+        </div>
+
+        <div class="coaching-summary-item">
+          <span>Movement Sources</span>
+          <strong>
+            ${
+              Object.keys(exposure.sourceCounts || {}).length
+                ? Object.keys(exposure.sourceCounts)
+                    .map(formatLabel)
+                    .join(", ")
+                : "None"
+            }
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
 export function renderCoachingInsightCard(session) {
   const report =
     generateCoachingReport(session) || {};
@@ -114,7 +186,7 @@ export function renderCoachingInsightCard(session) {
         }
 
       </div>
-      
+
       ${renderAtlasCoachingSection(report)}
 
     </article>
