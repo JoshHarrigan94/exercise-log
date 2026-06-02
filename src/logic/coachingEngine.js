@@ -8,7 +8,18 @@ import {
   getTopExpressions
 } from "./expressionClassifiers.js";
 
-export function generateCoachingReport(session) {
+import {
+  analyseExpressionGaps
+} from "./expressionGapAnalysis.js";
+
+import {
+  getTriggeredCoachingRules
+} from "./coachingRules.js";
+
+export function generateCoachingReport(
+  session,
+  athleteProfile = {}
+) {
   if (!session) {
     return emptyReport();
   }
@@ -40,13 +51,38 @@ export function generateCoachingReport(session) {
     recommendations
   );
 
+  const gapAnalysis =
+    analyseExpressionGaps(expressions);
+
+  gapAnalysis.recommendations.forEach(item => {
+    recommendations.push(item);
+  });
+
+  const triggeredRules =
+    getTriggeredCoachingRules(expressions);
+
+  triggeredRules.forEach(rule => {
+    recommendations.push(rule.recommendation);
+  });
+
   return {
     dominantDomain,
     primaryExpression,
+
     domains,
     expressions,
+
     observations,
-    recommendations
+
+    recommendations: dedupe(
+      recommendations
+    ),
+
+    requiredMetrics:
+      gapAnalysis.requiredMetrics,
+
+    triggeredRules:
+      triggeredRules.map(rule => rule.id)
   };
 }
 
@@ -54,16 +90,25 @@ function emptyReport() {
   return {
     dominantDomain: null,
     primaryExpression: null,
+
     domains: {},
     expressions: {},
+
     observations: [],
-    recommendations: []
+    recommendations: [],
+
+    requiredMetrics: [],
+    triggeredRules: []
   };
 }
 
 function getHighest(scores = {}) {
   return Object.entries(scores)
     .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+}
+
+function dedupe(items = []) {
+  return [...new Set(items)];
 }
 
 function buildDomainObservations(
@@ -79,7 +124,7 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Track total reps and external load progression closely."
+        "Track total reps and external load progression."
       );
       break;
 
@@ -89,17 +134,17 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Monitor fatigue accumulation and recovery capacity."
+        "Monitor fatigue accumulation and recovery."
       );
       break;
 
     case "plyometric":
       observations.push(
-        "Current training places a large demand on elastic and reactive qualities."
+        "Current training places large demands on elastic and reactive qualities."
       );
 
       recommendations.push(
-        "Track tendon soreness and landing quality."
+        "Monitor landing quality and tendon response."
       );
       break;
 
@@ -109,7 +154,7 @@ function buildDomainObservations(
       );
 
       recommendations.push(
-        "Monitor weekly volume progression carefully."
+        "Monitor weekly running volume progression."
       );
       break;
   }
@@ -129,39 +174,11 @@ function buildExpressionObservations(
       observations.push(
         `${score}% of training targets relative strength.`
       );
-
-      recommendations.push(
-        "Track bodyweight alongside performance trends."
-      );
     }
 
     if (expression === "hypertrophy") {
       observations.push(
         `${score}% of training targets hypertrophy.`
-      );
-
-      recommendations.push(
-        "Monitor weekly volume and recovery capacity."
-      );
-    }
-
-    if (expression === "reactive-strength") {
-      observations.push(
-        `${score}% of training targets reactive strength.`
-      );
-
-      recommendations.push(
-        "Monitor landing quality and tendon readiness."
-      );
-    }
-
-    if (expression === "aerobic-capacity") {
-      observations.push(
-        `${score}% of training targets aerobic development.`
-      );
-
-      recommendations.push(
-        "Monitor pace, heart rate and weekly duration."
       );
     }
 
@@ -169,9 +186,17 @@ function buildExpressionObservations(
       observations.push(
         `${score}% of training targets maximal strength.`
       );
+    }
 
-      recommendations.push(
-        "Track estimated 1RM trends over time."
+    if (expression === "reactive-strength") {
+      observations.push(
+        `${score}% of training targets reactive strength.`
+      );
+    }
+
+    if (expression === "aerobic-capacity") {
+      observations.push(
+        `${score}% of training targets aerobic capacity.`
       );
     }
   });
