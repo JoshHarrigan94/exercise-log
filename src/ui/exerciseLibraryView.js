@@ -88,6 +88,12 @@ function getUniqueValues(values) {
 }
 
 function renderBaseMovementRow(base) {
+  const meta = [
+    base.familyName,
+    ...(base.equipment || []).slice(0, 2),
+    ...(base.bodyRegions || []).slice(0, 2)
+  ].filter(Boolean);
+
   return `
     <button
       class="movement-row"
@@ -96,7 +102,7 @@ function renderBaseMovementRow(base) {
     >
       <div class="movement-row-main">
         <strong>${base.name}</strong>
-        <span>${base.familyName}</span>
+        <span>${meta.join(" · ")}</span>
       </div>
 
       <div class="movement-row-meta">
@@ -409,6 +415,9 @@ function baseMatchesFilters(base) {
     base.name,
     base.familyName,
     base.domain,
+    ...(base.aliases || []),
+    ...(base.equipment || []),
+    ...(base.bodyRegions || []),
     ...(base.primaryExpressionNames || []),
     ...(base.secondaryExpressionNames || []),
     ...(base.measurableOutputs || [])
