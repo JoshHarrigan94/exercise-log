@@ -1,10 +1,11 @@
-import { methodTypes } from "../data/methodTypes.js";
+
 
 import {
   getMovementAtlas,
   getAllExercises,
   getResolvedBaseMovement,
-  getVariantsForBaseMovement
+  getVariantsForBaseMovement,
+  getCompatibleMethodsForBaseMovement
 } from "../logic/exerciseLibrary.js";
 
 let selectedBaseMovementId = null;
@@ -105,6 +106,62 @@ function renderVariantCard(variant) {
   `;
 }
 
+function renderMethodCompatibilityCard(baseMovementId) {
+  const compatibility = getCompatibleMethodsForBaseMovement(baseMovementId);
+
+  return `
+    <article class="workspace-card">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Method compatibility</p>
+          <h2>Best ways to train this movement</h2>
+        </div>
+      </div>
+
+      <p class="card-copy">
+        Methods are now matched against the movement family, expression profile,
+        measurable outputs and variant logic.
+      </p>
+
+      <div class="section-header">
+        <p class="eyebrow">Recommended</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          compatibility.recommended.length
+            ? compatibility.recommended.map(item => renderMethodTag(item.method)).join("")
+            : renderTag("No strong matches yet")
+        }
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Possible</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          compatibility.possible.length
+            ? compatibility.possible.map(item => renderMethodTag(item.method)).join("")
+            : renderTag("None")
+        }
+      </div>
+
+      <div class="section-header">
+        <p class="eyebrow">Limited fit</p>
+      </div>
+
+      <div class="quick-chip-row">
+        ${
+          compatibility.limited.length
+            ? compatibility.limited.slice(0, 4).map(item => renderMethodTag(item.method)).join("")
+            : renderTag("None")
+        }
+      </div>
+    </article>
+  `;
+}
+
 function renderMovementDetail(baseMovementId) {
   const base = getResolvedBaseMovement(baseMovementId);
   const variants = getVariantsForBaseMovement(baseMovementId);
@@ -178,22 +235,7 @@ function renderMovementDetail(baseMovementId) {
         </div>
       </article>
 
-      <article class="workspace-card">
-        <div class="workspace-card-header">
-          <div>
-            <p class="eyebrow">Compatible methods</p>
-            <h2>How this movement can be trained</h2>
-          </div>
-        </div>
-
-        <p class="card-copy">
-          This is the next intelligence layer: matching movements to the methods they can safely and meaningfully support.
-        </p>
-
-        <div class="quick-chip-row">
-          ${methodTypes.slice(0, 8).map(renderMethodTag).join("")}
-        </div>
-      </article>
+      ${renderMethodCompatibilityCard(base.id)}
 
       <div class="section-header">
         <p class="eyebrow">Generated variants</p>
