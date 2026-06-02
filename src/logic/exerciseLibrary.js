@@ -4,6 +4,7 @@ import { movementFamilies } from "../data/movementFamilies.js";
 import { expressionTypes } from "../data/expressionTypes.js";
 import { store } from "../state/store.js";
 import { getMethodCompatibility } from "./methodCompatibility.js";
+import { movementRelationships } from "../data/movementRelationships.js";
 import {
   getBaseMovementById,
   getVariantById,
@@ -37,7 +38,16 @@ function resolveBaseMovement(base) {
     primaryExpressionNames: (base.primaryExpressions || []).map(formatExpressionName),
     secondaryExpressionNames: (base.secondaryExpressions || []).map(formatExpressionName),
     variantCount: variants.length,
-    variants
+    variants,
+    relationships: movementRelationships[base.id] || {
+  regressions: [],
+  progressions: [],
+  alternatives: []
+},
+
+regressionCount: movementRelationships[base.id]?.regressions?.length || 0,
+progressionCount: movementRelationships[base.id]?.progressions?.length || 0,
+alternativeCount: movementRelationships[base.id]?.alternatives?.length || 0
   };
 }
 
