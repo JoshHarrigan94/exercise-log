@@ -28,7 +28,6 @@ import {
   bindSessionDetailActions
 } from "./ui/sessionDetailView.js";
 
-import { methodTypes } from "./data/methodTypes.js";
 import { renderNav, renderSidebar } from "./components/nav.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
