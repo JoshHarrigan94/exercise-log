@@ -3,7 +3,9 @@ import { renderSession } from "./ui/sessionView.js";
 import { renderLiveSession } from "./ui/liveSessionView.js";
 import {
   getMovementAtlas,
-  getCompatibleMethodsForVariant
+  getCompatibleMethodsForVariant,
+  selectGeneratedMovement,
+clearGeneratedMovement
 } from "./logic/exerciseLibrary.js";
 import {
   validateCustomMovement,
@@ -460,6 +462,20 @@ function bindLibraryActions() {
       renderApp();
     });
   });
+  
+  document.querySelectorAll("[data-open-generated-movement]").forEach(button => {
+  button.addEventListener("click", () => {
+    selectGeneratedMovement(button.dataset.openGeneratedMovement);
+    renderApp();
+  });
+});
+
+document.querySelectorAll("[data-close-generated-movement]").forEach(button => {
+  button.addEventListener("click", () => {
+    clearGeneratedMovement();
+    renderApp();
+  });
+});
 
   document.querySelectorAll("[data-close-base-movement]").forEach(button => {
     button.addEventListener("click", () => {
