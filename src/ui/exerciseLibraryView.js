@@ -10,6 +10,35 @@ getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
 
 let selectedBaseMovementId = null;
+const libraryFilters = {
+  search: "",
+  family: "",
+  expression: "",
+  output: ""
+};
+
+export function setLibrarySearch(value) {
+  libraryFilters.search = value || "";
+}
+
+export function setLibraryFamilyFilter(value) {
+  libraryFilters.family = value || "";
+}
+
+export function setLibraryExpressionFilter(value) {
+  libraryFilters.expression = value || "";
+}
+
+export function setLibraryOutputFilter(value) {
+  libraryFilters.output = value || "";
+}
+
+export function clearLibraryFilters() {
+  libraryFilters.search = "";
+  libraryFilters.family = "";
+  libraryFilters.expression = "";
+  libraryFilters.output = "";
+}
 
 export function selectLibraryBaseMovement(baseMovementId) {
   selectedBaseMovementId = baseMovementId;
@@ -340,6 +369,136 @@ function renderCustomMovementCard(customExercises) {
   `;
 }
 
+function getUniqueValues(values) {
+  return Array.from(new Set(values.filter(Boolean))).sort();
+}
+
+function baseMatchesFilters(base) {
+  const search = libraryFilters.search.toLowerCase().trim();
+
+  const searchableText = [
+    base.name,
+    base.familyName,
+    base.domain,
+    ...(base.primaryExpressionNames || []),
+    ...(base.secondaryExpressionNames || []),
+    ...(base.measurableOutputs || [])
+  ].join(" ").toLowerCase();
+
+  const expressionIds = [
+    ...(base.primaryExpressions || []),
+    ...(base.secondaryExpressions || [])
+  ];
+
+  const matchesSearch =
+    !search || searchableText.includes(search);
+
+  const matchesFamily =
+    !libraryFilters.family || base.family === libraryFilters.family;
+
+  const matchesExpression =
+    !libraryFilters.expression || expressionIds.includes(libraryFilters.expression);
+
+  const matchesOutput =
+    !libraryFilters.output || (base.measurableOutputs || []).includes(libraryFilters.output);
+
+  return matchesSearch && matchesFamily && matchesExpression && matchesOutput;
+}
+
+function renderLibraryFilters(atlas, baseMovements) {
+  const familyOptions = atlas.map(family => ({
+    id: family.id,
+    name: family.name
+  }));
+
+  const expressionOptions = getUniqueValues(
+    baseMovements.flatMap(base => [
+      ...(base.primaryExpressionNames || []),
+      ...(base.secondaryExpressionNames || [])
+    ])
+  );
+
+  const outputOptions = getUniqueValues(
+    baseMovements.flatMap(base => base.measurableOutputs || [])
+  );
+
+  return `
+    <article class="workspace-card">
+      <div class="workspace-card-header">
+        <div>
+          <p class="eyebrow">Atlas controls</p>
+          <h2>Search and filter</h2>
+        </div>
+
+        <button 
+          class="secondary-button" 
+          type="button"
+          data-clear-library-filters
+        >
+          Clear
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Search</span>
+          <input 
+            id="library-search"
+            type="search"
+            value="${libraryFilters.search}"
+            placeholder="Pull up, hinge, power, reps..."
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Family</span>
+          <select id="library-family-filter">
+            <option value="">All families</option>
+            ${familyOptions.map(family => `
+              <option 
+                value="${family.id}"
+                ${libraryFilters.family === family.id ? "selected" : ""}
+              >
+                ${family.name}
+              </option>
+            `).join("")}
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Expression</span>
+          <select id="library-expression-filter">
+            <option value="">All expressions</option>
+            ${expressionOptions.map(expression => `
+              <option 
+                value="${expression}"
+                ${libraryFilters.expression === expression ? "selected" : ""}
+              >
+                ${expression}
+              </option>
+            `).join("")}
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Output</span>
+          <select id="library-output-filter">
+            <option value="">All outputs</option>
+            ${outputOptions.map(output => `
+              <option 
+                value="${output}"
+                ${libraryFilters.output === output ? "selected" : ""}
+              >
+                ${output}
+              </option>
+            `).join("")}
+          </select>
+        </label>
+      </div>
+    </article>
+  `;
+}
+
 export function renderLibrary() {
   if (selectedBaseMovementId) {
     return renderMovementDetail(selectedBaseMovementId);
@@ -352,6 +511,7 @@ export function renderLibrary() {
   );
 
   const baseMovements = atlas.flatMap(family => family.bases);
+const filteredBaseMovements = baseMovements.filter(baseMatchesFilters);
 
   return `
     <section class="screen active-screen">
@@ -369,6 +529,7 @@ export function renderLibrary() {
         </p>
       </article>
 
+      ${renderLibraryFilters(atlas, baseMovements)}
       ${renderCustomMovementCard(customExercises)}
 
       <div class="section-header">
@@ -386,7 +547,17 @@ export function renderLibrary() {
       </div>
 
       <div class="stack">
-        ${baseMovements.map(renderBaseMovementCard).join("")}
+        ${
+  filteredBaseMovements.length
+    ? filteredBaseMovements.map(renderBaseMovementCard).join("")
+    : `
+      <article class="workspace-card">
+        <p class="card-copy">
+          No base movements match these filters yet.
+        </p>
+      </article>
+    `
+}
       </div>
     </section>
   `;
