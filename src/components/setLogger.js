@@ -1,23 +1,12 @@
 import {
-  getMovementAtlas,
-  getCompatibleMethodsForVariant
-} from "../logic/exerciseLibrary.js";
-import {
   searchMovementCatalogue
 } from "../logic/movementSearchCatalogue.js";
+
 import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
 import { renderMethodPreview } from "./methodPreview.js";
 import { renderMethodMemoryPanel } from "./methodMemoryPanel.js";
-
-function renderFamilyOptions(atlas) {
-  return atlas.map(family => `
-    <option value="${family.id}">
-      ${family.name}
-    </option>
-  `).join("");
-}
 
 function renderMovementCatalogueOptions() {
   return searchMovementCatalogue()
@@ -29,59 +18,28 @@ function renderMovementCatalogueOptions() {
     .join("");
 }
 
-  return family.bases.flatMap(base =>
-    (base.variants || []).map(variant => `
-      <option 
-        value="${variant.id}"
-        data-base="${base.id}"
-        data-family="${family.id}"
-      >
-        ${variant.name}
-      </option>
-    `)
-  ).join("");
-}
-
-function renderMethodOptionsForExercise(exerciseId) {
-  const compatibility = getCompatibleMethodsForVariant(exerciseId);
-
-  const methods = [
-    ...(compatibility.recommended || []),
-    ...(compatibility.possible || [])
-  ];
-
-  if (!methods.length) {
-    return methodTypes.map(method => `
-      <option value="${method.id}">
-        ${method.name}
-      </option>
-    `).join("");
-  }
-
-  return methods.map(item => `
-    <option value="${item.method.id}">
-      ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+function renderMethodOptions() {
+  return methodTypes.map(method => `
+    <option value="${method.id}">
+      ${method.name}
     </option>
   `).join("");
 }
 
 export function renderSetLogger() {
-  const atlas = getMovementAtlas();
-const firstFamily = atlas[0];
-const firstExerciseId =
-  firstFamily?.bases?.[0]?.variants?.[0]?.id ||
-  "";
-  if (!atlas.length) {
-  return `
-    <article class="logger-card compact-logger">
-      <p class="eyebrow">Log</p>
-      <h2>No atlas movements found</h2>
-      <p class="card-copy">
-        Add movement data before logging sessions.
-      </p>
-    </article>
-  `;
-}
+  const catalogue = searchMovementCatalogue();
+
+  if (!catalogue.length) {
+    return `
+      <article class="logger-card compact-logger">
+        <p class="eyebrow">Log</p>
+        <h2>No movements found</h2>
+        <p class="card-copy">
+          Add movement patterns and modifiers before logging sessions.
+        </p>
+      </article>
+    `;
+  }
 
   return `
     <article class="logger-card compact-logger">
@@ -98,23 +56,16 @@ const firstExerciseId =
 
       <div class="compact-log-row">
         <label class="compact-field compact-field-wide">
-          <span>Family</span>
-          <select id="log-family">
-            ${renderFamilyOptions(atlas)}
-          </select>
-        </label>
-
-        <label class="compact-field compact-field-wide">
           <span>Movement</span>
           <select id="log-exercise">
-  ${renderMovementCatalogueOptions()}
-</select>
+            ${renderMovementCatalogueOptions()}
+          </select>
         </label>
 
         <label class="compact-field compact-field-wide">
           <span>Method</span>
           <select id="log-method">
-            ${renderMethodOptionsForExercise(firstExerciseId)}
+            ${renderMethodOptions()}
           </select>
         </label>
 
