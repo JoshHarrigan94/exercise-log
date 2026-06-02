@@ -110,6 +110,8 @@ function renderBaseMovementCard(base) {
         <div class="quick-chip-row">
           ${base.primaryExpressionNames.slice(0, 2).map(renderTag).join("")}
           ${(base.measurableOutputs || []).slice(0, 3).map(renderTag).join("")}
+          ${base.progressionCount ? renderTag(`${base.progressionCount} progressions`) : ""}
+${base.regressionCount ? renderTag(`${base.regressionCount} regressions`) : ""}
         </div>
       </div>
 
@@ -292,7 +294,7 @@ function renderMovementRelationshipCard(base) {
       <div class="quick-chip-row">
         ${
           relationships.regressions.length
-            ? relationships.regressions.map(renderTag).join("")
+            ? relationships.regressions.map(item => renderTag(item.name)).join("")
             : renderTag("None mapped yet")
         }
       </div>
@@ -304,7 +306,7 @@ function renderMovementRelationshipCard(base) {
       <div class="quick-chip-row">
         ${
           relationships.progressions.length
-            ? relationships.progressions.map(renderTag).join("")
+            ? relationships.progressions.map(item => renderTag(item.name)).join("")
             : renderTag("None mapped yet")
         }
       </div>
@@ -316,7 +318,7 @@ function renderMovementRelationshipCard(base) {
       <div class="quick-chip-row">
         ${
           relationships.alternatives.length
-            ? relationships.alternatives.map(renderTag).join("")
+            ? relationships.alternatives.map(item => renderTag(item.name)).join("")
             : renderTag("None mapped yet")
         }
       </div>
