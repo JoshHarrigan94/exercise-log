@@ -2,7 +2,9 @@ import {
   getMovementAtlas,
   getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
-
+import {
+  searchMovementCatalogue
+} from "../logic/movementSearchCatalogue.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { renderMethodFields } from "./methodFields.js";
 import { renderQuickChips } from "./quickChips.js";
@@ -17,8 +19,15 @@ function renderFamilyOptions(atlas) {
   `).join("");
 }
 
-function renderExerciseOptionsForFamily(family) {
-  if (!family) return "";
+function renderMovementCatalogueOptions() {
+  return searchMovementCatalogue()
+    .map(item => `
+      <option value="${item.id}">
+        ${item.label}
+      </option>
+    `)
+    .join("");
+}
 
   return family.bases.flatMap(base =>
     (base.variants || []).map(variant => `
@@ -98,8 +107,8 @@ const firstExerciseId =
         <label class="compact-field compact-field-wide">
           <span>Movement</span>
           <select id="log-exercise">
-            ${renderExerciseOptionsForFamily(firstFamily)}
-          </select>
+  ${renderMovementCatalogueOptions()}
+</select>
         </label>
 
         <label class="compact-field compact-field-wide">
