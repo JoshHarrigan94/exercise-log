@@ -3660,16 +3660,5 @@ export const exerciseBases = [
   primaryExpressions: ["motor-control"],
   secondaryExpressions: ["tissue-tolerance"],
   measurableOutputs: ["duration", "quality"]
-},
-
-{
-  id: "dead-hang",
-  name: "Dead Hang",
-  domain: "isometric",
-  family: "vertical-pull",
-  aliases: ["passive hang", "bar hang"],
-  equipment: ["bodyweight", "pull-up bar", "rings"],
-  bodyRegions: ["grip", "shoulders", "lats"],
-  primaryExpressions: ["tissue-tolerance"],
-  secondary
-}];
+}
+];
