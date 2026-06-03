@@ -466,7 +466,7 @@ export function renderSession() {
 
   return `
     <section class="screen active-screen blocks-screen adapt-plans-screen">
-      <section class="adapt-plans-hero">
+      <section class="adapt-plans-hero adapt-signal-patterning">
         <div>
           <p class="eyebrow">Plans</p>
           <h1>Build the block. Trust the signal.</h1>
