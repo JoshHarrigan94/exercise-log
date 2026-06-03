@@ -851,7 +851,7 @@ export function renderApp() {
       <section class="workspace-shell">
         <header class="top-bar">
           <div>
-            <p class="eyebrow">Progression Lab</p>
+            <p class="eyebrow">ADAPT</p>
             <h1>${getViewTitle()}</h1>
           </div>
 
