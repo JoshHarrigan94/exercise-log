@@ -3648,3 +3648,177 @@ body {
     text-align: center;
   }
 }
+
+/* ADAPT Pass 6 — Brand Signal Layer */
+
+.adapt-brand-mark {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(255,254,250,.96), rgba(232,228,218,.9));
+  border: 1px solid rgba(17,17,17,.08);
+  box-shadow: 0 10px 24px rgba(17,17,17,.07);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.adapt-brand-mark i {
+  position: absolute;
+  border: 1.8px solid var(--adapt-navy);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  opacity: .72;
+  transform: rotate(-34deg);
+}
+
+.adapt-brand-mark i:nth-child(1) {
+  width: 13px;
+  height: 13px;
+}
+
+.adapt-brand-mark i:nth-child(2) {
+  width: 21px;
+  height: 21px;
+  opacity: .46;
+}
+
+.adapt-brand-mark i:nth-child(3) {
+  width: 29px;
+  height: 29px;
+  opacity: .26;
+}
+
+.adapt-top-brand,
+.adapt-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.adapt-sidebar-brand {
+  align-items: flex-start;
+}
+
+.adapt-sidebar-brand > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adapt-signal-strength::after,
+.adapt-signal-capacity::after,
+.adapt-signal-power::after,
+.adapt-signal-recovery::after,
+.adapt-signal-patterning::after {
+  content: "";
+  position: absolute;
+  right: -42px;
+  top: -48px;
+  width: 260px;
+  height: 260px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: .82;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.adapt-signal-strength::after {
+  background-image: url("../assets/signals/strength.svg");
+}
+
+.adapt-signal-capacity::after {
+  background-image: url("../assets/signals/capacity.svg");
+}
+
+.adapt-signal-power::after {
+  background-image: url("../assets/signals/power.svg");
+}
+
+.adapt-signal-recovery::after {
+  background-image: url("../assets/signals/recovery.svg");
+}
+
+.adapt-signal-patterning::after {
+  background-image: url("../assets/signals/patterning.svg");
+}
+
+.adapt-hero-card,
+.adapt-session-hero,
+.adapt-review-hero,
+.adapt-plans-hero,
+.adapt-library-hero {
+  isolation: isolate;
+}
+
+.adapt-hero-card > *,
+.adapt-session-hero > *,
+.adapt-review-hero > *,
+.adapt-plans-hero > *,
+.adapt-library-hero > * {
+  position: relative;
+  z-index: 2;
+}
+
+.adapt-signal-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, .08);
+  color: var(--adapt-navy);
+  padding: 8px 11px;
+  font-size: .72rem;
+  font-weight: 950;
+  letter-spacing: .02em;
+}
+
+.adapt-signal-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .75;
+}
+
+.adapt-brand-pulse {
+  animation: adaptBrandPulse 1800ms ease-in-out infinite;
+}
+
+@keyframes adaptBrandPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: .82;
+  }
+
+  50% {
+    transform: scale(1.035);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 859px) {
+  .adapt-top-brand .adapt-brand-mark {
+    display: none;
+  }
+
+  .adapt-signal-strength::after,
+  .adapt-signal-capacity::after,
+  .adapt-signal-power::after,
+  .adapt-signal-recovery::after,
+  .adapt-signal-patterning::after {
+    right: -82px;
+    top: -62px;
+    width: 240px;
+    height: 240px;
+    opacity: .52;
+  }
+}
