@@ -6,7 +6,107 @@ const restChips = ["20s", "30s", "45s", "60s", "90s"];
 const segmentChips = ["8+3+2", "10+3+2", "12+4+2", "15+5+3"];
 const roundsChips = ["1", "2", "3", "4", "5"];
 
-export function renderMethodFields(methodId) {
+function renderStrengthFields() {
+  return `
+    <div class="form-grid">
+      <label class="form-field">
+        <span>Load</span>
+        <input id="dynamic-load" type="text" placeholder="80kg / +20kg / BW" />
+        ${renderQuickChips("dynamic-load", ["BW", "40kg", "60kg", "80kg", "100kg", "+10kg", "+20kg"])}
+      </label>
+
+      <label class="form-field">
+        <span>Reps</span>
+        <input id="dynamic-reps" type="number" placeholder="5" />
+        ${renderQuickChips("dynamic-reps", ["1", "2", "3", "5", "8", "10"])}
+      </label>
+    </div>
+  `;
+}
+
+function renderVolumeFields() {
+  return `
+    <div class="form-grid">
+      <label class="form-field">
+        <span>Sets</span>
+        <input id="dynamic-sets" type="number" placeholder="3" />
+        ${renderQuickChips("dynamic-sets", ["2", "3", "4", "5"])}
+      </label>
+
+      <label class="form-field">
+        <span>Reps</span>
+        <input id="dynamic-reps" type="number" placeholder="8" />
+        ${renderQuickChips("dynamic-reps", ["5", "6", "8", "10", "12", "15"])}
+      </label>
+    </div>
+  `;
+}
+
+function renderDurationFields() {
+  return `
+    <div class="form-grid">
+      <label class="form-field">
+        <span>Duration</span>
+        <input id="dynamic-duration" type="text" placeholder="30s" />
+        ${renderQuickChips("dynamic-duration", ["10s", "20s", "30s", "45s", "60s"])}
+      </label>
+
+      <label class="form-field">
+        <span>Load</span>
+        <input id="dynamic-load" type="text" placeholder="BW / +10kg" />
+        ${renderQuickChips("dynamic-load", loadChips)}
+      </label>
+    </div>
+  `;
+}
+
+function renderDistanceFields() {
+  return `
+    <div class="form-grid">
+      <label class="form-field">
+        <span>Distance</span>
+        <input id="dynamic-distance" type="text" placeholder="20m / 5km" />
+        ${renderQuickChips("dynamic-distance", ["10m", "20m", "30m", "100m", "1km", "5km"])}
+      </label>
+
+      <label class="form-field">
+        <span>Time</span>
+        <input id="dynamic-time" type="text" placeholder="12.4s / 25:00" />
+      </label>
+    </div>
+  `;
+}
+
+function renderQualityField() {
+  return `
+    <label class="form-field">
+      <span>Quality</span>
+      <select id="dynamic-quality">
+        <option value="">Select quality</option>
+        <option value="excellent">Excellent</option>
+        <option value="good">Good</option>
+        <option value="acceptable">Acceptable</option>
+        <option value="poor">Poor</option>
+      </select>
+    </label>
+  `;
+}
+
+export function renderMethodFields(methodId, outputIds = []) {
+  const outputs = new Set(outputIds || []);
+
+  const outputDrivenFields = `
+    ${outputs.has("load") || outputs.has("external-load") ? renderStrengthFields() : ""}
+    ${outputs.has("sets") || outputs.has("reps") ? renderVolumeFields() : ""}
+    ${outputs.has("duration") || outputs.has("hold-duration") ? renderDurationFields() : ""}
+    ${outputs.has("distance") || outputs.has("time") || outputs.has("pace") ? renderDistanceFields() : ""}
+    ${outputs.has("quality") || outputs.has("landing-quality") ? renderQualityField() : ""}
+  `;
+
+  if (outputIds.length && outputDrivenFields.trim()) {
+    return outputDrivenFields;
+  }
+
   switch (methodId) {
     case "top-set":
       return `
@@ -263,25 +363,8 @@ export function renderMethodFields(methodId) {
 
     default:
       return `
-        <div class="form-grid">
-          <label class="form-field">
-            <span>Load</span>
-            <input id="dynamic-load" type="text" placeholder="80kg" />
-            ${renderQuickChips("dynamic-load", ["BW", "40kg", "60kg", "80kg", "100kg", "120kg"])}
-          </label>
-
-          <label class="form-field">
-            <span>Sets</span>
-            <input id="dynamic-sets" type="number" placeholder="3" />
-            ${renderQuickChips("dynamic-sets", ["2", "3", "4", "5"])}
-          </label>
-        </div>
-
-        <label class="form-field">
-          <span>Reps</span>
-          <input id="dynamic-reps" type="number" placeholder="8" />
-          ${renderQuickChips("dynamic-reps", ["5", "6", "8", "10", "12", "15"])}
-        </label>
+        ${renderStrengthFields()}
+        ${renderVolumeFields()}
       `;
   }
 }
