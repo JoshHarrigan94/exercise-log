@@ -3822,3 +3822,250 @@ body {
     opacity: .52;
   }
 }
+
+/* ADAPT Pass 7 — Dark Mode */
+
+.app-shell[data-theme="dark"] {
+  --bg: #080b10;
+  --surface: #10151d;
+  --surface-soft: #161d27;
+  --surface-light: #202936;
+
+  --text: #f4f1ea;
+  --muted: rgba(244, 241, 234, 0.66);
+  --faint: rgba(244, 241, 234, 0.42);
+
+  --accent: #fffefa;
+  --accent-soft: rgba(255, 254, 250, 0.08);
+
+  --green: #68d391;
+  --yellow: #f6c85f;
+  --red: #fc8181;
+
+  --adapt-bg: #080b10;
+  --adapt-ink: #fffefa;
+  --adapt-navy: #f4f1ea;
+  --adapt-card: #10151d;
+  --adapt-border: rgba(255, 254, 250, 0.09);
+  --adapt-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+  --adapt-shadow-soft: 0 8px 26px rgba(0, 0, 0, 0.24);
+
+  color-scheme: dark;
+}
+
+.app-shell[data-theme="dark"] body,
+.app-shell[data-theme="dark"] .workspace-shell,
+.app-shell[data-theme="dark"] .view-container {
+  background: var(--adapt-bg);
+}
+
+.app-shell[data-theme="dark"] {
+  background:
+    radial-gradient(circle at top left, rgba(255, 254, 250, 0.08), transparent 30rem),
+    var(--adapt-bg);
+  color: var(--text);
+}
+
+.adapt-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--adapt-border);
+  border-radius: 50%;
+  background: rgba(255, 254, 250, 0.72);
+  color: var(--adapt-ink);
+  box-shadow: var(--adapt-shadow-soft);
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.app-shell[data-theme="dark"] .theme-toggle-button,
+.app-shell[data-theme="dark"] .profile-button {
+  background: rgba(255, 254, 250, 0.08);
+  color: #fffefa;
+}
+
+.app-shell[data-theme="dark"] .desktop-sidebar,
+.app-shell[data-theme="dark"] .top-bar,
+.app-shell[data-theme="dark"] .bottom-nav {
+  background: rgba(8, 11, 16, 0.82);
+  border-color: rgba(255, 254, 250, 0.08);
+}
+
+.app-shell[data-theme="dark"] .adapt-hero-card,
+.app-shell[data-theme="dark"] .adapt-session-hero,
+.app-shell[data-theme="dark"] .adapt-review-hero,
+.app-shell[data-theme="dark"] .adapt-plans-hero,
+.app-shell[data-theme="dark"] .adapt-library-hero,
+.app-shell[data-theme="dark"] .adapt-plan-card,
+.app-shell[data-theme="dark"] .adapt-library-panel,
+.app-shell[data-theme="dark"] .adapt-review-panel,
+.app-shell[data-theme="dark"] .adapt-coach-card,
+.app-shell[data-theme="dark"] .adapt-consistency-card,
+.app-shell[data-theme="dark"] .adapt-builder-panel,
+.app-shell[data-theme="dark"] .adapt-library-search-card,
+.app-shell[data-theme="dark"] .adapt-day-card,
+.app-shell[data-theme="dark"] .adapt-signal-card,
+.app-shell[data-theme="dark"] .adapt-calendar-card,
+.app-shell[data-theme="dark"] .adapt-exercise-card,
+.app-shell[data-theme="dark"] .adapt-logger-details,
+.app-shell[data-theme="dark"] .adapt-logged-panel,
+.app-shell[data-theme="dark"] .adapt-movement-row {
+  background:
+    linear-gradient(145deg, rgba(16, 21, 29, 0.96), rgba(10, 13, 19, 0.94));
+  border-color: rgba(255, 254, 250, 0.09);
+  box-shadow: var(--adapt-shadow-soft);
+}
+
+.app-shell[data-theme="dark"] .adapt-hero-card::before,
+.app-shell[data-theme="dark"] .adapt-session-hero::before,
+.app-shell[data-theme="dark"] .adapt-review-hero::before,
+.app-shell[data-theme="dark"] .adapt-plans-hero::before,
+.app-shell[data-theme="dark"] .adapt-library-hero::before {
+  background:
+    repeating-radial-gradient(
+      circle at 76% 26%,
+      rgba(255, 254, 250, 0.08) 0,
+      rgba(255, 254, 250, 0.08) 1px,
+      transparent 1px,
+      transparent 18px
+    );
+}
+
+.app-shell[data-theme="dark"] .adapt-hero-main p,
+.app-shell[data-theme="dark"] .adapt-session-copy p:not(.eyebrow),
+.app-shell[data-theme="dark"] .adapt-review-copy p:not(.eyebrow),
+.app-shell[data-theme="dark"] .adapt-plans-hero p:not(.eyebrow),
+.app-shell[data-theme="dark"] .adapt-library-hero p:not(.eyebrow),
+.app-shell[data-theme="dark"] p,
+.app-shell[data-theme="dark"] small {
+  color: rgba(244, 241, 234, 0.62);
+}
+
+.app-shell[data-theme="dark"] .adapt-brand-mark,
+.app-shell[data-theme="dark"] .adapt-session-orb,
+.app-shell[data-theme="dark"] .adapt-review-orb,
+.app-shell[data-theme="dark"] .adapt-movement-row-art {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 254, 250, 0.14), rgba(255, 254, 250, 0.04));
+  border-color: rgba(255, 254, 250, 0.1);
+}
+
+.app-shell[data-theme="dark"] .adapt-brand-mark i {
+  border-top-color: #fffefa;
+  border-right-color: #fffefa;
+}
+
+.app-shell[data-theme="dark"] .adapt-signal-strength::after,
+.app-shell[data-theme="dark"] .adapt-signal-capacity::after,
+.app-shell[data-theme="dark"] .adapt-signal-power::after,
+.app-shell[data-theme="dark"] .adapt-signal-recovery::after,
+.app-shell[data-theme="dark"] .adapt-signal-patterning::after {
+  filter: invert(1);
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+
+.app-shell[data-theme="dark"] .primary-button,
+.app-shell[data-theme="dark"] .complete-session-button,
+.app-shell[data-theme="dark"] .line-log-button,
+.app-shell[data-theme="dark"] .nav-item.active,
+.app-shell[data-theme="dark"] .sidebar-nav-item.active,
+.app-shell[data-theme="dark"] .calendar-day.active {
+  background: #fffefa;
+  color: #080b10;
+}
+
+.app-shell[data-theme="dark"] .primary-button small,
+.app-shell[data-theme="dark"] .nav-item.active small {
+  color: #080b10;
+}
+
+.app-shell[data-theme="dark"] .secondary-button,
+.app-shell[data-theme="dark"] .danger-button,
+.app-shell[data-theme="dark"] .soft-link-card,
+.app-shell[data-theme="dark"] .adapt-hero-metrics div,
+.app-shell[data-theme="dark"] .adapt-plan-stats div,
+.app-shell[data-theme="dark"] .adapt-plan-metrics div,
+.app-shell[data-theme="dark"] .adapt-metric-card,
+.app-shell[data-theme="dark"] .adapt-recommendation-box,
+.app-shell[data-theme="dark"] .adapt-deviation-row,
+.app-shell[data-theme="dark"] .adapt-session-row,
+.app-shell[data-theme="dark"] .adapt-plan-movement-row,
+.app-shell[data-theme="dark"] .adapt-workout-panel,
+.app-shell[data-theme="dark"] .adapt-week-panel,
+.app-shell[data-theme="dark"] .adapt-plan-detail,
+.app-shell[data-theme="dark"] .adapt-empty-read,
+.app-shell[data-theme="dark"] .adapt-coach-bullets p,
+.app-shell[data-theme="dark"] .adapt-execution-line {
+  background: rgba(255, 254, 250, 0.055);
+  border-color: rgba(255, 254, 250, 0.08);
+  color: #fffefa;
+}
+
+.app-shell[data-theme="dark"] input,
+.app-shell[data-theme="dark"] select,
+.app-shell[data-theme="dark"] textarea,
+.app-shell[data-theme="dark"] .adapt-execution-line input {
+  background: rgba(255, 254, 250, 0.07);
+  border-color: rgba(255, 254, 250, 0.1);
+  color: #fffefa;
+  color-scheme: dark;
+}
+
+.app-shell[data-theme="dark"] input::placeholder,
+.app-shell[data-theme="dark"] textarea::placeholder {
+  color: rgba(244, 241, 234, 0.36);
+}
+
+.app-shell[data-theme="dark"] .adapt-signal-pill,
+.app-shell[data-theme="dark"] .calendar-streak-pill,
+.app-shell[data-theme="dark"] .adapt-panel-pill,
+.app-shell[data-theme="dark"] .adapt-review-actions span,
+.app-shell[data-theme="dark"] .adapt-plans-summary span,
+.app-shell[data-theme="dark"] .adapt-library-hero-stats span,
+.app-shell[data-theme="dark"] .adapt-chip,
+.app-shell[data-theme="dark"] .domain-pill,
+.app-shell[data-theme="dark"] .adapt-plan-tags span,
+.app-shell[data-theme="dark"] .adapt-movement-row-action,
+.app-shell[data-theme="dark"] .adapt-signal-label {
+  background: rgba(255, 254, 250, 0.08);
+  color: #fffefa;
+}
+
+.app-shell[data-theme="dark"] .adapt-session-progress {
+  background: rgba(255, 254, 250, 0.08);
+  border-color: rgba(255, 254, 250, 0.08);
+}
+
+.app-shell[data-theme="dark"] .adapt-session-progress span,
+.app-shell[data-theme="dark"] .adapt-consistency-mark {
+  background: #fffefa;
+  color: #080b10;
+}
+
+.app-shell[data-theme="dark"] .adapt-live-actions,
+.app-shell[data-theme="dark"] .adapt-library-action-bar {
+  background: rgba(8, 11, 16, 0.78);
+  border-color: rgba(255, 254, 250, 0.08);
+}
+
+.theme-toggle-button,
+.profile-button {
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.theme-toggle-button:active,
+.profile-button:active {
+  transform: scale(0.94);
+}
