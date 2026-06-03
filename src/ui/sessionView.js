@@ -33,6 +33,12 @@ function getBlockMovementCount(template) {
   }, 0);
 }
 
+function getWorkoutCount(template) {
+  return (template.weeks || []).reduce((total, week) => {
+    return total + (week.workouts || []).length;
+  }, 0);
+}
+
 function getMovementName(item) {
   return (
     item.movementExpression?.displayName ||
@@ -45,9 +51,7 @@ function getMovementName(item) {
 function renderSetSummary(item) {
   const sets = item.sets || [];
 
-  if (sets.length === 0) {
-    return item.target || "No target";
-  }
+  if (sets.length === 0) return item.target || "No target";
 
   if (sets.length === 1) {
     const set = sets[0];
@@ -64,13 +68,13 @@ function renderMovementRows(template, workout) {
   const planned = workout.exercises || [];
 
   if (planned.length === 0) {
-    return `<div class="block-empty-row">No movements planned.</div>`;
+    return `<div class="adapt-empty-read">No movements planned.</div>`;
   }
 
   return `
-    <div class="block-movement-list">
+    <div class="adapt-plan-movement-list">
       ${planned.map(item => `
-        <div class="block-movement-row">
+        <div class="adapt-plan-movement-row">
           <div>
             <strong>${getMovementName(item)}</strong>
             <small>${getMethodName(item.methodId || item.movementExpression?.methodId)} · ${renderSetSummary(item)}</small>
@@ -99,15 +103,19 @@ function renderMovementRows(template, workout) {
 
 function renderWorkout(template, week, workout) {
   return `
-    <details class="workout-panel">
+    <details class="adapt-workout-panel">
       <summary>
-        <span>${workout.name}</span>
-        <small>${getWorkoutMovementCount(workout)} movements</small>
+        <div>
+          <strong>${workout.name}</strong>
+          <small>${workout.goal || `${getWorkoutMovementCount(workout)} planned movements`}</small>
+        </div>
+
+        <span>${getWorkoutMovementCount(workout)}</span>
       </summary>
 
-      <div class="workout-panel-body">
+      <div class="adapt-workout-body">
         <button
-          class="secondary-button compact-button"
+          class="primary-button compact-button"
           data-template-id="${template.id}"
           data-workout-id="${workout.id}"
         >
@@ -122,10 +130,10 @@ function renderWorkout(template, week, workout) {
 
 function renderWeek(template, week) {
   return `
-    <details class="block-week-panel" open>
+    <details class="adapt-week-panel" open>
       <summary>${week.name}</summary>
 
-      <div class="block-week-body">
+      <div class="adapt-week-body">
         ${(week.workouts || []).map(workout =>
           renderWorkout(template, week, workout)
         ).join("")}
@@ -151,9 +159,7 @@ function renderWeek(template, week) {
 function renderDomainSummary(template) {
   const analysis = analyseBlockDomain(template);
 
-  if (!analysis?.classification) {
-    return "";
-  }
+  if (!analysis?.classification) return "";
 
   const domains =
     analysis.classification.dominantDomains?.slice(0, 3) || [];
@@ -161,7 +167,7 @@ function renderDomainSummary(template) {
   const bestMatch = analysis.bestProgrammeMatch;
 
   return `
-    <div class="block-domain-panel">
+    <div class="adapt-plan-domain">
       <div class="block-domain-tags">
         ${domains.map(domain => `
           <span class="domain-pill">
@@ -173,7 +179,7 @@ function renderDomainSummary(template) {
       ${
         bestMatch
           ? `
-            <div class="programme-match">
+            <div class="adapt-programme-match">
               <span>Best match</span>
               <strong>${bestMatch.name}</strong>
               <small>${bestMatch.score}% similarity</small>
@@ -192,81 +198,66 @@ function renderBlockMetrics(template) {
   );
 
   const domain = metrics.domain?.classification;
-  const bestMatch = metrics.domain?.bestProgrammeMatch;
   const latestDecision = metrics.latestDecision;
-
   const dominantDomains = domain?.dominantDomains?.slice(0, 3) || [];
 
   return `
-    <div class="block-dashboard-panel">
-      <div class="block-dashboard-metrics">
-        <div>
-          <span>Completed</span>
-          <strong>${metrics.completedSessions}/${metrics.plannedWorkouts}</strong>
-        </div>
-
-        <div>
-          <span>Compliance</span>
-          <strong>${metrics.averageCompletion}%</strong>
-        </div>
-
-        <div>
-          <span>Warnings</span>
-          <strong>${metrics.warningCount}</strong>
-        </div>
+    <div class="adapt-plan-metrics">
+      <div>
+        <span>Completed</span>
+        <strong>${metrics.completedSessions}/${metrics.plannedWorkouts}</strong>
       </div>
 
-      <div class="block-domain-tags">
-        ${dominantDomains.map(domain => `
-          <span class="domain-pill">
-            ${domain.percentage}% ${domain.domain}
-          </span>
-        `).join("")}
+      <div>
+        <span>Compliance</span>
+        <strong>${metrics.averageCompletion}%</strong>
       </div>
 
-      ${
-        bestMatch
-          ? `
-            <div class="programme-match">
-              <span>Best match</span>
-              <strong>${bestMatch.name}</strong>
-              <small>${bestMatch.score}% similarity</small>
-            </div>
-          `
-          : ""
-      }
+      <div>
+        <span>Warnings</span>
+        <strong>${metrics.warningCount}</strong>
+      </div>
+    </div>
 
-      ${
-        latestDecision
-          ? `
-            <div class="programme-match">
-              <span>Current signal</span>
-              <strong>${latestDecision.decision}</strong>
-              <small>${latestDecision.reason}</small>
-            </div>
-          `
-          : `
-            <div class="programme-match">
-              <span>Current signal</span>
-              <strong>Awaiting data</strong>
-              <small>Complete a workout from this block to generate coaching feedback.</small>
-            </div>
-          `
-      }
+    ${
+      dominantDomains.length
+        ? `
+          <div class="adapt-plan-tags">
+            ${dominantDomains.map(domain => `
+              <span>${domain.percentage}% ${domain.domain}</span>
+            `).join("")}
+          </div>
+        `
+        : ""
+    }
+
+    <div class="adapt-programme-match">
+      <span>Current signal</span>
+      <strong>${latestDecision ? latestDecision.decision : "Awaiting data"}</strong>
+      <small>
+        ${
+          latestDecision
+            ? latestDecision.reason
+            : "Complete a workout from this block to generate coaching feedback."
+        }
+      </small>
     </div>
   `;
 }
 
 function renderBlockCard(template) {
   const movementCount = getBlockMovementCount(template);
+  const workoutCount = getWorkoutCount(template);
 
   return `
-    <article class="training-block-card">
-      <div class="training-block-top">
-        <button class="training-block-title" data-template-id="${template.id}">
-          <span>${template.priority || "Block"}</span>
+    <article class="adapt-plan-card">
+      <div class="adapt-plan-art"></div>
+
+      <div class="adapt-plan-top">
+        <button class="adapt-plan-title" data-template-id="${template.id}">
+          <span>${template.priority || "Training block"}</span>
           <strong>${template.name}</strong>
-          <small>${template.goal || "No goal set"} · ${movementCount} movements</small>
+          <small>${template.goal || "No goal set"}</small>
         </button>
 
         ${
@@ -286,26 +277,47 @@ function renderBlockCard(template) {
         }
       </div>
 
+      <div class="adapt-plan-stats">
+        <div>
+          <span>Weeks</span>
+          <strong>${template.weeks?.length || 0}</strong>
+        </div>
+
+        <div>
+          <span>Workouts</span>
+          <strong>${workoutCount}</strong>
+        </div>
+
+        <div>
+          <span>Movements</span>
+          <strong>${movementCount}</strong>
+        </div>
+      </div>
+
       ${renderDomainSummary(template)}
       ${renderBlockMetrics(template)}
 
-      <details class="block-detail-panel">
-        ${(template.weeks || []).map(week =>
-          renderWeek(template, week)
-        ).join("")}
+      <details class="adapt-plan-detail">
+        <summary>Open block structure</summary>
 
-        ${
-          isCustomTemplate(template)
-            ? `
-              <button
-                class="mini-action-button block-add-button"
-                data-add-week-to-template="${template.id}"
-              >
-                + Add week
-              </button>
-            `
-            : ""
-        }
+        <div class="adapt-plan-detail-body">
+          ${(template.weeks || []).map(week =>
+            renderWeek(template, week)
+          ).join("")}
+
+          ${
+            isCustomTemplate(template)
+              ? `
+                <button
+                  class="mini-action-button block-add-button"
+                  data-add-week-to-template="${template.id}"
+                >
+                  + Add week
+                </button>
+              `
+              : ""
+          }
+        </div>
       </details>
     </article>
   `;
@@ -313,8 +325,13 @@ function renderBlockCard(template) {
 
 function renderQuickStart() {
   return `
-    <details class="block-utility-panel">
-      <summary>Start ad hoc session</summary>
+    <details class="adapt-builder-panel">
+      <summary>
+        <div>
+          <span class="quiet-label">Flexible</span>
+          <strong>Start ad hoc session</strong>
+        </div>
+      </summary>
 
       <div class="block-utility-body">
         <input id="adhoc-session-name" type="text" placeholder="Session name" />
@@ -330,8 +347,13 @@ function renderQuickStart() {
 
 function renderCreateBlock() {
   return `
-    <details class="block-utility-panel" open>
-      <summary>Create training block</summary>
+    <details class="adapt-builder-panel" open>
+      <summary>
+        <div>
+          <span class="quiet-label">Builder</span>
+          <strong>Create training block</strong>
+        </div>
+      </summary>
 
       <div class="block-utility-body">
         <input id="custom-template-name" type="text" placeholder="Block name" />
@@ -341,7 +363,7 @@ function renderCreateBlock() {
         <input id="editing-template-id" type="hidden" value="" />
 
         <button class="primary-button" id="add-custom-template">
-          Save
+          Save block
         </button>
       </div>
     </details>
@@ -370,12 +392,17 @@ function renderMovementBuilder(templates) {
   const customTemplates = templates.filter(isCustomTemplate);
 
   return `
-    <details class="block-utility-panel" open>
-      <summary>Add movement to workout</summary>
+    <details class="adapt-builder-panel" open>
+      <summary>
+        <div>
+          <span class="quiet-label">Movement design</span>
+          <strong>Add movement to workout</strong>
+        </div>
+      </summary>
 
       ${
         customTemplates.length === 0
-          ? `<p>Create a custom block first.</p>`
+          ? `<div class="adapt-empty-read">Create a custom block first.</div>`
           : `
             <div class="block-builder-grid">
               <select id="template-builder-template">
@@ -438,21 +465,37 @@ export function renderSession() {
   const templates = getAllTemplates();
 
   return `
-    <section class="screen active-screen blocks-screen">
-      <div class="section-header">
-        <p class="eyebrow">Training blocks</p>
-        <h1>Plan the block. Execute the day.</h1>
-      </div>
+    <section class="screen active-screen blocks-screen adapt-plans-screen">
+      <section class="adapt-plans-hero">
+        <div>
+          <p class="eyebrow">Plans</p>
+          <h1>Build the block. Trust the signal.</h1>
+          <p>
+            Programmes are where intent becomes measurable. Pick the next exposure, start clean, and let ADAPT compare the plan against reality.
+          </p>
+        </div>
 
-      <div class="blocks-primary-list">
+        <div class="adapt-plans-summary">
+          <span>${templates.length} blocks</span>
+          <span>${templates.reduce((total, template) => total + getWorkoutCount(template), 0)} workouts</span>
+          <span>${templates.reduce((total, template) => total + getBlockMovementCount(template), 0)} movements</span>
+        </div>
+      </section>
+
+      <div class="adapt-plan-list">
         ${templates.map(renderBlockCard).join("")}
       </div>
 
-      <div class="blocks-builder-area">
+      <section class="adapt-builder-area">
+        <div class="section-header compact-section-header">
+          <p class="eyebrow">Build</p>
+          <h2>Custom structure</h2>
+        </div>
+
         ${renderCreateBlock()}
         ${renderMovementBuilder(templates)}
         ${renderQuickStart()}
-      </div>
+      </section>
     </section>
   `;
 }
