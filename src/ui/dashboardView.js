@@ -181,7 +181,7 @@ export function renderDashboard() {
 
   return `
     <section class="screen active-screen today-screen adapt-today-screen">
-      <section class="adapt-hero-card">
+      <section class="adapt-hero-card adapt-signal-strength">
         <div class="adapt-hero-art"></div>
 
         <div class="adapt-hero-content">
