@@ -5,9 +5,11 @@ import {
   getCompatibleMethodsForBaseMovement,
   getCompatibleMethodsForVariant
 } from "../logic/exerciseLibrary.js";
+
 import {
   searchMovementCatalogue
 } from "../logic/movementSearchCatalogue.js";
+
 import { methodTypes } from "../data/methodTypes.js";
 
 let selectedBaseMovementId = null;
@@ -70,11 +72,21 @@ export function clearLibraryFilters() {
   libraryFilters.output = "";
 }
 
+function formatLabel(value = "") {
+  return String(value || "")
+    .split("-")
+    .map(word =>
+      word.charAt(0).toUpperCase() +
+      word.slice(1)
+    )
+    .join(" ");
+}
+
 function renderTag(label) {
   if (!label) return "";
 
   return `
-    <span class="quick-chip">${label}</span>
+    <span class="quick-chip">${formatLabel(label)}</span>
   `;
 }
 
@@ -99,13 +111,23 @@ function getUniqueValues(values) {
   return Array.from(new Set(values.filter(Boolean))).sort();
 }
 
-function renderMovementCatalogueRow(item) {
-  const meta = [
-    item.pattern?.name,
-    ...(item.expressionBias || []).slice(0, 2),
-    ...(item.outputIds || []).slice(0, 2)
-  ].filter(Boolean);
+function getPatternMeta(item) {
+  const patternName =
+    item.pattern?.name ||
+    "Movement";
 
+  const patternCategory =
+    item.pattern?.category
+      ? formatLabel(item.pattern.category)
+      : "";
+
+  return [
+    patternName,
+    patternCategory
+  ].filter(Boolean).join(" · ");
+}
+
+function renderMovementCatalogueRow(item) {
   return `
     <button
       class="movement-row"
@@ -114,11 +136,7 @@ function renderMovementCatalogueRow(item) {
     >
       <div class="movement-row-main">
         <strong>${item.label}</strong>
-        <span>${meta.join(" · ")}</span>
-      </div>
-
-      <div class="movement-row-meta">
-        <span>${item.modifierIds.length || 0} modifiers</span>
+        <span>${getPatternMeta(item)}</span>
       </div>
     </button>
   `;
@@ -420,41 +438,6 @@ function renderCustomMovementButton() {
   `;
 }
 
-function baseMatchesFilters(base) {
-  const search = libraryFilters.search.toLowerCase().trim();
-
-  const searchableText = [
-    base.name,
-    base.familyName,
-    base.domain,
-    ...(base.aliases || []),
-    ...(base.equipment || []),
-    ...(base.bodyRegions || []),
-    ...(base.primaryExpressionNames || []),
-    ...(base.secondaryExpressionNames || []),
-    ...(base.measurableOutputs || [])
-  ].join(" ").toLowerCase();
-
-  const expressionNames = [
-    ...(base.primaryExpressionNames || []),
-    ...(base.secondaryExpressionNames || [])
-  ];
-
-  const matchesSearch =
-    !search || searchableText.includes(search);
-
-  const matchesFamily =
-    !libraryFilters.family || base.family === libraryFilters.family;
-
-  const matchesExpression =
-    !libraryFilters.expression || expressionNames.includes(libraryFilters.expression);
-
-  const matchesOutput =
-    !libraryFilters.output || (base.measurableOutputs || []).includes(libraryFilters.output);
-
-  return matchesSearch && matchesFamily && matchesExpression && matchesOutput;
-}
-
 function renderLibraryFilters(atlas, baseMovements) {
   const familyOptions = atlas.map(family => ({
     id: family.id,
@@ -472,8 +455,13 @@ function renderLibraryFilters(atlas, baseMovements) {
     baseMovements.flatMap(base => base.measurableOutputs || [])
   );
 
+  const hasActiveFilters =
+    libraryFilters.family ||
+    libraryFilters.expression ||
+    libraryFilters.output;
+
   return `
-    <article class="workspace-card library-search-panel">
+    <article class="workspace-card library-search-panel compact-library-search">
       <label class="form-field">
         <span>Search movements</span>
         <input 
@@ -484,62 +472,68 @@ function renderLibraryFilters(atlas, baseMovements) {
         />
       </label>
 
-      <div class="form-grid">
-        <label class="form-field">
-          <span>Pattern</span>
-          <select id="library-family-filter">
-            <option value="">All patterns</option>
-            ${familyOptions.map(family => `
-              <option 
-                value="${family.id}"
-                ${libraryFilters.family === family.id ? "selected" : ""}
-              >
-                ${family.name}
-              </option>
-            `).join("")}
-          </select>
-        </label>
+      <details class="library-filter-details" ${hasActiveFilters ? "open" : ""}>
+        <summary class="library-filter-toggle">
+          Filters${hasActiveFilters ? " active" : ""}
+        </summary>
 
-        <label class="form-field">
-          <span>Expression</span>
-          <select id="library-expression-filter">
-            <option value="">All expressions</option>
-            ${expressionOptions.map(expression => `
-              <option 
-                value="${expression}"
-                ${libraryFilters.expression === expression ? "selected" : ""}
-              >
-                ${expression}
-              </option>
-            `).join("")}
-          </select>
-        </label>
+        <div class="form-grid library-filter-panel">
+          <label class="form-field">
+            <span>Pattern</span>
+            <select id="library-family-filter">
+              <option value="">All patterns</option>
+              ${familyOptions.map(family => `
+                <option 
+                  value="${family.id}"
+                  ${libraryFilters.family === family.id ? "selected" : ""}
+                >
+                  ${family.name}
+                </option>
+              `).join("")}
+            </select>
+          </label>
 
-        <label class="form-field">
-          <span>Output</span>
-          <select id="library-output-filter">
-            <option value="">All outputs</option>
-            ${outputOptions.map(output => `
-              <option 
-                value="${output}"
-                ${libraryFilters.output === output ? "selected" : ""}
-              >
-                ${output}
-              </option>
-            `).join("")}
-          </select>
-        </label>
-      </div>
+          <label class="form-field">
+            <span>Expression</span>
+            <select id="library-expression-filter">
+              <option value="">All expressions</option>
+              ${expressionOptions.map(expression => `
+                <option 
+                  value="${expression}"
+                  ${libraryFilters.expression === expression ? "selected" : ""}
+                >
+                  ${formatLabel(expression)}
+                </option>
+              `).join("")}
+            </select>
+          </label>
 
-      <div class="library-filter-actions">
-        <button 
-          class="secondary-button" 
-          type="button"
-          data-clear-library-filters
-        >
-          Clear filters
-        </button>
-      </div>
+          <label class="form-field">
+            <span>Output</span>
+            <select id="library-output-filter">
+              <option value="">All outputs</option>
+              ${outputOptions.map(output => `
+                <option 
+                  value="${output}"
+                  ${libraryFilters.output === output ? "selected" : ""}
+                >
+                  ${formatLabel(output)}
+                </option>
+              `).join("")}
+            </select>
+          </label>
+        </div>
+
+        <div class="library-filter-actions">
+          <button 
+            class="secondary-button" 
+            type="button"
+            data-clear-library-filters
+          >
+            Clear filters
+          </button>
+        </div>
+      </details>
     </article>
   `;
 }
@@ -735,7 +729,7 @@ function renderGeneratedMovementDetail(itemId) {
         </button>
 
         <article class="workspace-card">
-          <p class="card-copy">Movement expression could not be found.</p>
+          <p class="card-copy">Movement could not be found.</p>
         </article>
       </section>
     `;
@@ -754,60 +748,11 @@ function renderGeneratedMovementDetail(itemId) {
       </button>
 
       <article class="hero-card">
-        <p class="eyebrow">Movement expression</p>
+        <p class="eyebrow">${getPatternMeta(item)}</p>
         <h1>${expression.displayName}</h1>
         <p class="hero-text">
-          ${expression.pattern?.name || "Movement"} expression generated from pattern and modifiers.
+          A selectable movement expression for logging, planning and future coaching analysis.
         </p>
-      </article>
-
-      <article class="workspace-card">
-        <div class="workspace-card-header">
-          <div>
-            <p class="eyebrow">Expression model</p>
-            <h2>What the engine sees</h2>
-          </div>
-        </div>
-
-        <div class="coaching-summary-grid">
-          <div class="coaching-summary-item">
-            <span>Pattern</span>
-            <strong>${expression.pattern?.name || "Unknown"}</strong>
-          </div>
-
-          <div class="coaching-summary-item">
-            <span>Modifiers</span>
-            <strong>
-              ${
-                expression.modifiers.length
-                  ? expression.modifiers.map(modifier => modifier.name).join(", ")
-                  : "None"
-              }
-            </strong>
-          </div>
-
-          <div class="coaching-summary-item">
-            <span>Expression Bias</span>
-            <strong>
-              ${
-                expression.expressionBias.length
-                  ? expression.expressionBias.join(", ")
-                  : "General"
-              }
-            </strong>
-          </div>
-
-          <div class="coaching-summary-item">
-            <span>Outputs</span>
-            <strong>
-              ${
-                expression.outputIds.length
-                  ? expression.outputIds.join(", ")
-                  : "None"
-              }
-            </strong>
-          </div>
-        </div>
       </article>
 
       <article class="workspace-card">
@@ -826,6 +771,23 @@ function renderGeneratedMovementDetail(itemId) {
           }
         </div>
       </article>
+
+      <article class="workspace-card">
+        <div class="workspace-card-header">
+          <div>
+            <p class="eyebrow">Tracked outputs</p>
+            <h2>What you can measure</h2>
+          </div>
+        </div>
+
+        <div class="quick-chip-row">
+          ${
+            expression.outputIds.length
+              ? expression.outputIds.map(renderTag).join("")
+              : renderTag("No outputs mapped yet")
+          }
+        </div>
+      </article>
     </section>
   `;
 }
@@ -834,24 +796,24 @@ export function renderLibrary() {
   if (customMovementBuilderOpen) {
     return renderCustomMovementBuilder();
   }
-  
+
   if (selectedGeneratedMovement) {
-  return renderGeneratedMovementDetail(selectedGeneratedMovement);
-}
+    return renderGeneratedMovementDetail(selectedGeneratedMovement);
+  }
 
   if (selectedBaseMovementId) {
     return renderMovementDetail(selectedBaseMovementId);
   }
 
   const atlas = getMovementAtlas();
-const baseMovements = atlas.flatMap(family => family.bases);
+  const baseMovements = atlas.flatMap(family => family.bases);
 
-const generatedResults = searchMovementCatalogue({
-  query: libraryFilters.search,
-  patternId: libraryFilters.family,
-  expressionBias: libraryFilters.expression,
-  outputId: libraryFilters.output
-});
+  const generatedResults = searchMovementCatalogue({
+    query: libraryFilters.search,
+    patternId: libraryFilters.family,
+    expressionBias: libraryFilters.expression,
+    outputId: libraryFilters.output
+  });
 
   return `
     <section class="screen active-screen">
@@ -871,10 +833,10 @@ const generatedResults = searchMovementCatalogue({
 
       <div class="movement-list">
         ${
-  generatedResults.length
-    ? generatedResults.map(renderMovementCatalogueRow).join("")
-    : renderAtlasEmptyState()
-}
+          generatedResults.length
+            ? generatedResults.map(renderMovementCatalogueRow).join("")
+            : renderAtlasEmptyState()
+        }
       </div>
 
       ${renderCustomMovementButton()}
