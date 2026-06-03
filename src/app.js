@@ -47,6 +47,7 @@ import {
 } from "./ui/sessionDetailView.js";
 
 import { renderNav, renderSidebar, renderAdaptMark } from "./components/nav.js";
+import { getTheme, toggleTheme } from "./state/theme.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
 
@@ -845,7 +846,7 @@ function bindBlockStructureActions() {
 
 export function renderApp() {
   app.innerHTML = `
-    <main class="app-shell">
+    <main class="app-shell" data-theme="${getTheme()}">
       ${renderSidebar(store.activeView)}
 
       <section class="workspace-shell">
@@ -859,7 +860,13 @@ export function renderApp() {
     </div>
   </div>
 
+  <div class="adapt-top-actions">
+  <button class="theme-toggle-button" id="theme-toggle" type="button">
+    ${getTheme() === "dark" ? "☀" : "☾"}
+  </button>
+
   <button class="profile-button">JH</button>
+</div>
 </header>
 
         <div class="view-container">
@@ -872,6 +879,10 @@ export function renderApp() {
   `;
 
   bindNavigation();
+  document.querySelector("#theme-toggle")?.addEventListener("click", () => {
+  toggleTheme();
+  renderApp();
+});
   bindSessionStart();
   bindHistoryActions();
   bindLiveSessionActions();
