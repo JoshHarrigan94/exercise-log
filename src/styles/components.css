@@ -4069,3 +4069,285 @@ body {
 .profile-button:active {
   transform: scale(0.94);
 }
+
+/* ADAPT Pass 8 — Interaction Polish */
+
+.screen {
+  animation: adaptScreenEnter 260ms ease both;
+}
+
+@keyframes adaptScreenEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+button,
+summary,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.complete-session-button,
+.line-log-button,
+.mini-action-button,
+.mini-delete-button,
+.theme-toggle-button,
+.profile-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-button::after,
+.secondary-button::after,
+.complete-session-button::after,
+.line-log-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.22);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.primary-button:active::after,
+.secondary-button:active::after,
+.complete-session-button:active::after,
+.line-log-button:active::after {
+  opacity: 1;
+}
+
+details[open] {
+  animation: adaptDetailsOpen 220ms ease both;
+}
+
+@keyframes adaptDetailsOpen {
+  from {
+    opacity: 0.92;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.adapt-exercise-card[open],
+.adapt-workout-panel[open],
+.adapt-week-panel[open],
+.adapt-plan-detail[open],
+.adapt-builder-panel[open],
+.adapt-logger-details[open],
+.adapt-logged-panel[open],
+.adapt-filter-details[open] {
+  animation: adaptCardOpen 220ms ease both;
+}
+
+@keyframes adaptCardOpen {
+  from {
+    box-shadow: var(--adapt-shadow-soft);
+  }
+
+  to {
+    box-shadow: var(--adapt-shadow);
+  }
+}
+
+.adapt-movement-row,
+.adapt-session-row,
+.adapt-plan-card,
+.adapt-signal-card,
+.adapt-day-card,
+.adapt-metric-card,
+.adapt-review-panel,
+.adapt-exercise-card,
+.adapt-workout-panel {
+  will-change: transform;
+}
+
+.adapt-movement-row:hover,
+.adapt-session-row:hover,
+.adapt-plan-card:hover,
+.adapt-signal-card:hover,
+.adapt-day-card:hover,
+.adapt-metric-card:hover,
+.adapt-review-panel:hover,
+.adapt-exercise-card:hover,
+.adapt-workout-panel:hover {
+  transform: translateY(-2px);
+}
+
+.adapt-movement-row:active,
+.adapt-session-row:active,
+.adapt-plan-card:active,
+.adapt-signal-card:active,
+.adapt-day-card:active,
+.adapt-metric-card:active,
+.adapt-review-panel:active,
+.adapt-exercise-card:active,
+.adapt-workout-panel:active {
+  transform: scale(0.992);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(23, 32, 51, 0.28);
+  box-shadow: 0 0 0 4px rgba(23, 32, 51, 0.08);
+}
+
+.app-shell[data-theme="dark"] input:focus,
+.app-shell[data-theme="dark"] select:focus,
+.app-shell[data-theme="dark"] textarea:focus {
+  border-color: rgba(255, 254, 250, 0.24);
+  box-shadow: 0 0 0 4px rgba(255, 254, 250, 0.07);
+}
+
+.adapt-session-progress span {
+  animation: adaptProgressFill 420ms ease both;
+}
+
+@keyframes adaptProgressFill {
+  from {
+    width: 0;
+  }
+}
+
+.execution-item-complete {
+  animation: adaptCompletePulse 420ms ease both;
+}
+
+@keyframes adaptCompletePulse {
+  0% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.01);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.complete-session-button {
+  animation: adaptCompleteButtonBreath 2200ms ease-in-out infinite;
+}
+
+@keyframes adaptCompleteButtonBreath {
+  0%, 100% {
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.12);
+  }
+
+  50% {
+    box-shadow: 0 18px 44px rgba(23, 32, 51, 0.2);
+  }
+}
+
+.app-shell[data-theme="dark"] .complete-session-button {
+  animation: adaptCompleteButtonBreathDark 2200ms ease-in-out infinite;
+}
+
+@keyframes adaptCompleteButtonBreathDark {
+  0%, 100% {
+    box-shadow: 0 12px 30px rgba(255, 254, 250, 0.08);
+  }
+
+  50% {
+    box-shadow: 0 18px 44px rgba(255, 254, 250, 0.16);
+  }
+}
+
+.adapt-brand-mark {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.adapt-brand-mark:hover {
+  transform: rotate(-3deg) scale(1.04);
+}
+
+.nav-item,
+.sidebar-nav-item {
+  position: relative;
+}
+
+.nav-item.active,
+.sidebar-nav-item.active {
+  animation: adaptNavSelect 220ms ease both;
+}
+
+@keyframes adaptNavSelect {
+  from {
+    transform: scale(0.96);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.calendar-day.active {
+  animation: adaptCalendarSelect 220ms ease both;
+}
+
+@keyframes adaptCalendarSelect {
+  from {
+    transform: scale(0.92);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.adapt-chip,
+.domain-pill,
+.adapt-plan-tags span,
+.adapt-signal-pill,
+.calendar-streak-pill,
+.adapt-panel-pill {
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.adapt-chip:hover,
+.domain-pill:hover,
+.adapt-plan-tags span:hover,
+.adapt-signal-pill:hover,
+.calendar-streak-pill:hover,
+.adapt-panel-pill:hover {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
