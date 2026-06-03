@@ -4,7 +4,6 @@ import { getExerciseById } from "../logic/exerciseLibrary.js";
 import { methodTypes } from "../data/methodTypes.js";
 import { getExecutionRows } from "../logic/executionRows.js";
 
-
 function getExerciseName(id) {
   return getExerciseById(id)?.name || "Exercise";
 }
@@ -24,36 +23,31 @@ function getLoggedCountForExercise(session, exerciseId) {
   return session.exercises.filter(log => log.exerciseId === exerciseId).length;
 }
 
+function getSessionCompletion(session) {
+  const planned = session.plannedExercises || [];
+  const totalRows = planned.reduce((total, item) => {
+    return total + getExecutionRows(item).length;
+  }, 0);
+
+  if (totalRows === 0) return 0;
+
+  return Math.min(
+    100,
+    Math.round((session.exercises.length / totalRows) * 100)
+  );
+}
+
 function renderExecutionRow(item, row) {
   const key = `${item.exerciseId}-${row.id}`;
 
   return `
-    <div class="execution-line">
+    <div class="execution-line adapt-execution-line">
       <span class="execution-set-label">${row.label}</span>
 
-      <input
-        data-exec-load="${key}"
-        value="${row.load || ""}"
-        placeholder="Load"
-      />
-
-      <input
-        data-exec-result="${key}"
-        value="${row.result || ""}"
-        placeholder="Result"
-      />
-
-      <input
-        data-exec-rest="${key}"
-        value="${row.rest || ""}"
-        placeholder="Rest"
-      />
-
-      <input
-        data-exec-rpe="${key}"
-        value="${row.rpe || ""}"
-        placeholder="RPE"
-      />
+      <input data-exec-load="${key}" value="${row.load || ""}" placeholder="Load" />
+      <input data-exec-result="${key}" value="${row.result || ""}" placeholder="Result" />
+      <input data-exec-rest="${key}" value="${row.rest || ""}" placeholder="Rest" />
+      <input data-exec-rpe="${key}" value="${row.rpe || ""}" placeholder="RPE" />
 
       <button
         class="line-log-button"
@@ -75,15 +69,16 @@ function renderExerciseBlock(session, item, index) {
   const isComplete = loggedCount >= rows.length;
 
   return `
-    <details class="execution-item ${isComplete ? "execution-item-complete" : ""}" open>
+    <details class="execution-item adapt-exercise-card ${isComplete ? "execution-item-complete" : ""}" open>
       <summary class="execution-item-top">
         <div class="execution-index">
           ${isComplete ? "✓" : index + 1}
         </div>
 
         <div class="execution-title">
+          <span class="quiet-label">${getMethodName(item.methodId)}</span>
           <h2>${getExerciseName(item.exerciseId)}</h2>
-          <p>${getMethodName(item.methodId)} · ${item.target || "No target"}</p>
+          <p>${item.target || "No target set"}</p>
         </div>
 
         <span class="execution-status">
@@ -91,11 +86,7 @@ function renderExerciseBlock(session, item, index) {
         </span>
       </summary>
 
-      ${
-        item.notes
-          ? `<p class="execution-note">${item.notes}</p>`
-          : ""
-      }
+      ${item.notes ? `<p class="execution-note">${item.notes}</p>` : ""}
 
       <div class="execution-lines">
         ${rows.map(row => renderExecutionRow(item, row)).join("")}
@@ -116,9 +107,9 @@ function renderLoggedSummary(session) {
   if (session.exercises.length === 0) return "";
 
   return `
-    <details class="logged-summary-panel">
+    <details class="logged-summary-panel adapt-logged-panel">
       <summary>
-        Logged results · ${session.exercises.length}
+        Captured results · ${session.exercises.length}
       </summary>
 
       <div class="logged-summary-list">
@@ -134,10 +125,7 @@ function renderLoggedSummary(session) {
               </small>
             </div>
 
-            <button
-              class="mini-delete-button"
-              data-remove-log-id="${log.id}"
-            >
+            <button class="mini-delete-button" data-remove-log-id="${log.id}">
               ×
             </button>
           </div>
@@ -153,44 +141,51 @@ export function renderLiveSession() {
   if (!activeSession) {
     return `
       <section class="screen active-screen">
-        <article class="hero-card">
-          <p class="eyebrow">No active session</p>
-          <h1>Start a session</h1>
-          <p class="hero-text">Choose a plan or start an ad hoc session.</p>
+        <article class="adapt-hero-card">
+          <div class="adapt-hero-content">
+            <p class="eyebrow">ADAPT</p>
+            <h1>Start a session</h1>
+            <p>Choose a plan or start an ad hoc session.</p>
 
-          <button class="secondary-button" data-view="session">
-            Go to Plans
-          </button>
+            <button class="secondary-button" data-view="session">
+              Go to Plans
+            </button>
+          </div>
         </article>
       </section>
     `;
   }
 
   const planned = activeSession.plannedExercises || [];
+  const completion = getSessionCompletion(activeSession);
 
   return `
-    <section class="screen active-screen live-session-screen">
-      <div class="session-execution-header">
-        <div>
-          <p class="eyebrow">Now training</p>
-          <h1>${activeSession.name}</h1>
-          ${
-            activeSession.goal
-              ? `<p>${activeSession.goal}</p>`
-              : ""
-          }
+    <section class="screen active-screen live-session-screen adapt-live-session">
+      <section class="adapt-session-hero">
+        <div class="adapt-session-orb">
+          <span>${completion}%</span>
         </div>
 
-        <div class="session-execution-meta">
+        <div class="adapt-session-copy">
+          <p class="eyebrow">Now training</p>
+          <h1>${activeSession.name}</h1>
+          ${activeSession.goal ? `<p>${activeSession.goal}</p>` : ""}
+        </div>
+
+        <div class="session-execution-meta adapt-session-meta">
           <span>${activeSession.exercises.length} logs</span>
           <span>${formatStartTime(activeSession.startedAt)}</span>
         </div>
+      </section>
+
+      <div class="adapt-session-progress">
+        <span style="width:${completion}%"></span>
       </div>
 
       ${
         planned.length === 0
           ? `
-            <div class="execution-empty">
+            <div class="execution-empty adapt-empty-session">
               <p class="eyebrow">Ad hoc session</p>
               <h2>Add movement</h2>
               <p>No planned movements. Use the compact logger below.</p>
@@ -199,13 +194,13 @@ export function renderLiveSession() {
             ${renderSetLogger()}
           `
           : `
-            <div class="execution-list">
+            <div class="execution-list adapt-execution-list">
               ${planned.map((item, index) =>
                 renderExerciseBlock(activeSession, item, index)
               ).join("")}
             </div>
 
-            <details class="logger-details">
+            <details class="logger-details adapt-logger-details">
               <summary>Add unplanned movement</summary>
               <div class="logger-details-body">
                 ${renderSetLogger()}
@@ -216,7 +211,7 @@ export function renderLiveSession() {
 
       ${renderLoggedSummary(activeSession)}
 
-      <div class="live-session-actions">
+      <div class="live-session-actions adapt-live-actions">
         <button class="complete-session-button">
           Complete Session
         </button>
