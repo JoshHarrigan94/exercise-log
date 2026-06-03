@@ -46,7 +46,7 @@ import {
   bindSessionDetailActions
 } from "./ui/sessionDetailView.js";
 
-import { renderNav, renderSidebar } from "./components/nav.js";
+import { renderNav, renderSidebar, renderAdaptMark } from "./components/nav.js";
 import { bindQuickChips } from "./components/quickChips.js";
 import { updateMethodPreview } from "./components/methodPreview.js";
 
@@ -849,14 +849,18 @@ export function renderApp() {
       ${renderSidebar(store.activeView)}
 
       <section class="workspace-shell">
-        <header class="top-bar">
-          <div>
-            <p class="eyebrow">ADAPT</p>
-            <h1>${getViewTitle()}</h1>
-          </div>
+        <header class="top-bar adapt-top-bar">
+  <div class="adapt-top-brand">
+    ${renderAdaptMark()}
 
-          <button class="profile-button">JH</button>
-        </header>
+    <div>
+      <p class="eyebrow">ADAPT</p>
+      <h1>${getViewTitle()}</h1>
+    </div>
+  </div>
+
+  <button class="profile-button">JH</button>
+</header>
 
         <div class="view-container">
           ${renderView()}
