@@ -13,6 +13,16 @@ function normaliseActiveView(activeView) {
   return activeView;
 }
 
+export function renderAdaptMark() {
+  return `
+    <span class="adapt-brand-mark" aria-hidden="true">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+  `;
+}
+
 export function renderNav(activeView) {
   const normalisedView = normaliseActiveView(activeView);
 
@@ -36,9 +46,12 @@ export function renderSidebar(activeView) {
 
   return `
     <aside class="desktop-sidebar">
-      <div class="sidebar-brand">
-        <span>Progression Lab</span>
-        <strong>Training Workspace</strong>
+      <div class="sidebar-brand adapt-sidebar-brand">
+        ${renderAdaptMark()}
+        <div>
+          <span>ADAPT</span>
+          <strong>Training Intelligence</strong>
+        </div>
       </div>
 
       <nav class="sidebar-nav">
