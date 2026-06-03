@@ -3001,3 +3001,398 @@ body {
     flex-direction: column;
   }
 }
+
+/* ADAPT Design Pass 4 — Plans */
+
+.adapt-plans-screen {
+  gap: 16px;
+  animation: adaptPageIn 260ms ease both;
+}
+
+.adapt-plans-hero,
+.adapt-plan-card,
+.adapt-builder-panel {
+  border: 1px solid var(--adapt-border);
+  background: rgba(255, 254, 250, 0.82);
+  box-shadow: var(--adapt-shadow-soft);
+}
+
+.adapt-plans-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 36px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 254, 250, 0.98), rgba(244, 241, 234, 0.94));
+  box-shadow: var(--adapt-shadow);
+}
+
+.adapt-plans-hero::before {
+  content: "";
+  position: absolute;
+  inset: -70%;
+  background:
+    repeating-radial-gradient(
+      circle at 80% 18%,
+      rgba(23, 32, 51, 0.075) 0,
+      rgba(23, 32, 51, 0.075) 1px,
+      transparent 1px,
+      transparent 18px
+    );
+  opacity: 0.42;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+
+.adapt-plans-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.adapt-plans-hero h1 {
+  max-width: 760px;
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 0.88;
+  letter-spacing: -0.09em;
+}
+
+.adapt-plans-hero p:not(.eyebrow) {
+  max-width: 640px;
+  margin-top: 12px;
+  color: rgba(17, 17, 17, 0.62);
+}
+
+.adapt-plans-summary {
+  min-width: 170px;
+  display: grid;
+  gap: 8px;
+  align-content: end;
+}
+
+.adapt-plans-summary span {
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.08);
+  color: var(--adapt-navy);
+  padding: 9px 12px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-align: center;
+}
+
+.adapt-plan-list {
+  display: grid;
+  gap: 14px;
+}
+
+.adapt-plan-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 34px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.adapt-plan-card:hover {
+  box-shadow: var(--adapt-shadow);
+}
+
+.adapt-plan-art {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(23, 32, 51, 0.1), transparent 64%);
+  pointer-events: none;
+}
+
+.adapt-plan-top,
+.adapt-plan-stats,
+.adapt-plan-metrics,
+.adapt-plan-title,
+.adapt-workout-panel summary,
+.adapt-plan-movement-row,
+.adapt-builder-panel summary {
+  position: relative;
+  z-index: 1;
+}
+
+.adapt-plan-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.adapt-plan-title {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.adapt-plan-title span,
+.adapt-plan-stats span,
+.adapt-plan-metrics span,
+.adapt-programme-match span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.adapt-plan-title strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--adapt-ink);
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+}
+
+.adapt-plan-title small {
+  display: block;
+  margin-top: 8px;
+  color: rgba(17, 17, 17, 0.56);
+  font-weight: 750;
+}
+
+.adapt-plan-stats,
+.adapt-plan-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.adapt-plan-stats div,
+.adapt-plan-metrics div {
+  border-radius: 22px;
+  border: 1px solid rgba(17, 17, 17, 0.055);
+  background: rgba(255, 255, 255, 0.62);
+  padding: 13px;
+}
+
+.adapt-plan-stats strong,
+.adapt-plan-metrics strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 1.35rem;
+  letter-spacing: -0.06em;
+}
+
+.adapt-plan-domain {
+  display: grid;
+  gap: 10px;
+}
+
+.adapt-plan-tags,
+.block-domain-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.adapt-plan-tags span,
+.domain-pill {
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.07);
+  color: var(--adapt-navy);
+  padding: 7px 10px;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.adapt-programme-match {
+  border-radius: 22px;
+  background: rgba(23, 32, 51, 0.055);
+  padding: 13px;
+}
+
+.adapt-programme-match strong {
+  display: block;
+  margin-top: 4px;
+  letter-spacing: -0.03em;
+}
+
+.adapt-programme-match small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(17, 17, 17, 0.56);
+  font-weight: 750;
+}
+
+.adapt-plan-detail {
+  border-radius: 24px;
+  background: rgba(17, 17, 17, 0.03);
+  border: 1px solid rgba(17, 17, 17, 0.045);
+}
+
+.adapt-plan-detail > summary,
+.adapt-week-panel > summary,
+.adapt-workout-panel > summary {
+  cursor: pointer;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.adapt-plan-detail > summary {
+  padding: 14px;
+}
+
+.adapt-plan-detail-body {
+  padding: 0 14px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.adapt-week-panel,
+.adapt-workout-panel {
+  border-radius: 20px;
+  background: rgba(255, 254, 250, 0.8);
+  border: 1px solid rgba(17, 17, 17, 0.055);
+  overflow: hidden;
+}
+
+.adapt-week-panel > summary {
+  padding: 13px;
+}
+
+.adapt-week-body,
+.adapt-workout-body {
+  padding: 0 13px 13px;
+  display: grid;
+  gap: 9px;
+}
+
+.adapt-workout-panel summary {
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.adapt-workout-panel summary small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(17, 17, 17, 0.55);
+}
+
+.adapt-workout-panel summary span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--adapt-navy);
+  color: #fffefa;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.adapt-plan-movement-list {
+  display: grid;
+  gap: 8px;
+}
+
+.adapt-plan-movement-row {
+  border-radius: 18px;
+  background: rgba(17, 17, 17, 0.028);
+  padding: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.adapt-plan-movement-row strong {
+  display: block;
+  letter-spacing: -0.035em;
+}
+
+.adapt-plan-movement-row small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(17, 17, 17, 0.56);
+  font-weight: 750;
+}
+
+.adapt-builder-area {
+  display: grid;
+  gap: 12px;
+}
+
+.compact-section-header h2 {
+  font-size: 1.8rem;
+  letter-spacing: -0.06em;
+}
+
+.adapt-builder-panel {
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.adapt-builder-panel summary {
+  cursor: pointer;
+  padding: 16px;
+}
+
+.adapt-builder-panel summary strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.15rem;
+  letter-spacing: -0.04em;
+}
+
+.adapt-builder-panel .block-utility-body,
+.adapt-builder-panel .block-builder-grid {
+  padding: 0 16px 16px;
+}
+
+.adapt-builder-panel input,
+.adapt-builder-panel select {
+  min-height: 46px;
+  border-radius: 16px;
+}
+
+.adapt-plan-title:active,
+.adapt-plan-card:active,
+.adapt-workout-panel:active,
+.adapt-plan-movement-row:active {
+  transform: scale(0.995);
+}
+
+@media (max-width: 859px) {
+  .adapt-plans-hero,
+  .adapt-plan-top {
+    flex-direction: column;
+  }
+
+  .adapt-plans-summary {
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .adapt-plan-stats,
+  .adapt-plan-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .adapt-plan-movement-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
