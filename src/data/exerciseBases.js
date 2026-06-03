@@ -3672,4 +3672,4 @@ export const exerciseBases = [
   bodyRegions: ["grip", "shoulders", "lats"],
   primaryExpressions: ["tissue-tolerance"],
   secondary
-];
+}];
