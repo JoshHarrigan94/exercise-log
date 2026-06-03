@@ -14,7 +14,9 @@ import {
   getMovementAtlas,
   getCompatibleMethodsForVariant
 } from "./logic/exerciseLibrary.js";
-
+import {
+  searchMovementCatalogue
+} from "./logic/movementSearchCatalogue.js";
 import {
   validateCustomMovement,
   normaliseCustomMovement
@@ -324,7 +326,14 @@ function renderLoggerMethodOptions(exerciseId) {
 
 function refreshLoggerMethods() {
   const exerciseInput = document.querySelector("#log-exercise");
-  const methodInput = document.querySelector("#log-method");
+ document
+  .querySelector("#log-method")
+  ?.dispatchEvent(
+    new Event("change", {
+      bubbles: true
+    })
+  );
+   const methodInput = document.querySelector("#log-method");
 
   if (!exerciseInput || !methodInput) return;
 
@@ -447,7 +456,18 @@ function bindLiveSessionActions() {
       const container = document.querySelector("#dynamic-method-fields");
       if (!container) return;
 
-      container.innerHTML = renderMethodFields(event.target.value);
+      const selectedMovementId =
+  document.querySelector("#log-exercise")?.value;
+
+const movement =
+  searchMovementCatalogue()
+    .find(item => item.id === selectedMovementId);
+
+container.innerHTML =
+  renderMethodFields(
+    event.target.value,
+    movement?.expression?.outputIds || []
+  );
 
       bindQuickChips();
       bindPreviewInputs();
