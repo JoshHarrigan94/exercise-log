@@ -161,7 +161,7 @@ export function renderLiveSession() {
 
   return `
     <section class="screen active-screen live-session-screen adapt-live-session">
-      <section class="adapt-session-hero">
+      <section class="adapt-session-hero adapt-signal-strength">
         <div class="adapt-session-orb">
           <span>${completion}%</span>
         </div>
