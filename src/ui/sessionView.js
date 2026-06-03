@@ -1,16 +1,16 @@
 import { getAllTemplates } from "../logic/templateLibrary.js";
+
 import {
   analyseBlockDomain,
   analyseBlockMetrics
 } from "../engine/index.js";
 
 import { store } from "../state/store.js";
+
 import {
-  getAllExercises,
-  getExerciseById,
-  getMovementAtlas,
-  getCompatibleMethodsForVariant
-} from "../logic/exerciseLibrary.js";
+  searchMovementCatalogue
+} from "../logic/movementSearchCatalogue.js";
+
 import { methodTypes } from "../data/methodTypes.js";
 
 function isCustomTemplate(template) {
@@ -33,17 +33,30 @@ function getBlockMovementCount(template) {
   }, 0);
 }
 
+function getMovementName(item) {
+  return (
+    item.movementExpression?.displayName ||
+    item.exerciseName ||
+    item.name ||
+    "Movement"
+  );
+}
+
 function renderSetSummary(item) {
   const sets = item.sets || [];
 
-  if (sets.length === 0) return item.target || "No target";
+  if (sets.length === 0) {
+    return item.target || "No target";
+  }
 
   if (sets.length === 1) {
     const set = sets[0];
+
     return `${set.load || "Load"} × ${set.reps || "Result"}${set.rest ? ` · ${set.rest}` : ""}${set.rpe ? ` · RPE ${set.rpe}` : ""}`;
   }
 
   const first = sets[0];
+
   return `${sets.length} sets · ${first.load || "Load"} × ${first.reps || "Reps"}${first.rest ? ` · ${first.rest}` : ""}`;
 }
 
@@ -56,34 +69,30 @@ function renderMovementRows(template, workout) {
 
   return `
     <div class="block-movement-list">
-      ${planned.map(item => {
-        const exercise = getExerciseById(item.exerciseId);
-
-        return `
-          <div class="block-movement-row">
-            <div>
-              <strong>${exercise?.name || "Exercise"}</strong>
-              <small>${getMethodName(item.methodId)} · ${renderSetSummary(item)}</small>
-            </div>
-
-            ${
-              isCustomTemplate(template)
-                ? `
-                  <div class="planned-exercise-actions">
-                    <button class="mini-action-button" data-template-id="${template.id}" data-edit-template-exercise="${item.id}">
-                      Edit
-                    </button>
-
-                    <button class="mini-delete-button" data-template-id="${template.id}" data-remove-template-exercise="${item.id}">
-                      ×
-                    </button>
-                  </div>
-                `
-                : ""
-            }
+      ${planned.map(item => `
+        <div class="block-movement-row">
+          <div>
+            <strong>${getMovementName(item)}</strong>
+            <small>${getMethodName(item.methodId || item.movementExpression?.methodId)} · ${renderSetSummary(item)}</small>
           </div>
-        `;
-      }).join("")}
+
+          ${
+            isCustomTemplate(template)
+              ? `
+                <div class="planned-exercise-actions">
+                  <button class="mini-action-button" data-template-id="${template.id}" data-edit-template-exercise="${item.id}">
+                    Edit
+                  </button>
+
+                  <button class="mini-delete-button" data-template-id="${template.id}" data-remove-template-exercise="${item.id}">
+                    ×
+                  </button>
+                </div>
+              `
+              : ""
+          }
+        </div>
+      `).join("")}
     </div>
   `;
 }
@@ -117,24 +126,24 @@ function renderWeek(template, week) {
       <summary>${week.name}</summary>
 
       <div class="block-week-body">
-  ${(week.workouts || []).map(workout =>
-    renderWorkout(template, week, workout)
-  ).join("")}
+        ${(week.workouts || []).map(workout =>
+          renderWorkout(template, week, workout)
+        ).join("")}
 
-  ${
-    isCustomTemplate(template)
-      ? `
-        <button
-          class="mini-action-button block-add-button"
-          data-template-id="${template.id}"
-          data-add-workout-to-week="${week.id}"
-        >
-          + Add workout
-        </button>
-      `
-      : ""
-  }
-</div>
+        ${
+          isCustomTemplate(template)
+            ? `
+              <button
+                class="mini-action-button block-add-button"
+                data-template-id="${template.id}"
+                data-add-workout-to-week="${week.id}"
+              >
+                + Add workout
+              </button>
+            `
+            : ""
+        }
+      </div>
     </details>
   `;
 }
@@ -153,7 +162,6 @@ function renderDomainSummary(template) {
 
   return `
     <div class="block-domain-panel">
-
       <div class="block-domain-tags">
         ${domains.map(domain => `
           <span class="domain-pill">
@@ -173,7 +181,6 @@ function renderDomainSummary(template) {
           `
           : ""
       }
-
     </div>
   `;
 }
@@ -279,27 +286,27 @@ function renderBlockCard(template) {
         }
       </div>
 
-${renderDomainSummary(template)}
-${renderBlockMetrics(template)}
+      ${renderDomainSummary(template)}
+      ${renderBlockMetrics(template)}
 
-<details class="block-detail-panel">
-  ${(template.weeks || []).map(week =>
-    renderWeek(template, week)
-  ).join("")}
+      <details class="block-detail-panel">
+        ${(template.weeks || []).map(week =>
+          renderWeek(template, week)
+        ).join("")}
 
-  ${
-    isCustomTemplate(template)
-      ? `
-        <button
-          class="mini-action-button block-add-button"
-          data-add-week-to-template="${template.id}"
-        >
-          + Add week
-        </button>
-      `
-      : ""
-  }
-</div>
+        ${
+          isCustomTemplate(template)
+            ? `
+              <button
+                class="mini-action-button block-add-button"
+                data-add-week-to-template="${template.id}"
+              >
+                + Add week
+              </button>
+            `
+            : ""
+        }
+      </details>
     </article>
   `;
 }
@@ -341,69 +348,30 @@ function renderCreateBlock() {
   `;
 }
 
-function renderAtlasFamilyOptions(atlas) {
-  return atlas.map(family => `
-    <option value="${family.id}">
-      ${family.name}
-    </option>
-  `).join("");
-}
-
-function renderAtlasExerciseOptions(atlas) {
-  return atlas.map(family => `
-    <optgroup label="${family.name}">
-      ${family.bases.flatMap(base =>
-        (base.variants || []).map(variant => `
-          <option 
-            value="${variant.id}"
-            data-family="${family.id}"
-            data-base="${base.id}"
-          >
-            ${variant.name}
-          </option>
-        `)
-      ).join("")}
-    </optgroup>
-  `).join("");
-}
-
-function renderMethodOptionsForExercise(exerciseId) {
-  const compatibility = getCompatibleMethodsForVariant(exerciseId);
-
-  const recommended = compatibility.recommended || [];
-  const possible = compatibility.possible || [];
-
-  const methods = [
-    ...recommended,
-    ...possible
-  ];
-
-  if (methods.length === 0) {
-    return methodTypes.map(method => `
-      <option value="${method.id}">
-        ${method.name}
+function renderMovementCatalogueOptions() {
+  return searchMovementCatalogue()
+    .map(item => `
+      <option value="${item.id}">
+        ${item.label}
       </option>
-    `).join("");
-  }
+    `)
+    .join("");
+}
 
-  return methods.map(item => `
-    <option value="${item.method.id}">
-      ${item.method.name}${item.score >= 5 ? " · recommended" : ""}
+function renderMethodOptions() {
+  return methodTypes.map(method => `
+    <option value="${method.id}">
+      ${method.name}
     </option>
   `).join("");
 }
 
-function renderMovementBuilder(templates, exercises) {
+function renderMovementBuilder(templates) {
   const customTemplates = templates.filter(isCustomTemplate);
-  const atlas = getMovementAtlas();
-  const firstExerciseId =
-    atlas[0]?.bases?.[0]?.variants?.[0]?.id ||
-    exercises[0]?.id ||
-    "";
 
   return `
     <details class="block-utility-panel" open>
-      <summary>Add atlas movement to workout</summary>
+      <summary>Add movement to workout</summary>
 
       ${
         customTemplates.length === 0
@@ -438,16 +406,12 @@ function renderMovementBuilder(templates, exercises) {
                 ).join("")}
               </select>
 
-              <select id="template-builder-family">
-                ${renderAtlasFamilyOptions(atlas)}
-              </select>
-
               <select id="template-builder-exercise">
-                ${renderAtlasExerciseOptions(atlas)}
+                ${renderMovementCatalogueOptions()}
               </select>
 
               <select id="template-builder-method">
-                ${renderMethodOptionsForExercise(firstExerciseId)}
+                ${renderMethodOptions()}
               </select>
 
               <input id="template-builder-load" type="text" placeholder="Load" />
@@ -472,7 +436,6 @@ function renderMovementBuilder(templates, exercises) {
 
 export function renderSession() {
   const templates = getAllTemplates();
-  const exercises = getAllExercises();
 
   return `
     <section class="screen active-screen blocks-screen">
@@ -487,7 +450,7 @@ export function renderSession() {
 
       <div class="blocks-builder-area">
         ${renderCreateBlock()}
-        ${renderMovementBuilder(templates, exercises)}
+        ${renderMovementBuilder(templates)}
         ${renderQuickStart()}
       </div>
     </section>
