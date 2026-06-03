@@ -55,7 +55,7 @@ function renderEngineFeedback(analysis) {
 
   if (!analysis) {
     return `
-      <article class="adapt-review-hero">
+      <article class="adapt-review-hero adapt-signal-recovery">
         <div class="adapt-review-orb neutral">
           <span>0%</span>
         </div>
@@ -70,7 +70,7 @@ function renderEngineFeedback(analysis) {
   }
 
   return `
-    <article class="adapt-review-hero">
+    <article class="adapt-review-hero adapt-signal-recovery">
       <div class="adapt-review-orb ${tone}">
         <span>${analysis.feedback.completionRate}%</span>
       </div>
